@@ -32,14 +32,18 @@ CONFIG-=app_bundle
 # add .cpp files
 SOURCES+= ./src/main.cpp \
 	  ./src/NGLScene.cpp \
-	  ./src/NGLSceneMouseControls.cpp
+	  ./src/NGLSceneMouseControls.cpp \
+    ./src/Environment.cpp
 
 # add .h files
 HEADERS+= $$PWD/include/NGLScene.h \
-	  ./include/WindowParams.h
+	  ./include/WindowParams.h \
+    ./include/Environment.h \
+    ./include/ProductionRule.h
 
 # add the readme and glsl shader files
-OTHER_FILES+= README.md
+OTHER_FILES+= README.md \
+                          ./rules.txt
 # add the ui form
 
 

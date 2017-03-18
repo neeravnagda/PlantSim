@@ -1,14 +1,20 @@
-/****************************************************************************
-basic OpenGL demo modified from http://qt-project.org/doc/qt-5.0/qtgui/openglwindow.html
-****************************************************************************/
 #include <QtGui/QGuiApplication>
 #include <iostream>
 #include "NGLScene.h"
-
-
+#include "Environment.h"
 
 int main(int argc, char **argv)
 {
+		Environment *myEnv = new Environment;
+
+		for (unsigned i=0; i<2; ++i)
+		{
+				myEnv->update();
+		}
+
+		delete myEnv;
+		return EXIT_SUCCESS;
+/*
   QGuiApplication app(argc, argv);
   // create an OpenGL format specifier
   QSurfaceFormat format;
@@ -41,6 +47,7 @@ int main(int argc, char **argv)
   window.show();
 
   return app.exec();
+*/
 }
 
 
