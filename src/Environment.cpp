@@ -6,11 +6,7 @@
 Environment::Environment()
 {
 		readGrammarFromFile("rules.txt");
-		std::cout<<m_axiom<<" is the axiom\n";
-		for (auto p : m_productionRules)
-		{
-				std::cout<<p.m_predecessor<<"="<<p.m_successor<<","<<p.m_probability<<"\n";
-		}
+		m_plants.emplace_back(m_axiom,5,&m_productionRules);
 }
 
 Environment::~Environment()
@@ -20,7 +16,12 @@ Environment::~Environment()
 
 void Environment::update()
 {
-
+		for (auto p : m_plants)
+		{
+				std::cout<<"string before "<<p.getString()<<"\n";
+				p.update();
+				std::cout<<"after "<<p.getString()<<"\n\n";
+		}
 }
 
 //Set the first line of the file as the axiom

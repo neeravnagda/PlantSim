@@ -1,5 +1,5 @@
-#ifndef PRODUCTIONRULE_H
-#define PRODUCTIONRULE_H
+#ifndef PRODUCTIONRULE_H_
+#define PRODUCTIONRULE_H_
 
 #include <string>
 
@@ -13,13 +13,13 @@
 
 typedef struct ProductionRule
 {
-		std::string m_predecessor;	///< Character(s) to be replaced
-		std::string m_successor;	///< Character(s) to replace
-		float m_probability;	///< Probability of replacing predecessor with successor
-		ProductionRule(std::string _predecessor, std::string _successor, float _probability) :
+		std::string m_predecessor;	// Character(s) to be replaced
+		std::string m_successor;	// Character(s) to replace
+		float m_probability;	// Probability of replacing predecessor with successor
+		ProductionRule(std::string _predecessor, std::string _successor, float _probability) ://Constructor
 				m_predecessor(_predecessor),
 				m_successor(_successor),
 				m_probability(_probability){}
 } ProductionRule;
 
-#endif // PRODUCTIONRULE_H
+#endif // PRODUCTIONRULE_H_

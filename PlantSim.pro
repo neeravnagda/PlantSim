@@ -33,13 +33,16 @@ CONFIG-=app_bundle
 SOURCES+= ./src/main.cpp \
 	  ./src/NGLScene.cpp \
 	  ./src/NGLSceneMouseControls.cpp \
-    ./src/Environment.cpp
+    ./src/Environment.cpp \
+    src/Plant.cpp
 
 # add .h files
 HEADERS+= $$PWD/include/NGLScene.h \
 	  ./include/WindowParams.h \
     ./include/Environment.h \
-    ./include/ProductionRule.h
+    ./include/ProductionRule.h \
+    include/Plant.h \
+    include/Branch.h
 
 # add the readme and glsl shader files
 OTHER_FILES+= README.md \
