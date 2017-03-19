@@ -42,7 +42,8 @@ HEADERS+= $$PWD/include/NGLScene.h \
     ./include/Environment.h \
     ./include/ProductionRule.h \
     include/Plant.h \
-    include/Branch.h
+    include/Branch.h \
+    include/RTreeTypes.h
 
 # add the readme and glsl shader files
 OTHER_FILES+= README.md \

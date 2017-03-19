@@ -8,11 +8,12 @@ std::random_device Plant::s_randomDevice;//Seed
 std::mt19937 Plant::s_numberGenerator(Plant::s_randomDevice());//Mersienne Twister algorithm
 //----------------------------------------------------------------------------------------------------------------------
 
-Plant::Plant(const std::string _axiom, const int _maxDepth, std::vector<ProductionRule>* _productionRules)
+Plant::Plant(const std::string _axiom, const int _maxDepth, std::vector<ProductionRule>* _productionRules, rTree_t* _rTree)
 {
 		m_string = _axiom;//Initialise the string with the axiom
 		m_maxDepth = _maxDepth;
 		m_productionRules = _productionRules;
+		m_rTree = _rTree;
 		stringToBranches();//Initialise the struct m_branches
 }
 

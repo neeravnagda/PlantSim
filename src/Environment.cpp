@@ -6,7 +6,7 @@
 Environment::Environment()
 {
 		readGrammarFromFile("rules.txt");
-		m_plants.emplace_back(m_axiom,5,&m_productionRules);
+		m_plants.emplace_back(m_axiom,5,&m_productionRules,&m_rTree);
 }
 
 Environment::~Environment()
