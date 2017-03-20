@@ -6,7 +6,10 @@
 Environment::Environment()
 {
 		readGrammarFromFile("rules.txt");
-		m_plants.emplace_back(m_axiom,5,&m_productionRules,&m_rTree);
+		for (unsigned i=0; i<1; ++i)
+		{
+				m_plants.emplace_back(m_axiom,5,&m_productionRules,&m_rTree);
+		}
 }
 
 Environment::~Environment()
@@ -16,7 +19,7 @@ Environment::~Environment()
 
 void Environment::update()
 {
-		for (auto p : m_plants)
+		for (auto &p : m_plants)
 		{
 				std::cout<<"string before "<<p.getString()<<"\n";
 				p.update();

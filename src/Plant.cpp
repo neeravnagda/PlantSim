@@ -26,6 +26,12 @@ void Plant::update()
 {
 		stringRewrite();
 		stringToBranches();
+		for (auto &b : m_branches)
+		{
+				std::cout<<"{"<<b.m_ID<<","<<b.m_creationDepth<<","<<b.m_string<<"} ";
+		}
+		std::cout<<"\n";
+		branchesToString();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -42,9 +48,10 @@ void Plant::stringRewrite()
 		{
 				std::string temp;//Temp string to store rewritten string
 
+				bool isReplaced = false;//Check if a production rule was executed
 				for (unsigned i=0, branchCount=0; i<m_string.length(); ++i)//Loop through each char in the string
 				{
-						bool isReplaced = false;//Check if a production rule was executed
+						isReplaced = false;
 						for (ProductionRule r : *m_productionRules)//Loop through the production rules
 						{
 								if(r.m_predecessor == m_string.substr(i,r.m_predecessor.length()))//Check if a substring matches the rule predecessor
@@ -53,8 +60,8 @@ void Plant::stringRewrite()
 										{
 												temp += r.m_successor;//Add the replaced rule
 												i += r.m_predecessor.length() - 1;//Iterate further through the original string if predecessor length > 1 char
-												addBranches(countBranches(r.m_successor), branchCount);//Add to the container m_branches
 												isReplaced = true;
+												addBranches(countBranches(r.m_successor), branchCount);//Add to the container m_branches
 										}
 										break;//Avoid checking other rules
 								}
@@ -116,5 +123,27 @@ void Plant::stringToBranches()
 
 				branchStartPos = branchEndPos+1;
 		}
+}
+
+void Plant::branchesToString()
+{
+		std::string temp;
+		//Add all but the last branch
+		for (unsigned i=0; i<m_branches.size()-1; ++i)
+		{
+				temp += "[" + m_branches[i].m_string;//Start a branch and add its string
+				//If the next branch was created at the same depth or earlier, end this branch
+				for (int j=0; j<=static_cast<int>(m_branches[i].m_creationDepth - m_branches[i+1].m_creationDepth); ++j)
+				{
+						temp += "]";
+				}
+		}
+		//Add the last branch as the above would require accessing an element out of bounds
+		temp += "[" + m_branches.back().m_string;
+		for (int j=0; j<=static_cast<int>(m_branches.back().m_creationDepth); ++j)
+		{
+				temp += "]";
+		}
+		m_string = temp;
 }
 //----------------------------------------------------------------------------------------------------------------------

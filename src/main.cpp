@@ -7,7 +7,7 @@ int main(int argc, char **argv)
 {
 		Environment *myEnv = new Environment;
 
-		for (unsigned i=0; i<1; ++i)
+		for (unsigned i=0; i<2; ++i)
 		{
 				myEnv->update();
 		}
