@@ -1,18 +1,25 @@
 #include <QtGui/QGuiApplication>
 #include <iostream>
+#include <vector>
 #include "NGLScene.h"
-#include "Environment.h"
+#include "PlantBlueprint.h"
+#include "Plant.h"
 
 int main(int argc, char **argv)
 {
-		Environment *myEnv = new Environment;
+		std::vector<Plant> m_plants;
 
-		for (unsigned i=0; i<2; ++i)
-		{
-				myEnv->update();
-		}
+		PlantBlueprint::instance("Test")->readGrammarFromFile("rules.txt");
+		PlantBlueprint::instance("Test")->setMaxDepth(5);
+		PlantBlueprint::instance("Test")->setDrawLength(1.0f);
+		PlantBlueprint::instance("Test")->setDrawAngle(45.0f);
 
-		delete myEnv;
+		m_plants.emplace_back("Test");
+		std::cout<<m_plants[0].getString()<<" is the first string\n";
+		m_plants[0].update();
+		std::cout<<m_plants[0].getString()<<" updated\n";
+
+		PlantBlueprint::destroyAll();
 		return EXIT_SUCCESS;
 /*
   QGuiApplication app(argc, argv);

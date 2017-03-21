@@ -1,19 +1,14 @@
 #include <iostream>
 #include "Plant.h"
 
-//----------------------------------------------------------------------------------------------------------------------
 //Initialise random device and number generator
-//These are static for the class
 std::random_device Plant::s_randomDevice;//Seed
 std::mt19937 Plant::s_numberGenerator(Plant::s_randomDevice());//Mersienne Twister algorithm
-//----------------------------------------------------------------------------------------------------------------------
 
-Plant::Plant(const std::string _axiom, const int _maxDepth, std::vector<ProductionRule>* _productionRules, rTree_t* _rTree)
+Plant::Plant(std::string _blueprint)
 {
-		m_string = _axiom;//Initialise the string with the axiom
-		m_maxDepth = _maxDepth;
-		m_productionRules = _productionRules;
-		m_rTree = _rTree;
+		m_blueprint = PlantBlueprint::instance(_blueprint);
+		m_string = *m_blueprint->getAxiom();
 		stringToBranches();//Initialise the struct m_branches
 }
 
@@ -34,8 +29,6 @@ void Plant::update()
 		branchesToString();
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-// L-system simulation
 float Plant::genRand()
 {
 		std::uniform_real_distribution<float> distribute(0,1);
@@ -44,7 +37,7 @@ float Plant::genRand()
 
 void Plant::stringRewrite()
 {
-		if (m_depth < m_maxDepth)//Only rewrite the string if the current depth is less than the max
+		if (m_depth < *m_blueprint->getMaxDepth())//Only rewrite the string if the current depth is less than the max
 		{
 				std::string temp;//Temp string to store rewritten string
 
@@ -52,7 +45,7 @@ void Plant::stringRewrite()
 				for (unsigned i=0, branchCount=0; i<m_string.length(); ++i)//Loop through each char in the string
 				{
 						isReplaced = false;
-						for (ProductionRule r : *m_productionRules)//Loop through the production rules
+						for (ProductionRule r : *m_blueprint->getProductionRules())//Loop through the production rules
 						{
 								if(r.m_predecessor == m_string.substr(i,r.m_predecessor.length()))//Check if a substring matches the rule predecessor
 								{
@@ -73,10 +66,7 @@ void Plant::stringRewrite()
 				++m_depth;//Increment the depth of the expansion
 		}
 }
-//----------------------------------------------------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------------------------------------------------
-// Intermediary simulation stage
 //Count the number of '[' in a string
 unsigned Plant::countBranches(std::string _string)
 {
@@ -146,4 +136,3 @@ void Plant::branchesToString()
 		}
 		m_string = temp;
 }
-//----------------------------------------------------------------------------------------------------------------------

@@ -1,106 +1,117 @@
-#ifndef PLANT_H_
-#define PLANT_H_
+#ifndef PLANTBLUEPRINT_H_
+#define PLANTBLUEPRINT_H_
 
-#include <random>
+#include <map>
+#include <memory>
 #include <string>
 #include <vector>
-#include "Branch.h"
-#include "PlantBlueprint.h"
 #include "ProductionRule.h"
 #include "RTreeTypes.h"
 
 //----------------------------------------------------------------------------------------------------------------------
-/// @file Plant.h
-/// @brief this class contains the information of one plant in the open L-system simulation
+/// @file PlantBlueprint.h
+/// @brief this class contains data required for Plant objects
 /// @author Neerav Nagda
-/// @version 0.1
-/// @date 18/03/17
-/// @class Plant
-/// @brief this class manages the simulation of one plant
+/// @version 0.5
+/// @date 21/03/17
+/// @class PlantBlueprint
+/// @brief this class manages the data for each plant type
 //----------------------------------------------------------------------------------------------------------------------
 
-class Plant
+
+class PlantBlueprint
 {
 		public:
 				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief constructor for the class
-				/// @param _environmentKey the environment that contains global plant information
+				/// @brief delete copy constructors
 				//----------------------------------------------------------------------------------------------------------------------
-				Plant(std::string _blueprint);
+				PlantBlueprint(const PlantBlueprint&) = delete;
+				PlantBlueprint& operator=(const PlantBlueprint&) = delete;
 				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief destructor
+				/// @brief get an instance of this class
+				/// @param _instanceID the key of the instance to return
+				/// If no such instance exists, a new one is created
 				//----------------------------------------------------------------------------------------------------------------------
-				~Plant();
+				static PlantBlueprint* instance(const std::string _instanceID);
 				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief update function to evaluate the open L-system simulation
-				/// this expands the L-system, converts the string to tokens, and adds bounding boxes to a R-tree
-				/// data flows between these functions to ensure the plant interacts with the environment
+				/// @brief destroys an instance
+				/// @param _instanceID the key of the instance to delete
 				//----------------------------------------------------------------------------------------------------------------------
-				void update();
+				static void destroy(const std::string _instanceID);
 				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief get function for the L-system string
-				/// @return the L-system string
+				/// @brief destroys all instances
+				/// This is used for cleanup
 				//----------------------------------------------------------------------------------------------------------------------
-				std::string getString() const {return m_string;}
+				static void destroyAll();
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief read the L-system grammar from a text file
+				/// @param _filePath file path to text file
+				//----------------------------------------------------------------------------------------------------------------------
+				void readGrammarFromFile(const std::string _filePath);
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief set function for m_maxDepth
+				/// @param _md new max depth
+				//----------------------------------------------------------------------------------------------------------------------
+				void setMaxDepth(int _md){m_maxDepth = _md;}
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief set function for m_drawAngle
+				/// @param _angle new angle to rotate
+				//----------------------------------------------------------------------------------------------------------------------
+				void setDrawAngle(float _angle){m_drawAngle = _angle;}
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief set function for m_drawLength
+				/// @param _length new default draw length
+				//----------------------------------------------------------------------------------------------------------------------
+				void setDrawLength(float _length){m_drawLength = _length;}
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief get function for m_axiom
+				/// @return reference of the axiom for the L-system
+				//----------------------------------------------------------------------------------------------------------------------
+				std::string* getAxiom(){return &m_axiom;}
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief get function for m_maxDepth
+				/// @return reference of the max depth of the L-system
+				//----------------------------------------------------------------------------------------------------------------------
+				unsigned* getMaxDepth(){return &m_maxDepth;}
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief get function for m_productionRules
+				/// @return reference to the container of Production Rules
+				//----------------------------------------------------------------------------------------------------------------------
+				std::vector<ProductionRule>* getProductionRules(){return &m_productionRules;}
+
+		protected:
+				PlantBlueprint();
+				~PlantBlueprint();
 
 		private:
 				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief remember what type of plant this is
+				/// @brief a container for the instances of this class
 				//----------------------------------------------------------------------------------------------------------------------
-				PlantBlueprint* m_blueprint;
+				static std::map<std::string, PlantBlueprint*> s_instances;
 				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief static seed for random number generator
+				/// @brief spatial visualisation of the environment
 				//----------------------------------------------------------------------------------------------------------------------
-				static std::random_device s_randomDevice;
+				static rTree_t s_rTree;
 				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief static mersenne twister algorithm
+				/// @brief L-system axiom
 				//----------------------------------------------------------------------------------------------------------------------
-				static std::mt19937 s_numberGenerator;
+				std::string m_axiom;
 				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief the L-system string
+				/// @brief container for L-sytem production rules
 				//----------------------------------------------------------------------------------------------------------------------
-				std::string m_string;
+				std::vector<ProductionRule> m_productionRules;
 				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief the current depth of the L-system string expansion
-				/// Always initialise to 0
+				/// @brief the max number of iterations for the L-system string expansion
 				//----------------------------------------------------------------------------------------------------------------------
-				unsigned m_depth = 0;
+				unsigned m_maxDepth;
 				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief container for branch information
+				/// @brief the angle to rotate when drawing
 				//----------------------------------------------------------------------------------------------------------------------
-				std::vector<Branch> m_branches;
-
+				float m_drawAngle;
 				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief use the mersienne twister algorithm with a uniform real distribution to generate a random number
-				/// @return random float in the range [0,1]
+				/// @brief the length of one forward draw command
 				//----------------------------------------------------------------------------------------------------------------------
-				float genRand();
-				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief expand the string using the L-system rules
-				//----------------------------------------------------------------------------------------------------------------------
-				void stringRewrite();
-				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief count the number of branches in a given string
-				/// @param _string a valid L-system string
-				/// @return the number of branches within the string
-				//----------------------------------------------------------------------------------------------------------------------
-				unsigned countBranches(std::string _string);
-				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief add to the container m_branches
-				/// @param _number the number of new branches to add
-				/// @param _position the position in the container
-				/// This creates the struct branch in the container with no string member
-				//----------------------------------------------------------------------------------------------------------------------
-				void addBranches(unsigned _number, unsigned _position);
-				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief convert the L-system string to branch structs
-				/// This adds the string member to each branch struct in the container m_branches
-				//----------------------------------------------------------------------------------------------------------------------
-				void stringToBranches();
-				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief convert branch structs back to one single string
-				//----------------------------------------------------------------------------------------------------------------------
-				void branchesToString();
+				float m_drawLength;
 };
 
-#endif // PLANT_H_
+#endif // PLANTBLUEPRINT_H_
