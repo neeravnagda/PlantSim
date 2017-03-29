@@ -2,7 +2,7 @@
 # specify the executable name
 TARGET=PlantSim
 # were are going to default to a console app
-CONFIG += console
+#CONFIG += console
 # core Qt Libs to use add more here if needed.
 QT+=gui opengl core
 
@@ -10,14 +10,14 @@ QT+=gui opengl core
 # where our exe is going to live (root of project)
 DESTDIR=./
 # where to put the .o files
-OBJECTS_DIR=./obj
+OBJECTS_DIR=obj
 # where to put moc auto generated files
-MOC_DIR=./moc
+MOC_DIR=moc
 # where to put ui header files
-UI_DIR=./ui
+UI_DIR=ui
 # and add the include dir into the search path for Qt and make
-INCLUDEPATH +=./include \
-			    ./ui
+INCLUDEPATH +=include \
+			    ui
 
 #Set some mac stuff
 # as I want to support 4.8 and 5 this will set a flag for some of the mac stuff
@@ -30,27 +30,30 @@ isEqual(QT_MAJOR_VERSION, 5) {
 CONFIG-=app_bundle
 
 # add .cpp files
-SOURCES+= ./src/main.cpp \
-	  ./src/NGLScene.cpp \
-	  ./src/NGLSceneMouseControls.cpp \
-    ./src/Plant.cpp \
-    ./src/PlantBlueprint.cpp
+SOURCES+= src/main.cpp \
+	  src/NGLScene.cpp \
+	  src/NGLSceneMouseControls.cpp \
+    src/Plant.cpp \
+    src/PlantBlueprint.cpp \
+    src/MainWindow.cpp
 
 # add .h files
-HEADERS+= $$PWD/include/NGLScene.h \
-	  ./include/WindowParams.h \
-    ./include/Branch.h \
-    ./include/ProductionRule.h \
-    ./include/RTreeTypes.h \
-    ./include/Plant.h \
-    ./include/PlantBlueprint.h
+HEADERS+= include/NGLScene.h \
+	  include/WindowParams.h \
+    include/Branch.h \
+    include/ProductionRule.h \
+    include/RTreeTypes.h \
+    include/Plant.h \
+    include/PlantBlueprint.h \
+    include/MainWindow.h
 
 # add the readme and glsl shader files
 OTHER_FILES+= README.md \
-                          ./shaders/*.glsl \
-                          ./rules.txt
-# add the ui form
+                          shaders/*.glsl \
+                          rules.txt
 
+# add the ui form
+FORMS += ui/MainWindow.ui
 
 #Sort out NGL stuff
 NGLPATH=$$(NGLDIR)

@@ -11,10 +11,11 @@
 #include "NGLScene.h"
 #include "PlantBlueprint.h"
 
-NGLScene::NGLScene()
+NGLScene::NGLScene(QWidget *_parent) : QOpenGLWidget(_parent)
 {
 		// re-size the widget to that of the parent (in this case the GLFrame passed in on construction)
-		setTitle("PlantSim");
+		setFocus();
+		this->resize(_parent->size());
 
 		PlantBlueprint* pb = PlantBlueprint::instance("test");
 		pb->readGrammarFromFile("rules.txt");
@@ -37,10 +38,18 @@ NGLScene::~NGLScene()
 		std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
 }
 
-
+void NGLScene::updatePlants()
+{
+		for (auto &p : m_plants)
+		{
+				p.update();
+		}
+		update();
+}
 
 void NGLScene::resizeGL(int _w , int _h)
 {
+		m_camera.setShape(45, static_cast<float>(width())/height(), 0.1f, 100.0f);
 		m_win.width  = static_cast<int>( _w * devicePixelRatio() );
 		m_win.height = static_cast<int>( _h * devicePixelRatio() );
 }
