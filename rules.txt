@@ -1,2 +1,2 @@
 FA
-A=[/FA][\FA]
+A=[/FA][\FA][+FA][-FA]

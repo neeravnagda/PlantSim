@@ -6,6 +6,7 @@
 #include <vector>
 #include <unordered_map>
 #include <ngl/ShaderLib.h>
+#include <ngl/Util.h>
 #include "ProductionRule.h"
 #include "RTreeTypes.h"
 
@@ -128,6 +129,11 @@ class PlantBlueprint
 				/// @return reference to the draw angle
 				//----------------------------------------------------------------------------------------------------------------------
 				const float& getDrawAngle(){return m_drawAngle;}
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief get function for m_drawAngle
+				/// @return the draw angle in radians
+				//----------------------------------------------------------------------------------------------------------------------
+				float getDrawAngleRadians() const {return ngl::radians(m_drawAngle);}
 				//----------------------------------------------------------------------------------------------------------------------
 				/// @brief get function for m_rootRadius
 				/// @return reference to the initial radius

@@ -54,9 +54,9 @@ ngl::Vec3 Plant::eulerToAxis(ngl::Vec3 _euler)
 		float sz = sin(_euler.m_z);
 
 		ngl::Vec3 axis;
-		axis.m_x = cy*cz*sx - sy*sz*cx;
-		axis.m_y = cy*sz*cx + sy*cz*sx;
-		axis.m_z = sy*cz*cx - cy*sz*sx;
+		axis.m_x = cz*cx*sy - sz*sx*cy;
+		axis.m_y = cz*sx*cy + sz*cx*sy;
+		axis.m_z = sz*cx*cy - cz*sx*sy;
 		axis.normalize();
 		return axis;
 }
@@ -71,8 +71,8 @@ void Plant::draw(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _pro
 		float decay = 1.0f;
 		std::stack<ngl::Vec3> positionStack;
 		positionStack.emplace(m_position);
-		std::stack<ngl::Vec3> directionStack;
-		directionStack.emplace(ngl::Vec3(90,0,0));
+		std::stack<ngl::Vec3> rotationStack;
+		rotationStack.emplace(ngl::Vec3(90,0,0));
 
 		for (auto &b : m_branches)
 		{
@@ -83,9 +83,9 @@ void Plant::draw(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _pro
 						{
 								positionStack.pop();
 						}
-						if (directionStack.size() > 1)
+						if (rotationStack.size() > 1)
 						{
-								directionStack.pop();
+								rotationStack.pop();
 						}
 				}
 				//Recalculate the decay constant if the branch is at a different depth
@@ -95,15 +95,15 @@ void Plant::draw(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _pro
 				}
 
 				//Set initial scale
-				ngl::Vec3 scale = ngl::Vec3(m_blueprint->getRootRadius(), m_blueprint->getRootRadius(), m_blueprint->getDrawLength());
-				scale *= decay;
-				m_transform.setScale(scale);
+				ngl::Vec3 branchScale = ngl::Vec3(m_blueprint->getRootRadius(), m_blueprint->getRootRadius(), m_blueprint->getDrawLength());
+				branchScale *= decay;
+				m_transform.setScale(branchScale);
 
 				//Set the initial transformation
-				m_transform.setPosition(positionStack.top());
+				m_transform.setPosition(positionStack.top() / 2);
 
 				//Set the initial direction
-				m_transform.setRotation(directionStack.top());
+				m_transform.setRotation(rotationStack.top());
 
 				for (char &c : b.m_string)
 				{
@@ -112,21 +112,21 @@ void Plant::draw(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _pro
 								case 'F' :
 								{
 										//Draw the cylinder
-										m_transform.setScale(scale);
+										m_transform.setScale(branchScale);
 										loadMatricesToShader(_mouseGlobalTX, _viewMatrix, _projectionMatrix);
 										prim->draw(m_blueprint->getGeometryName());
 
+										//Update the position
+//										ngl::Vec3 newPos = m_blueprint->getDrawLength() * eulerToAxis(m_transform.getRotation()) * decay / 2;
+//										m_transform.addPosition(newPos);
+/*
 										//Draw the sphere
 										ngl::Vec3 sphereScale = ngl::Vec3(m_blueprint->getRootRadius(),m_blueprint->getRootRadius(),m_blueprint->getRootRadius());
 										sphereScale *= decay;
 										m_transform.setScale(sphereScale);
 										loadMatricesToShader(_mouseGlobalTX, _viewMatrix, _projectionMatrix);
 										prim->draw("sphere");
-
-										//Update the position
-										ngl::Vec3 newPos = m_blueprint->getDrawLength() * eulerToAxis(m_transform.getRotation()) * decay;
-//										std::cout<<newPos<<" new pos\n";
-										m_transform.addPosition(newPos);
+*/
 										break;
 								}
 								case '/' :
@@ -165,7 +165,7 @@ void Plant::draw(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _pro
 
 				//Update the variables
 				positionStack.push(b.m_endPosition);
-				directionStack.push(m_transform.getRotation());
+				rotationStack.push(m_transform.getRotation());
 				lastBranchDepth = b.m_creationDepth;
 		}//End for loop [branches]
 }
@@ -303,8 +303,8 @@ void Plant::branchesToString()
 void Plant::evaluateBranches()
 {
 		//Precompute sin and cos functions for 2d rotation matrices
-		const float cosTheta = cos(m_blueprint->getDrawAngle());
-		const float sinTheta = sin(m_blueprint->getDrawAngle());
+		const float cosTheta = cos(m_blueprint->getDrawAngleRadians());
+		const float sinTheta = sin(m_blueprint->getDrawAngleRadians());
 
 		const float drawLength = m_blueprint->getDrawLength();
 		unsigned lastBranchDepth = 0;//This is needed as a range based for loop is being used
@@ -323,6 +323,9 @@ void Plant::evaluateBranches()
 						if (positionStack.size() > 1)
 						{
 								positionStack.pop();
+						}
+						if (positionStack.size() > 1)
+						{
 								directionStack.pop();
 						}
 				}
@@ -330,7 +333,7 @@ void Plant::evaluateBranches()
 				//Recalculate decay constant if necessary
 				if (b.m_creationDepth != lastBranchDepth)
 				{
-				decay = calculateDecay(b.m_creationDepth);
+						decay = calculateDecay(b.m_creationDepth);
 				}
 
 				//If the branch end position has already been calculated, don't recalculate it
@@ -358,7 +361,7 @@ void Plant::evaluateBranches()
 												currentPos += drawLength * currentRot * decay;
 												break;
 										}
-										//rotate the direction vector by +theta on the xy plane
+												//rotate the direction vector by +theta on the xy plane
 										case static_cast<char>('/') :
 										{
 												float x = cosTheta*currentRot.m_x - sinTheta*currentRot.m_y;
@@ -368,7 +371,7 @@ void Plant::evaluateBranches()
 												currentRot.normalize();
 												break;
 										}
-										//rotate the direction vector by -theta on the xy plane
+												//rotate the direction vector by -theta on the xy plane
 										case static_cast<char>('\\') :
 										{
 												float x = cosTheta*currentRot.m_x + sinTheta*currentRot.m_y;
@@ -378,7 +381,7 @@ void Plant::evaluateBranches()
 												currentRot.normalize();
 												break;
 										}
-										//rotate the direction vector by +theta on the yz plane
+												//rotate the direction vector by +theta on the yz plane
 										case static_cast<char>('+') :
 										{
 												float y = cosTheta*currentRot.m_y - sinTheta*currentRot.m_z;
@@ -388,7 +391,7 @@ void Plant::evaluateBranches()
 												currentRot.normalize();
 												break;
 										}
-										//rotate the direction vector by -theta on the yz plane
+												//rotate the direction vector by -theta on the yz plane
 										case static_cast<char>('-') :
 										{
 												float y = cosTheta*currentRot.m_y + sinTheta*currentRot.m_z;
@@ -398,7 +401,7 @@ void Plant::evaluateBranches()
 												currentRot.normalize();
 												break;
 										}
-										//rotate the direction vector by +theta on the xz plane
+												//rotate the direction vector by +theta on the xz plane
 										case static_cast<char>('&') :
 										{
 												float x = cosTheta*currentRot.m_x + sinTheta*currentRot.m_z;
@@ -408,7 +411,7 @@ void Plant::evaluateBranches()
 												currentRot.normalize();
 												break;
 										}
-										//rotate the direction vector by -theta on the xz plane
+												//rotate the direction vector by -theta on the xz plane
 										case static_cast<char>('^') :
 										{
 												float x = cosTheta*currentRot.m_x - sinTheta*currentRot.m_z;

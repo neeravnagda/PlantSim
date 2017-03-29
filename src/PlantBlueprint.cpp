@@ -1,7 +1,6 @@
 #include <iostream>
 #include <algorithm>
 #include <fstream>
-#include <ngl/Util.h>
 #include <ngl/VAOPrimitives.h>
 #include "PlantBlueprint.h"
 //----------------------------------------------------------------------------------------------------------------------
