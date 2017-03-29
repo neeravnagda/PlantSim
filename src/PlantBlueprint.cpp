@@ -1,11 +1,14 @@
 #include <iostream>
 #include <algorithm>
 #include <fstream>
-#include "include/PlantBlueprint.h"
-
-std::map<std::string, PlantBlueprint*> PlantBlueprint::s_instances;
+#include <ngl/Util.h>
+#include <ngl/VAOPrimitives.h>
+#include "PlantBlueprint.h"
+//----------------------------------------------------------------------------------------------------------------------
+std::unordered_map<std::string, PlantBlueprint*> PlantBlueprint::s_instances;
 rTree_t PlantBlueprint::s_rTree;
-
+std::string PlantBlueprint::s_geometryName = "plantGeometry";
+//----------------------------------------------------------------------------------------------------------------------
 PlantBlueprint* PlantBlueprint::instance(const std::string _instanceID)
 {
 		const auto it = s_instances.find(_instanceID);
@@ -19,7 +22,7 @@ PlantBlueprint* PlantBlueprint::instance(const std::string _instanceID)
 		s_instances[_instanceID] = blueprint;
 		return blueprint;
 }
-
+//----------------------------------------------------------------------------------------------------------------------
 void PlantBlueprint::destroy(const std::string _instanceID)
 {
 		auto it = s_instances.find(_instanceID);
@@ -29,7 +32,7 @@ void PlantBlueprint::destroy(const std::string _instanceID)
 				s_instances.erase(it);
 		}
 }
-
+//----------------------------------------------------------------------------------------------------------------------
 void PlantBlueprint::destroyAll()
 {
 		for (auto i : s_instances)
@@ -38,10 +41,58 @@ void PlantBlueprint::destroyAll()
 		}
 		s_instances.clear();
 }
-
-PlantBlueprint::PlantBlueprint(){}
-PlantBlueprint::~PlantBlueprint(){}
-
+//----------------------------------------------------------------------------------------------------------------------
+void PlantBlueprint::initGeometry()
+{
+		ngl::VAOPrimitives *prim = ngl::VAOPrimitives::instance();
+		prim->createCylinder(s_geometryName,1.0f,1.0f,16,0);
+		prim->createSphere("sphere",1.0f,20);
+}
+//----------------------------------------------------------------------------------------------------------------------
+void PlantBlueprint::createShaderProgram(const std::string _name)
+{
+		m_shaderProgramName = _name;
+		ngl::ShaderLib::instance()->createShaderProgram(m_shaderProgramName);
+}
+//----------------------------------------------------------------------------------------------------------------------
+void PlantBlueprint::loadShader(const std::string _filePath, ngl::ShaderType _type)
+{
+		ngl::ShaderLib *shaderlib = ngl::ShaderLib::instance();
+		std::string shader = m_shaderProgramName;
+		switch (_type)
+		{
+				case ngl::ShaderType::VERTEX : {shader+="Vertex"; break;}
+				case ngl::ShaderType::TESSCONTROL : {shader+="TessControl"; break;}
+				case ngl::ShaderType::TESSEVAL : {shader+="TessEval"; break;}
+				case ngl::ShaderType::GEOMETRY : {shader+="Geometry"; break;}
+				case ngl::ShaderType::FRAGMENT : {shader+="Fragment"; break;}
+				case ngl::ShaderType::COMPUTE : {shader+="Compute"; break;}
+				default:
+						break;
+		}
+		shaderlib->attachShader(shader, _type);
+		shaderlib->loadShaderSource(shader, _filePath);
+		shaderlib->compileShader(shader);
+		shaderlib->attachShaderToProgram(m_shaderProgramName, shader);
+}
+//----------------------------------------------------------------------------------------------------------------------
+void PlantBlueprint::linkProgram()
+{
+		ngl::ShaderLib::instance()->linkProgramObject(m_shaderProgramName);
+}
+//----------------------------------------------------------------------------------------------------------------------
+void PlantBlueprint::setDecay(DecayType _decay, float _customDecayConstant)
+{
+		switch (_decay)
+		{
+				case DecayType::NONE : m_decayConstant = 1.0f; break;
+				case DecayType::LINEAR : m_decayConstant = 2.0f; break;
+				case DecayType::EXPONENTIAL : m_decayConstant = 2.271828f; break;
+				case DecayType::CUSTOM : m_decayConstant = _customDecayConstant; break;
+				default : m_decayConstant = 1.0f; break;
+		}
+}
+//----------------------------------------------------------------------------------------------------------------------
 //Set the first line of the file as the axiom
 //All successive lines are the production rules
 void PlantBlueprint::readGrammarFromFile(const std::string _filePath)
@@ -132,3 +183,4 @@ void PlantBlueprint::readGrammarFromFile(const std::string _filePath)
 				m_productionRules.emplace_back(predecessorValue,successorValue,probabilityValue);
 		}
 }
+//----------------------------------------------------------------------------------------------------------------------

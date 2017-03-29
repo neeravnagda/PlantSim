@@ -1,10 +1,11 @@
 #ifndef PLANTBLUEPRINT_H_
 #define PLANTBLUEPRINT_H_
 
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
+#include <unordered_map>
+#include <ngl/ShaderLib.h>
 #include "ProductionRule.h"
 #include "RTreeTypes.h"
 
@@ -14,11 +15,16 @@
 /// @author Neerav Nagda
 /// @version 0.5
 /// @date 21/03/17
+//----------------------------------------------------------------------------------------------------------------------
+/// @enum DecayType
+/// @brief a type of decay
+/// This is typically used to calculate shorter branches
+//----------------------------------------------------------------------------------------------------------------------
+enum class DecayType {NONE, LINEAR, EXPONENTIAL, CUSTOM};
+//----------------------------------------------------------------------------------------------------------------------
 /// @class PlantBlueprint
 /// @brief this class manages the data for each plant type
 //----------------------------------------------------------------------------------------------------------------------
-
-
 class PlantBlueprint
 {
 		public:
@@ -44,6 +50,29 @@ class PlantBlueprint
 				//----------------------------------------------------------------------------------------------------------------------
 				static void destroyAll();
 				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief initialise the geometry used to draw all plants
+				//----------------------------------------------------------------------------------------------------------------------
+				static void initGeometry();
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief create a new shader program with a given name
+				/// @param _name the name of the shader program to create
+				/// This is effectively a set function
+				//----------------------------------------------------------------------------------------------------------------------
+				void createShaderProgram(const std::string _name);
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief load in a shader file
+				/// @param _filePath the file to load in
+				/// @param _type the type of shader to make
+				/// This attaches, loads and compiles the shader
+				/// Therefore this should only be called once per shader type
+				//----------------------------------------------------------------------------------------------------------------------
+				void loadShader(const std::string _filePath, ngl::ShaderType _type);
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief link the shader program
+				/// note this must be called after all the shaders have been loaded in
+				//----------------------------------------------------------------------------------------------------------------------
+				void linkProgram();
+				//----------------------------------------------------------------------------------------------------------------------
 				/// @brief read the L-system grammar from a text file
 				/// @param _filePath file path to text file
 				//----------------------------------------------------------------------------------------------------------------------
@@ -64,34 +93,85 @@ class PlantBlueprint
 				//----------------------------------------------------------------------------------------------------------------------
 				void setDrawLength(float _length){m_drawLength = _length;}
 				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief set function for m_rootRadius
+				/// @param _radius new initial radius
+				//----------------------------------------------------------------------------------------------------------------------
+				void setRootRadius(float _radius){m_rootRadius = _radius;}
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief set function for m_decayConstant
+				/// @param _decay new decay type
+				/// @param _customDecayConstant user defined decay constant
+				//----------------------------------------------------------------------------------------------------------------------
+				void setDecay(DecayType _decay, float _customDecayConstant = 1.0f);
+				//----------------------------------------------------------------------------------------------------------------------
 				/// @brief get function for m_axiom
 				/// @return reference of the axiom for the L-system
 				//----------------------------------------------------------------------------------------------------------------------
-				std::string* getAxiom(){return &m_axiom;}
+				const std::string& getAxiom(){return m_axiom;}
 				//----------------------------------------------------------------------------------------------------------------------
 				/// @brief get function for m_maxDepth
 				/// @return reference of the max depth of the L-system
 				//----------------------------------------------------------------------------------------------------------------------
-				unsigned* getMaxDepth(){return &m_maxDepth;}
+				const unsigned& getMaxDepth(){return m_maxDepth;}
 				//----------------------------------------------------------------------------------------------------------------------
 				/// @brief get function for m_productionRules
 				/// @return reference to the container of Production Rules
 				//----------------------------------------------------------------------------------------------------------------------
-				std::vector<ProductionRule>* getProductionRules(){return &m_productionRules;}
+				const std::vector<ProductionRule>& getProductionRules(){return m_productionRules;}
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief get function for m_drawLength
+				/// @return reference to the draw length
+				//----------------------------------------------------------------------------------------------------------------------
+				const float& getDrawLength(){return m_drawLength;}
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief get function for m_drawAngle
+				/// @return reference to the draw angle
+				//----------------------------------------------------------------------------------------------------------------------
+				const float& getDrawAngle(){return m_drawAngle;}
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief get function for m_rootRadius
+				/// @return reference to the initial radius
+				//----------------------------------------------------------------------------------------------------------------------
+				const float& getRootRadius(){return m_rootRadius;}
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief get function for m_decayConstant
+				/// @return the decay constant
+				//----------------------------------------------------------------------------------------------------------------------
+				float getDecayConstant(){return m_decayConstant;}
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief get function for the geometry name
+				/// @return reference to a string representing the geometry
+				/// this is a handle used for draw calls
+				//----------------------------------------------------------------------------------------------------------------------
+				const std::string& getGeometryName(){return s_geometryName;}
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief get function for the shader program name
+				/// @return reference to the name of the shader program
+				/// this is a handle used for draw calls
+				//----------------------------------------------------------------------------------------------------------------------
+				const std::string& getShaderProgramName(){return m_shaderProgramName;}
 
 		protected:
-				PlantBlueprint();
-				~PlantBlueprint();
+				PlantBlueprint(){}
+				~PlantBlueprint(){}
 
 		private:
 				//----------------------------------------------------------------------------------------------------------------------
 				/// @brief a container for the instances of this class
 				//----------------------------------------------------------------------------------------------------------------------
-				static std::map<std::string, PlantBlueprint*> s_instances;
+				static std::unordered_map<std::string, PlantBlueprint*> s_instances;
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief handle for the geometry
+				//----------------------------------------------------------------------------------------------------------------------
+				static std::string s_geometryName;
 				//----------------------------------------------------------------------------------------------------------------------
 				/// @brief spatial visualisation of the environment
 				//----------------------------------------------------------------------------------------------------------------------
 				static rTree_t s_rTree;
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief handle for the shader name
+				//----------------------------------------------------------------------------------------------------------------------
+				std::string m_shaderProgramName;
 				//----------------------------------------------------------------------------------------------------------------------
 				/// @brief L-system axiom
 				//----------------------------------------------------------------------------------------------------------------------
@@ -112,6 +192,15 @@ class PlantBlueprint
 				/// @brief the length of one forward draw command
 				//----------------------------------------------------------------------------------------------------------------------
 				float m_drawLength;
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief the initial radius
+				//----------------------------------------------------------------------------------------------------------------------
+				float m_rootRadius;
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief the decay constant
+				//----------------------------------------------------------------------------------------------------------------------
+				float m_decayConstant = 1.0f;
+
 };
 
 #endif // PLANTBLUEPRINT_H_

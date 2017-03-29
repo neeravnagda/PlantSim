@@ -47,6 +47,7 @@ HEADERS+= $$PWD/include/NGLScene.h \
 
 # add the readme and glsl shader files
 OTHER_FILES+= README.md \
+                          ./shaders/*.glsl \
                           ./rules.txt
 # add the ui form
 
