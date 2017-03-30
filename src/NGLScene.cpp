@@ -26,10 +26,6 @@ NGLScene::NGLScene(QWidget *_parent) : QOpenGLWidget(_parent)
 		pb->setDecay(DecayType::LINEAR);
 
 		m_plants.emplace_back("test",ngl::Vec3::zero());
-		m_plants[0].update();
-		std::cout<<m_plants[0].getString()<<" updated\n";
-		m_plants[0].update();
-		std::cout<<m_plants[0].getString()<<" updated\n";
 }
 
 

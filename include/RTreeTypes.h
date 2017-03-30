@@ -25,7 +25,7 @@ typedef bg::model::box<point_t> box_t;
 //Define the tuple for values to add to the R-tree
 //The first is the geometry type
 //The second and third are IDs of the plant and branch
-typedef std::tuple<segment_t,unsigned,unsigned> rTreeElement;
+typedef std::tuple<box_t,unsigned,unsigned> rTreeElement;
 
 //Define the R-tree to store rTreeElement values with a quadratic algorithm
 typedef bgi::rtree<rTreeElement, bgi::quadratic<16> > rTree_t;

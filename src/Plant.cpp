@@ -176,12 +176,14 @@ void Plant::update()
 		stringToBranches();
 		evaluateBranches();
 		branchesToString();
-		for (auto &b : m_branches)
+        /*
+        for (auto &b : m_branches)
 		{
 				std::cout<<"{"<<b.m_ID<<","<<b.m_creationDepth<<","<<b.m_string<<",";
 				std::cout<<"("<<b.m_endPosition.m_x<<","<<b.m_endPosition.m_y<<","<<b.m_endPosition.m_z<<")"<<"}";
 		}
 		std::cout<<"\n";
+        */
 }
 //----------------------------------------------------------------------------------------------------------------------
 float Plant::genRand()
