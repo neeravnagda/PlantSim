@@ -7,7 +7,7 @@
 
 int main(int argc, char **argv)
 {
-		/*
+	/*
 	QGuiApplication app(argc, argv);
 	// create an OpenGL format specifier
 	QSurfaceFormat format;
@@ -42,31 +42,31 @@ int main(int argc, char **argv)
 	return app.exec();
 */
 
-		QSurfaceFormat format;
-		// set the number of samples for multisampling
-		// will need to enable glEnable(GL_MULTISAMPLE); once we have a context
-		format.setSamples(4);
+	QSurfaceFormat format;
+	// set the number of samples for multisampling
+	// will need to enable glEnable(GL_MULTISAMPLE); once we have a context
+	format.setSamples(4);
 #if defined( __APPLE__)
-		// at present mac osx Mountain Lion only supports GL3.2
-		// the new mavericks will have GL 4.x so can change
-		format.setMajorVersion(3);
-		format.setMinorVersion(3);
+	// at present mac osx Mountain Lion only supports GL3.2
+	// the new mavericks will have GL 4.x so can change
+	format.setMajorVersion(3);
+	format.setMinorVersion(3);
 #else
-		// with luck we have the latest GL version so set to this
-		format.setMajorVersion(3);
-		format.setMinorVersion(3);
+	// with luck we have the latest GL version so set to this
+	format.setMajorVersion(3);
+	format.setMinorVersion(3);
 #endif
-		// now we are going to set to CoreProfile OpenGL so we can't use and old Immediate mode GL
-		format.setProfile(QSurfaceFormat::CoreProfile);
-		// now set the depth buffer to 24 bits
-		format.setDepthBufferSize(24);
+	// now we are going to set to CoreProfile OpenGL so we can't use and old Immediate mode GL
+	format.setProfile(QSurfaceFormat::CoreProfile);
+	// now set the depth buffer to 24 bits
+	format.setDepthBufferSize(24);
 
-		QSurfaceFormat::setDefaultFormat(format);
+	QSurfaceFormat::setDefaultFormat(format);
 
-		QApplication app(argc, argv);
-		MainWindow w;
+	QApplication app(argc, argv);
+	MainWindow w;
 
-		w.show();
+	w.show();
 
-		return app.exec();
+	return app.exec();
 }

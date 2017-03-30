@@ -19,10 +19,10 @@ typedef struct Branch
 		ngl::Vec3 m_endPosition;//End position of the branch
 		std::string m_string;//L-system string of the branch
 		Branch(int _ID, int _depth, ngl::Vec3 _endPos = ngl::Vec3::zero(), std::string _string = "") ://Constructor
-				m_ID(_ID),
-				m_creationDepth(_depth),
-				m_endPosition(_endPos),
-				m_string(_string){}
+			m_ID(_ID),
+			m_creationDepth(_depth),
+			m_endPosition(_endPos),
+			m_string(_string){}
 } Branch;
 
 #endif // BRANCH_H_
