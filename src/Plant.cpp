@@ -27,16 +27,16 @@ void Plant::loadMatricesToShader(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix
 	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
 	ngl::Mat4 MV;
 	ngl::Mat4 MVP;
-	ngl::Mat3 normalMatrix;
+	ngl::Mat3 N;
 	ngl::Mat4 M = m_transform.getMatrix() * _mouseGlobalTX;
 	MV = M * _viewMatrix;
 	MVP = M * _projectionMatrix;
-	normalMatrix = MV;
-	normalMatrix.inverse();
-	shader->setShaderParamFromMat4("MV",MV);
+	N = MV;
+	N.inverse();
 	shader->setShaderParamFromMat4("MVP",MVP);
-	shader->setShaderParamFromMat3("normalMatrix",normalMatrix);
-	shader->setShaderParamFromMat4("M",M);
+	//shader->setShaderParamFromMat4("MV",MV);
+	shader->setShaderParamFromMat3("N",N);
+	//shader->setShaderParamFromMat4("M",M);
 }
 //----------------------------------------------------------------------------------------------------------------------
 ngl::Vec3 Plant::eulerToAxis(ngl::Vec3 _euler)

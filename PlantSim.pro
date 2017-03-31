@@ -68,3 +68,7 @@ else{ # note brace must be here
 	message("Using custom NGL location")
 	include($(NGLDIR)/UseNGL.pri)
 }
+
+DISTFILES += \
+    shaders/Phong.vertex.glsl \
+    shaders/Phong.fragment.glsl

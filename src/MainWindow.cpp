@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	m_plantBlueprintDialog = new PlantBlueprintDialog(this);
 
-	connect(m_ui->m_updateButton, SIGNAL(released()), m_gl, SLOT(updatePlants()));
+	connect(m_ui->m_updateButton, SIGNAL(released()), this, SLOT(updatePlants()));
 	connect(m_ui->m_newPlantButton, SIGNAL(released()), this, SLOT(createNewPlant()));
 	connect(m_ui->m_plantType, SIGNAL(currentIndexChanged(int)), this, SLOT(openPlantBlueprintDialogFromUI()));
 	connect(m_ui->s_newPlantBlueprint, SIGNAL(triggered(bool)), this, SLOT(openPlantBlueprintDialogFromMenubar()));
@@ -80,5 +80,10 @@ void MainWindow::createPlantBlueprint()
 			}
 		}
 	}
+}
+//----------------------------------------------------------------------------------------------------------------------
+void MainWindow::updatePlants()
+{
+	m_gl->updatePlants();
 }
 //----------------------------------------------------------------------------------------------------------------------

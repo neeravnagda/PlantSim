@@ -65,10 +65,13 @@ PlantBlueprintDialog::PlantBlueprintDialog(QWidget *parent) :
 	m_shaderNameWidget->setValidator(shaderNameValidator);
 
 	//Add a validator for the QLineEdits for shader files
-	QRegExp shaderFileExp("(../\\w+/)*(\\w+/)*(\\w+)((\\.vert)|(\\.vertex)|(\\.frag)|(\\.fragment))?(\\.glsl)");
-	QRegExpValidator *shaderFileValidator = new QRegExpValidator(shaderFileExp, this);
-	m_vertexShaderPathWidget->setValidator(shaderFileValidator);
-	m_fragmentShaderPathWidget->setValidator(shaderFileValidator);
+	QRegExp vertexShaderFileExp("(../\\w+/)*(\\w+/)*(\\w+)((\\.vs)|(\\.vert)|(\\.vertex))?(\\.glsl)");
+	QRegExpValidator *vertexShaderFileValidator = new QRegExpValidator(vertexShaderFileExp, this);
+	m_vertexShaderPathWidget->setValidator(vertexShaderFileValidator);
+
+	QRegExp fragmentShaderFileExp("(../\\w+/)*(\\w+/)*(\\w+)((\\.fs)|(\\.frag)|(\\.fragment))?(\\.glsl)");
+	QRegExpValidator *fragmentShaderFileValidator = new QRegExpValidator(fragmentShaderFileExp, this);
+	m_fragmentShaderPathWidget->setValidator(fragmentShaderFileValidator);
 
 	//Connect signals and slots
 	connect(m_ui->m_blueprintName, SIGNAL(editingFinished()), this, SLOT(checkBlueprintExists()));

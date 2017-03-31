@@ -4,10 +4,8 @@
 #include <string>
 #include <vector>
 #include <ngl/Camera.h>
-#include <ngl/Light.h>
-#include <ngl/Transformation.h>
+#include <ngl/Mat4.h>
 #include <ngl/Vec3.h>
-
 #include <QOpenGLWidget>
 #include "Plant.h"
 #include "WindowParams.h"
@@ -26,10 +24,6 @@
 
 class NGLScene : public QOpenGLWidget
 {
-		Q_OBJECT
-
-	public slots:
-		void updatePlants();
 
 	public:
 		void createPlant(std::string _type, float _x, float _z);
@@ -55,6 +49,11 @@ class NGLScene : public QOpenGLWidget
 		/// @brief this is called everytime we resize the window
 		//----------------------------------------------------------------------------------------------------------------------
 		void resizeGL(int _w, int _h) override;
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief update the plants
+		/// This is forwarded from a slot in the MainWindow class
+		//----------------------------------------------------------------------------------------------------------------------
+		void updatePlants();
 
 	private:
 		//----------------------------------------------------------------------------------------------------------------------
@@ -73,14 +72,6 @@ class NGLScene : public QOpenGLWidget
 		/// @brief the camera
 		//----------------------------------------------------------------------------------------------------------------------
 		ngl::Camera m_camera;
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief the light
-		//----------------------------------------------------------------------------------------------------------------------
-		std::unique_ptr<ngl::Light> m_light;
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief transformation stack
-		//----------------------------------------------------------------------------------------------------------------------
-		ngl::Transformation m_transform;
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief container of plant objects
 		//----------------------------------------------------------------------------------------------------------------------
@@ -112,7 +103,6 @@ class NGLScene : public QOpenGLWidget
 		/// @param _event the Qt Event structure
 		//----------------------------------------------------------------------------------------------------------------------
 		void mouseReleaseEvent ( QMouseEvent *_event ) override;
-
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief this method is called everytime the mouse wheel is moved
 		/// inherited from QObject and overridden here.

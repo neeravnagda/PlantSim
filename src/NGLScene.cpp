@@ -1,29 +1,14 @@
 #include <iostream>
-#include <cmath>
 #include <QMouseEvent>
 #include <QGuiApplication>
-
-#include <ngl/Light.h>
-#include <ngl/Material.h>
 #include <ngl/NGLInit.h>
-#include <ngl/VAOPrimitives.h>
-#include <ngl/ShaderLib.h>
 #include "NGLScene.h"
-#include "PlantBlueprint.h"
 
 NGLScene::NGLScene(QWidget *_parent) : QOpenGLWidget(_parent)
 {
 	// re-size the widget to that of the parent (in this case the GLFrame passed in on construction)
 	setFocus();
 	this->resize(_parent->size());
-
-	PlantBlueprint* pb = PlantBlueprint::instance("test");
-	pb->readGrammarFromFile("rules.txt");
-	pb->setMaxDepth(5);
-	pb->setDrawLength(1.0f);
-	pb->setDrawAngle(45.0f);
-	pb->setRootRadius(0.1f);
-	pb->setDecay(1.6f);
 }
 
 
@@ -67,36 +52,12 @@ void NGLScene::initializeGL()
 	// enable multisampling for smoother drawing
 	glEnable(GL_MULTISAMPLE);
 
-	PlantBlueprint *pb = PlantBlueprint::instance("test");
-	pb->createShaderProgram("Phong");
-	pb->loadShader("shaders/PhongVertex.glsl", ngl::ShaderType::VERTEX);
-	pb->loadShader("shaders/PhongFragment.glsl", ngl::ShaderType::FRAGMENT);
-	pb->linkProgram();
-
-	ngl::ShaderLib* shader = ngl::ShaderLib::instance();
-	(*shader)[ pb->getShaderProgramName() ]->use();
-	shader->setShaderParam1i("Normalize",1);
-	ngl::Material m(ngl::STDMAT::GOLD);
-	m.loadToShader("material");
-
 	ngl::Vec3 from = ngl::Vec3(0.0f, 4.0f, -10.0f);
 	ngl::Vec3 to = ngl::Vec3::zero();
 	ngl::Vec3 up = ngl::Vec3::up();
 	m_camera.set(from, to, up);
 
 	m_camera.setShape(45, static_cast<float>(width())/height(), 0.1f, 100.0f);
-	shader->setShaderParam3f("viewerPos", m_camera.getEye().m_x, m_camera.getEye().m_y, m_camera.getEye().m_z);
-
-	ngl::Real lightAngle = 0.0f;
-	m_light.reset( new ngl::Light(ngl::Vec3(sin(lightAngle), 2, cos(lightAngle)),
-																ngl::Colour(1,1,1,1),
-																ngl::Colour(1,1,1,1),
-																ngl::LightModes::POINTLIGHT));
-
-	ngl::Mat4 iv = m_camera.getViewMatrix();
-	iv.transpose();
-	m_light->setTransform(iv);
-	m_light->loadToShader("light");
 
 	PlantBlueprint::initGeometry();
 	glViewport(0,0,width(),height());
