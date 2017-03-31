@@ -6,6 +6,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 std::unordered_map<std::string, PlantBlueprint*> PlantBlueprint::s_instances;
 std::unordered_set<std::string> PlantBlueprint::s_keys;
+std::unordered_set<std::string> PlantBlueprint::s_shaderNames;
 rTree_t PlantBlueprint::s_rTree;
 std::string PlantBlueprint::s_geometryName = "plantGeometry";
 //----------------------------------------------------------------------------------------------------------------------
@@ -54,6 +55,7 @@ void PlantBlueprint::createShaderProgram(const std::string _name)
 {
 	m_shaderProgramName = _name;
 	ngl::ShaderLib::instance()->createShaderProgram(m_shaderProgramName);
+	s_shaderNames.emplace(_name);
 }
 //----------------------------------------------------------------------------------------------------------------------
 void PlantBlueprint::loadShader(const std::string _filePath, ngl::ShaderType _type)
@@ -80,18 +82,6 @@ void PlantBlueprint::loadShader(const std::string _filePath, ngl::ShaderType _ty
 void PlantBlueprint::linkProgram()
 {
 	ngl::ShaderLib::instance()->linkProgramObject(m_shaderProgramName);
-}
-//----------------------------------------------------------------------------------------------------------------------
-void PlantBlueprint::setDecay(DecayType _decay, float _customDecayConstant)
-{
-	switch (_decay)
-	{
-		case DecayType::NONE : m_decayConstant = 1.0f; break;
-		case DecayType::LINEAR : m_decayConstant = 2.0f; break;
-		case DecayType::EXPONENTIAL : m_decayConstant = 2.271828f; break;
-		case DecayType::CUSTOM : m_decayConstant = _customDecayConstant; break;
-		default : m_decayConstant = 1.0f; break;
-	}
 }
 //----------------------------------------------------------------------------------------------------------------------
 //Set the first line of the file as the axiom

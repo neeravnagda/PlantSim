@@ -35,7 +35,8 @@ SOURCES+= src/main.cpp \
 	  src/NGLSceneMouseControls.cpp \
     src/Plant.cpp \
     src/PlantBlueprint.cpp \
-    src/MainWindow.cpp
+    src/MainWindow.cpp \
+    src/PlantBlueprintDialog.cpp
 
 # add .h files
 HEADERS+= include/NGLScene.h \
@@ -45,7 +46,8 @@ HEADERS+= include/NGLScene.h \
     include/RTreeTypes.h \
     include/Plant.h \
     include/PlantBlueprint.h \
-    include/MainWindow.h
+    include/MainWindow.h \
+    include/PlantBlueprintDialog.h
 
 # add the readme and glsl shader files
 OTHER_FILES+= README.md \
@@ -53,7 +55,8 @@ OTHER_FILES+= README.md \
                           rules.txt
 
 # add the ui form
-FORMS += ui/MainWindow.ui
+FORMS += ui/MainWindow.ui \
+    ui/PlantBlueprintDialog.ui
 
 #Sort out NGL stuff
 NGLPATH=$$(NGLDIR)

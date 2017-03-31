@@ -23,7 +23,7 @@ NGLScene::NGLScene(QWidget *_parent) : QOpenGLWidget(_parent)
 	pb->setDrawLength(1.0f);
 	pb->setDrawAngle(45.0f);
 	pb->setRootRadius(0.1f);
-	pb->setDecay(DecayType::CUSTOM,1.6f);
+	pb->setDecay(1.6f);
 }
 
 

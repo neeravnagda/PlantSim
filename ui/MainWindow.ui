@@ -33,7 +33,7 @@
       <property name="title">
        <string>Update Plants</string>
       </property>
-      <layout class="QGridLayout" name="gridLayout_2">
+      <layout class="QGridLayout" name="s_updatePlantsGridLayout">
        <item row="0" column="0">
         <widget class="QPushButton" name="m_updateButton">
          <property name="text">
@@ -62,9 +62,18 @@
       <property name="title">
        <string>New Plant</string>
       </property>
-      <layout class="QGridLayout" name="gridLayout">
+      <layout class="QGridLayout" name="s_newPlantGridLayout">
        <item row="3" column="0" colspan="2">
-        <widget class="QComboBox" name="m_plantType"/>
+        <widget class="QComboBox" name="m_plantType">
+         <property name="currentIndex">
+          <number>-1</number>
+         </property>
+         <item>
+          <property name="text">
+           <string>create new</string>
+          </property>
+         </item>
+        </widget>
        </item>
        <item row="2" column="0" colspan="2">
         <widget class="QLabel" name="label_2">
@@ -118,11 +127,30 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>19</height>
+     <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuPlantSim">
+    <property name="title">
+     <string>PlantSim</string>
+    </property>
+    <addaction name="s_newPlantBlueprint"/>
+    <addaction name="separator"/>
+    <addaction name="s_quit"/>
+   </widget>
+   <addaction name="menuPlantSim"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="s_newPlantBlueprint">
+   <property name="text">
+    <string>New Plant Blueprint</string>
+   </property>
+  </action>
+  <action name="s_quit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

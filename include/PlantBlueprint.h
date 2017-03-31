@@ -17,13 +17,6 @@
 /// @author Neerav Nagda
 /// @version 0.5
 /// @date 21/03/17
-//----------------------------------------------------------------------------------------------------------------------
-/// @enum DecayType
-/// @brief a type of decay
-/// This is typically used to calculate shorter branches
-//----------------------------------------------------------------------------------------------------------------------
-enum class DecayType {NONE, LINEAR, EXPONENTIAL, CUSTOM};
-//----------------------------------------------------------------------------------------------------------------------
 /// @class PlantBlueprint
 /// @brief this class manages the data for each plant type
 //----------------------------------------------------------------------------------------------------------------------
@@ -55,6 +48,11 @@ class PlantBlueprint
 		/// @brief initialise the geometry used to draw all plants
 		//----------------------------------------------------------------------------------------------------------------------
 		static void initGeometry();
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief set the shader program to use an existing shader
+		/// @param _name the name of the shader program to use
+		//----------------------------------------------------------------------------------------------------------------------
+		void setShaderProgram(const std::string _name) {m_shaderProgramName = _name;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief create a new shader program with a given name
 		/// @param _name the name of the shader program to create
@@ -104,7 +102,7 @@ class PlantBlueprint
 		/// @param _decay new decay type
 		/// @param _customDecayConstant user defined decay constant
 		//----------------------------------------------------------------------------------------------------------------------
-		void setDecay(DecayType _decay, float _customDecayConstant = 1.0f);
+		void setDecay(float _decayConstant){m_decayConstant = _decayConstant;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief get function for m_axiom
 		/// @return reference of the axiom for the L-system
@@ -162,6 +160,11 @@ class PlantBlueprint
 		/// @return reference to the keys of the map, i.e. the names of the instances
 		//----------------------------------------------------------------------------------------------------------------------
 		static const std::unordered_set<std::string>& getKeys(){return s_keys;}
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief get function for s_shaderNames
+		/// @return reference to the shaders used by blueprints
+		//----------------------------------------------------------------------------------------------------------------------
+		static const std::unordered_set<std::string>& getShaderNames(){return s_shaderNames;}
 
 	protected:
 		PlantBlueprint(){}
@@ -177,6 +180,11 @@ class PlantBlueprint
 		/// This is needed by the UI
 		//----------------------------------------------------------------------------------------------------------------------
 		static std::unordered_set<std::string> s_keys;
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief a container for the different shaders used
+		/// This is needed by the UI
+		//----------------------------------------------------------------------------------------------------------------------
+		static std::unordered_set<std::string> s_shaderNames;
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief handle for the geometry
 		//----------------------------------------------------------------------------------------------------------------------
@@ -217,7 +225,6 @@ class PlantBlueprint
 		/// @brief the decay constant
 		//----------------------------------------------------------------------------------------------------------------------
 		float m_decayConstant = 1.0f;
-
 };
 
 #endif // PLANTBLUEPRINT_H_
