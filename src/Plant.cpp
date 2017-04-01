@@ -38,28 +38,6 @@ void Plant::loadMatricesToShader(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix
 	//shader->setShaderParamFromMat4("M",M);
 }
 //----------------------------------------------------------------------------------------------------------------------
-ngl::Vec3 Plant::eulerToAxis(ngl::Vec3 _euler)
-{
-	//First convert to radians
-	_euler.m_x = ngl::radians(_euler.m_x);//bank
-	_euler.m_y = ngl::radians(_euler.m_y);//heading
-	_euler.m_z = ngl::radians(_euler.m_z);//attitude
-
-	float cx = cos(_euler.m_x);
-	float cy = cos(_euler.m_y);
-	float cz = cos(_euler.m_z);
-	float sx = sin(_euler.m_x);
-	float sy = sin(_euler.m_y);
-	float sz = sin(_euler.m_z);
-
-	ngl::Vec3 axis;
-	axis.m_x = cz*cx*sy - sz*sx*cy;
-	axis.m_y = cz*sx*cy + sz*cx*sy;
-	axis.m_z = sz*cx*cy - cz*sx*sy;
-	axis.normalize();
-	return axis;
-}
-//----------------------------------------------------------------------------------------------------------------------
 void Plant::draw(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _projectionMatrix)
 {
 	ngl::VAOPrimitives *prim = ngl::VAOPrimitives::instance();

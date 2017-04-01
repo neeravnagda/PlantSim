@@ -13,130 +13,129 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 /// @file Plant.h
-/// @brief this class contains the information of one plant in the open L-system simulation
+/// @brief This class simulates one Plant
 /// @author Neerav Nagda
 /// @version 0.1
-/// @date 18/03/17
+/// @date 01/04/17
 /// @class Plant
-/// @brief this class manages the simulation of one plant
+/// @brief This class manages the simulation of one plant
 //----------------------------------------------------------------------------------------------------------------------
 
 class Plant
 {
 	public:
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief constructor for the class
-		/// @param _environmentKey the environment that contains global plant information
+		/// @brief Constructor for the class
+		/// @param _blueprint The name of the PlantBlueprint that this object uses
+		/// @param _position The position of the Plant on the ground. Note that the y coordinate is always 0 to be on the ground
 		//----------------------------------------------------------------------------------------------------------------------
 		Plant(std::string _blueprint, ngl::Vec3 _position);
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief destructor
+		/// @brief Destructor
 		//----------------------------------------------------------------------------------------------------------------------
 		~Plant();
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief update function to evaluate the open L-system simulation
-		/// this expands the L-system, converts the string to tokens, and adds bounding boxes to a R-tree
-		/// data flows between these functions to ensure the plant interacts with the environment
+		/// @brief Update function to evaluate the Plant simulation
+		/// This expands the L-system, converts the string to tokens, and adds bounding boxes to a R-tree
 		//----------------------------------------------------------------------------------------------------------------------
 		void update();
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief draw the plant
-		/// @param _mouseGlobalTX the global mouse position used for camera rotations
+		/// @brief Draw the plant
+		/// @param _mouseGlobalTX The global mouse transformation
+		/// @param _viewMatrix The view matrix from the camera
+		/// @param _projectionMatrix The projection matrix from the camera
 		//----------------------------------------------------------------------------------------------------------------------
 		void draw(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _projectionMatrix);
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief get function for the L-system string
-		/// @return the L-system string
+		/// @brief Get function for the L-system string
+		/// @return The L-system string
 		//----------------------------------------------------------------------------------------------------------------------
 		std::string getString() const {return m_string;}
 
 	private:
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief remember what type of plant this is
+		/// @brief The PlantBlueprint containing Plant information
 		//----------------------------------------------------------------------------------------------------------------------
 		PlantBlueprint* m_blueprint;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief the position of the object on the ground
+		/// @brief The position of the object on the ground
+		/// The y coordinate is always 0 to be on the ground
 		//----------------------------------------------------------------------------------------------------------------------
 		ngl::Vec3 m_position;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief static seed for random number generator
+		/// @brief Static seed for random number generator
 		//----------------------------------------------------------------------------------------------------------------------
 		static std::random_device s_randomDevice;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief static mersenne twister algorithm
+		/// @brief Static mersenne twister algorithm
 		//----------------------------------------------------------------------------------------------------------------------
 		static std::mt19937 s_numberGenerator;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief the L-system string
+		/// @brief The L-system string
 		//----------------------------------------------------------------------------------------------------------------------
 		std::string m_string;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief the current depth of the L-system string expansion
-		/// Always initialise to 0
+		/// @brief The current depth of the L-system string expansion
 		//----------------------------------------------------------------------------------------------------------------------
 		unsigned m_depth = 0;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief container for branch information
+		/// @brief Container for branch information
 		//----------------------------------------------------------------------------------------------------------------------
 		std::vector<Branch> m_branches;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief transformation stack
+		/// @brief Transformation stack for draw calls
 		//----------------------------------------------------------------------------------------------------------------------
 		ngl::Transformation m_transform;
 
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief use the mersienne twister algorithm with a uniform real distribution to generate a random number
-		/// @return random float in the range [0,1]
+		/// @brief Generate a random number for stochastic L-systems
+		/// @return Random float in the range [0,1]
 		//----------------------------------------------------------------------------------------------------------------------
 		float genRand();
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief calculate a scalar decay value
-		/// @return float in the range [0,1]
-		/// This is to shorten branches, and must be multiplied
+		/// @brief Calculate a scalar decay value
+		/// @return Float in the range [0,1]
+		/// This is used to shorten branches, and must be multiplied to a length
 		//----------------------------------------------------------------------------------------------------------------------
 		float calculateDecay(unsigned _depth);
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief expand the string using the L-system rules
+		/// @brief Expand the string using the L-system rules
 		//----------------------------------------------------------------------------------------------------------------------
 		void stringRewrite();
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief count the number of branches in a given string
-		/// @param _string a valid L-system string
-		/// @return the number of branches within the string
+		/// @brief Count the number of branches in a given string
+		/// @param _string A valid L-system string
+		/// @return The number of branches within the string
 		//----------------------------------------------------------------------------------------------------------------------
 		unsigned countBranches(std::string _string);
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief add to the container m_branches
-		/// @param _number the number of new branches to add
-		/// @param _position the position in the container
-		/// This creates the struct branch in the container with no string member
+		/// @brief Add to the container m_branches
+		/// @param _number The number of new branches to add
+		/// @param _position The position in the container
+		/// This creates the struct branch with only two of the four attributes
 		//----------------------------------------------------------------------------------------------------------------------
 		void addBranches(unsigned _number, unsigned _position);
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief convert the L-system string to branch structs
+		/// @brief Split the L-system string to branches
 		/// This adds the string member to each branch struct in the container m_branches
 		//----------------------------------------------------------------------------------------------------------------------
 		void stringToBranches();
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief convert branch structs back to one single string
+		/// @brief Convert branch structs back to one single string
 		//----------------------------------------------------------------------------------------------------------------------
 		void branchesToString();
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief evaluate branches to add end positions
+		/// @brief Evaluate branches to add end positions
+		/// This is calculated once per L-system update for collision detection
 		//----------------------------------------------------------------------------------------------------------------------
 		void evaluateBranches();
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief load the matrices to the shader
-		/// @param _mouseGlobalTX the global mouse position used for camera rotations
+		/// @brief Calculate and load the matrices to the shader
+		/// @param _mouseGlobalTX The global mouse transformation
+		/// @param _viewMatrix The view matrix from the camera
+		/// @param _projectionMatrix The projection matrix from the camera
 		//----------------------------------------------------------------------------------------------------------------------
 		void loadMatricesToShader(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _projectionMatrix);
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief convert euler rotations to a directional axis
-		/// @param _euler a rotation vector (rx, ry, rz)
-		/// @return a direction vector (dx, dy, dz)
-		//----------------------------------------------------------------------------------------------------------------------
-		ngl::Vec3 eulerToAxis(ngl::Vec3 _euler);
 };
 
 #endif // PLANT_H_

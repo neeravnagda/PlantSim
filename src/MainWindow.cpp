@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_set>
+#include <QApplication>
 #include <QString>
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
@@ -17,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	m_plantBlueprintDialog = new PlantBlueprintDialog(this);
 
+	connect(m_ui->s_quit, SIGNAL(triggered(bool)), this, SLOT(quit()));
 	connect(m_ui->m_updateButton, SIGNAL(released()), this, SLOT(updatePlants()));
 	connect(m_ui->m_newPlantButton, SIGNAL(released()), this, SLOT(createNewPlant()));
 	connect(m_ui->m_plantType, SIGNAL(currentIndexChanged(int)), this, SLOT(openPlantBlueprintDialogFromUI()));
@@ -35,13 +37,18 @@ MainWindow::~MainWindow()
 	delete m_ui;
 }
 //----------------------------------------------------------------------------------------------------------------------
+void MainWindow::quit()
+{
+	QApplication::exit(EXIT_SUCCESS);
+}
+//----------------------------------------------------------------------------------------------------------------------
 void MainWindow::createNewPlant()
 {
-	const float x = static_cast<float>(m_ui->m_positionX->value());
-	const float z = static_cast<float>(m_ui->m_positionZ->value());
-	if (m_ui->m_plantType->currentIndex() > -1)
+	if (m_ui->m_plantType->currentIndex() > 0)
 	{
-		const std::string type = static_cast<std::string>(m_ui->m_plantType->currentText().toStdString());
+		const float x = static_cast<float>(m_ui->m_positionX->value());
+		const float z = static_cast<float>(m_ui->m_positionZ->value());
+		const std::string type = m_ui->m_plantType->currentText().toStdString();
 		m_gl->createPlant(type,x,z);
 	}
 }

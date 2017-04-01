@@ -26,7 +26,6 @@ class NGLScene : public QOpenGLWidget
 {
 
 	public:
-		void createPlant(std::string _type, float _x, float _z);
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief ctor for our NGL drawing class
 		/// @param [in] parent the parent window to the class
@@ -50,10 +49,17 @@ class NGLScene : public QOpenGLWidget
 		//----------------------------------------------------------------------------------------------------------------------
 		void resizeGL(int _w, int _h) override;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief update the plants
-		/// This is forwarded from a slot in the MainWindow class
+		/// @brief Update the plants
+		/// This is called from a slot in the MainWindow class
 		//----------------------------------------------------------------------------------------------------------------------
 		void updatePlants();
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Create a new plant object in the container
+		/// @param _type The PlantBlueprint for the object to use
+		/// @param _x The x coordinate to place the object at
+		/// @param _z The z coordinate to place the object at
+		//----------------------------------------------------------------------------------------------------------------------
+		void createPlant(std::string _type, float _x, float _z);
 
 	private:
 		//----------------------------------------------------------------------------------------------------------------------
@@ -61,7 +67,8 @@ class NGLScene : public QOpenGLWidget
 		//----------------------------------------------------------------------------------------------------------------------
 		WinParams m_win;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// position for our model
+		/// @brief position for our model
+		/// Since there is more than one model, this acts as the position to rotate around for mouse rotation
 		//----------------------------------------------------------------------------------------------------------------------
 		ngl::Vec3 m_modelPos;
 		//----------------------------------------------------------------------------------------------------------------------
@@ -73,12 +80,12 @@ class NGLScene : public QOpenGLWidget
 		//----------------------------------------------------------------------------------------------------------------------
 		ngl::Camera m_camera;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief container of plant objects
+		/// @brief Container of plant objects
 		//----------------------------------------------------------------------------------------------------------------------
 		std::vector<Plant> m_plants;
 
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief draw the meshes in the scene
+		/// @brief Draw the meshes in the scene
 		//----------------------------------------------------------------------------------------------------------------------
 		void drawScene();
 		//----------------------------------------------------------------------------------------------------------------------
@@ -109,9 +116,6 @@ class NGLScene : public QOpenGLWidget
 		/// @param _event the Qt Event structure
 		//----------------------------------------------------------------------------------------------------------------------
 		void wheelEvent( QWheelEvent *_event) override;
-
 };
-
-
 
 #endif

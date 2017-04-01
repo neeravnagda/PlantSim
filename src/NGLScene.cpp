@@ -14,6 +14,7 @@ NGLScene::NGLScene(QWidget *_parent) : QOpenGLWidget(_parent)
 
 NGLScene::~NGLScene()
 {
+	PlantBlueprint::destroyAll();//Clear all Plant Blueprints
 	std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
 }
 
@@ -96,8 +97,8 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
 	// we then switch on the key value and set the camera in the GLWindow
 	switch (_event->key())
 	{
-		// escape key to quite
-		case Qt::Key_Escape : QGuiApplication::exit(EXIT_SUCCESS); break;
+		// escape key to quit
+		//case Qt::Key_Escape : QGuiApplication::exit(EXIT_SUCCESS); break;
 		case Qt::Key_Space :
 		{
 			m_win.spinXFace=0;

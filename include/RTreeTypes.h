@@ -7,10 +7,12 @@
 #include <boost/geometry/geometries/box.hpp>
 #include <boost/geometry/index/rtree.hpp>
 
+//----------------------------------------------------------------------------------------------------------------------
 /// @file RTreeTypes.h
 /// @brief this includes type definitions needed for boost geometry
 /// @author Neerav Nagda
 /// @date 19/03/17
+//----------------------------------------------------------------------------------------------------------------------
 
 namespace bg = boost::geometry;
 namespace bgi = boost::geometry::index;

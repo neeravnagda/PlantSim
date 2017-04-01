@@ -2,7 +2,7 @@
 # specify the executable name
 TARGET=PlantSim
 # were are going to default to a console app
-#CONFIG += console
+CONFIG += console
 # core Qt Libs to use add more here if needed.
 QT+=gui opengl core
 
@@ -51,7 +51,8 @@ HEADERS+= include/NGLScene.h \
 
 # add the readme and glsl shader files
 OTHER_FILES+= README.md \
-                          shaders/*.glsl \
+                          shaders/Phong.vertex.glsl \
+                          shaders/Phong.fragment.glsl \
                           rules.txt
 
 # add the ui form
@@ -68,7 +69,3 @@ else{ # note brace must be here
 	message("Using custom NGL location")
 	include($(NGLDIR)/UseNGL.pri)
 }
-
-DISTFILES += \
-    shaders/Phong.vertex.glsl \
-    shaders/Phong.fragment.glsl

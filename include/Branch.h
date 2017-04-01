@@ -4,21 +4,37 @@
 #include <string>
 #include <ngl/Vec3.h>
 
+//----------------------------------------------------------------------------------------------------------------------
 /// @file Branch.h
-/// @brief this struct is used to contain substrings from the L-system string
+/// @brief This struct is used to contain precomputed branch information
 /// @author Neerav Nagda
 /// @version 1.2
-/// @date 24/03/17
+/// @date 01/04/17
 /// @struct Branch
-/// @brief struct to contain branch information from L-system string
-
+/// @brief Struct to contain precomputed branch information
+//----------------------------------------------------------------------------------------------------------------------
 typedef struct Branch
 {
-		unsigned m_ID;//ID of the branch
-		unsigned m_creationDepth;//Depth of tree when branch was created
-		ngl::Vec3 m_endPosition;//End position of the branch
-		std::string m_string;//L-system string of the branch
-		Branch(int _ID, int _depth, ngl::Vec3 _endPos = ngl::Vec3::zero(), std::string _string = "") ://Constructor
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief ID of the branch
+		//----------------------------------------------------------------------------------------------------------------------
+		unsigned m_ID;
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Depth of tree when branch was created
+		//----------------------------------------------------------------------------------------------------------------------
+		unsigned m_creationDepth;
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief End position of the branch
+		//----------------------------------------------------------------------------------------------------------------------
+		ngl::Vec3 m_endPosition;
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief L-system string of the branch
+		//----------------------------------------------------------------------------------------------------------------------
+		std::string m_string;
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Constructor
+		//----------------------------------------------------------------------------------------------------------------------
+		Branch(int _ID, int _depth, ngl::Vec3 _endPos = ngl::Vec3::zero(), std::string _string = "") :
 			m_ID(_ID),
 			m_creationDepth(_depth),
 			m_endPosition(_endPos),

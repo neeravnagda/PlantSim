@@ -1,8 +1,6 @@
+#include <sys/stat.h>
 #include <QRegExp>
 #include <QRegExpValidator>
-#include <QString>
-#include <fstream>
-#include <string>
 #include <unordered_set>
 #include "PlantBlueprint.h"
 #include "PlantBlueprintDialog.h"
@@ -47,6 +45,10 @@ PlantBlueprintDialog::PlantBlueprintDialog(QWidget *parent) :
 	connect(m_ui->m_blueprintName, SIGNAL(textChanged(QString)), this, SLOT(checkBlueprintExists()));
 	connect(m_ui->m_grammarFilePath, SIGNAL(editingFinished()), this, SLOT(checkGrammarFileExists()));
 	connect(m_ui->m_grammarFilePath, SIGNAL(textChanged(QString)), this, SLOT(resetGrammarFileTextColour()));
+	connect(m_ui->m_woodTextureFilePath, SIGNAL(editingFinished()), this, SLOT(checkWoodTextureFileExists()));
+	connect(m_ui->m_woodTextureFilePath, SIGNAL(textChanged(QString)), this, SLOT(resetWoodTextureFileTextColour()));
+	connect(m_ui->m_leafTextureFilePath, SIGNAL(editingFinished()), this, SLOT(checkLeafTextureFileExists()));
+	connect(m_ui->m_leafTextureFilePath, SIGNAL(textChanged(QString)), this, SLOT(resetLeafTextureFileTextColour()));
 }
 //----------------------------------------------------------------------------------------------------------------------
 PlantBlueprintDialog::~PlantBlueprintDialog()
@@ -96,8 +98,7 @@ void PlantBlueprintDialog::checkGrammarFileExists()
 {
 	QPalette palette = c_defaultPalette;
 
-	std::ifstream file(m_ui->m_grammarFilePath->text().toStdString(), std::ifstream::in);//Open as read-only
-	if (file.is_open())//Check if the file opened
+	if (checkFileExists(m_ui->m_grammarFilePath->text()))
 	{
 		palette.setColor(QPalette::Text,Qt::green);//Set text to green if OK
 		m_validationChecks[ValidationVariables::GRAMMARFILE] = true;
@@ -113,5 +114,55 @@ void PlantBlueprintDialog::checkGrammarFileExists()
 void PlantBlueprintDialog::resetGrammarFileTextColour()
 {
 	m_ui->m_grammarFilePath->setPalette(c_defaultPalette);
+}
+//----------------------------------------------------------------------------------------------------------------------
+void PlantBlueprintDialog::checkWoodTextureFileExists()
+{
+	QPalette palette = c_defaultPalette;
+
+	if (checkFileExists(m_ui->m_woodTextureFilePath->text()))
+	{
+		palette.setColor(QPalette::Text,Qt::green);//Set text to green if OK
+		m_validationChecks[ValidationVariables::WOODTEXTURE] = true;
+	}
+	else
+	{
+		palette.setColor(QPalette::Text,Qt::red);//Set text to red if invalid
+		m_validationChecks[ValidationVariables::WOODTEXTURE] = false;
+	}
+	m_ui->m_woodTextureFilePath->setPalette(palette);
+}
+//----------------------------------------------------------------------------------------------------------------------
+void PlantBlueprintDialog::resetWoodTextureFileTextColour()
+{
+	m_ui->m_woodTextureFilePath->setPalette(c_defaultPalette);
+}
+//----------------------------------------------------------------------------------------------------------------------
+void PlantBlueprintDialog::checkLeafTextureFileExists()
+{
+	QPalette palette = c_defaultPalette;
+
+	if (checkFileExists(m_ui->m_leafTextureFilePath->text()))
+	{
+		palette.setColor(QPalette::Text,Qt::green);//Set text to green if OK
+		m_validationChecks[ValidationVariables::LEAFTEXTURE] = true;
+	}
+	else
+	{
+		palette.setColor(QPalette::Text,Qt::red);//Set text to red if invalid
+		m_validationChecks[ValidationVariables::LEAFTEXTURE] = false;
+	}
+	m_ui->m_leafTextureFilePath->setPalette(palette);
+}
+//----------------------------------------------------------------------------------------------------------------------
+void PlantBlueprintDialog::resetLeafTextureFileTextColour()
+{
+	m_ui->m_leafTextureFilePath->setPalette(c_defaultPalette);
+}
+//----------------------------------------------------------------------------------------------------------------------
+bool PlantBlueprintDialog::checkFileExists(QString _fileName)
+{
+	struct stat buffer;
+	return (stat(_fileName.toStdString().c_str(), &buffer) == 0);
 }
 //----------------------------------------------------------------------------------------------------------------------

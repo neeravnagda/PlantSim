@@ -13,127 +13,129 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 /// @file PlantBlueprint.h
-/// @brief this class contains data required for Plant objects
+/// @brief This class contains data required for Plant objects
 /// @author Neerav Nagda
 /// @version 0.5
-/// @date 21/03/17
+/// @date 01/04/17
 /// @class PlantBlueprint
-/// @brief this class manages the data for each plant type
+/// @brief This class contains data required for Plant objects
 //----------------------------------------------------------------------------------------------------------------------
 class PlantBlueprint
 {
 	public:
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief delete copy constructors
+		/// @brief Delete copy constructor since this is a multiton class
 		//----------------------------------------------------------------------------------------------------------------------
 		PlantBlueprint(const PlantBlueprint&) = delete;
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Delete copy constructor since this is a multiton class
+		//----------------------------------------------------------------------------------------------------------------------
 		PlantBlueprint& operator=(const PlantBlueprint&) = delete;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief get an instance of this class
-		/// @param _instanceID the key of the instance to return
-		/// If no such instance exists, a new one is created
+		/// @brief Get or create an instance of this class
+		/// @param _instanceID The key of the instance to return
 		//----------------------------------------------------------------------------------------------------------------------
 		static PlantBlueprint* instance(const std::string _instanceID);
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief destroys an instance
-		/// @param _instanceID the key of the instance to delete
+		/// @brief Destroys an instance
+		/// @param _instanceID The key of the instance to delete
 		//----------------------------------------------------------------------------------------------------------------------
 		static void destroy(const std::string _instanceID);
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief destroys all instances
-		/// This is used for cleanup
+		/// @brief Destroys all instances
+		/// This should be called on program exit
 		//----------------------------------------------------------------------------------------------------------------------
 		static void destroyAll();
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief initialise the shaders and geometry
+		/// @brief Initialise the shaders and geometry
 		//----------------------------------------------------------------------------------------------------------------------
 		static void init();
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief read the L-system grammar from a text file
-		/// @param _filePath file path to text file
+		/// @brief Read the L-system grammar from a text file
+		/// @param _filePath File path to the text file containing L-system grammar and axiom
 		//----------------------------------------------------------------------------------------------------------------------
 		void readGrammarFromFile(const std::string _filePath);
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief set function for m_maxDepth
-		/// @param _md new max depth
+		/// @brief Set function for m_maxDepth
+		/// @param _md New max depth
 		//----------------------------------------------------------------------------------------------------------------------
 		void setMaxDepth(int _md){m_maxDepth = _md;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief set function for m_drawAngle
-		/// @param _angle new angle to rotate
+		/// @brief Set function for m_drawAngle
+		/// @param _angle New angle to rotate
 		//----------------------------------------------------------------------------------------------------------------------
 		void setDrawAngle(float _angle){m_drawAngle = _angle;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief set function for m_drawLength
-		/// @param _length new default draw length
+		/// @brief Set function for m_drawLength
+		/// @param _length New default draw length
 		//----------------------------------------------------------------------------------------------------------------------
 		void setDrawLength(float _length){m_drawLength = _length;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief set function for m_rootRadius
-		/// @param _radius new initial radius
+		/// @brief Set function for m_rootRadius
+		/// @param _radius New initial radius
 		//----------------------------------------------------------------------------------------------------------------------
 		void setRootRadius(float _radius){m_rootRadius = _radius;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief set function for m_decayConstant
-		/// @param _decay new decay type
-		/// @param _customDecayConstant user defined decay constant
+		/// @brief Set function for m_decayConstant
+		/// @param _decayConstant New decay constant
 		//----------------------------------------------------------------------------------------------------------------------
 		void setDecay(float _decayConstant){m_decayConstant = _decayConstant;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief get function for m_axiom
-		/// @return reference of the axiom for the L-system
+		/// @brief Get function for m_axiom
+		/// @return Reference of the axiom for the L-system
 		//----------------------------------------------------------------------------------------------------------------------
 		const std::string& getAxiom(){return m_axiom;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief get function for m_maxDepth
-		/// @return reference of the max depth of the L-system
+		/// @brief Get function for m_maxDepth
+		/// @return Reference of the max depth of the L-system
 		//----------------------------------------------------------------------------------------------------------------------
 		const unsigned& getMaxDepth(){return m_maxDepth;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief get function for m_productionRules
-		/// @return reference to the container of Production Rules
+		/// @brief Get function for m_productionRules
+		/// @return Reference to the container of Production Rules
 		//----------------------------------------------------------------------------------------------------------------------
 		const std::vector<ProductionRule>& getProductionRules(){return m_productionRules;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief get function for m_drawLength
-		/// @return reference to the draw length
+		/// @brief Get function for m_drawLength
+		/// @return Reference to the draw length
 		//----------------------------------------------------------------------------------------------------------------------
 		const float& getDrawLength(){return m_drawLength;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief get function for m_drawAngle
-		/// @return reference to the draw angle
+		/// @brief Get function for m_drawAngle
+		/// @return Reference to the draw angle
 		//----------------------------------------------------------------------------------------------------------------------
 		const float& getDrawAngle(){return m_drawAngle;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief get function for m_drawAngle
-		/// @return the draw angle in radians
+		/// @brief Get function for m_drawAngle
+		/// @return The draw angle in radians
 		//----------------------------------------------------------------------------------------------------------------------
 		float getDrawAngleRadians() const {return ngl::radians(m_drawAngle);}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief get function for m_rootRadius
-		/// @return reference to the initial radius
+		/// @brief Get function for m_rootRadius
+		/// @return Reference to the initial radius
 		//----------------------------------------------------------------------------------------------------------------------
 		const float& getRootRadius(){return m_rootRadius;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief get function for m_decayConstant
-		/// @return the decay constant
+		/// @brief Get function for m_decayConstant
+		/// @return The decay constant
 		//----------------------------------------------------------------------------------------------------------------------
 		float getDecayConstant(){return m_decayConstant;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief get function for the branch geometry name
-		/// @return reference to a string representing the branch geometry
-		/// this is a handle used for draw calls
+		/// @brief Get function for the branch geometry name
+		/// @return Reference to a string representing the branch geometry
+		/// This is a handle used for draw calls
 		//----------------------------------------------------------------------------------------------------------------------
 		static std::string& getGeometryName(){return s_branchGeometryName;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief get function for the leaf geometry name
-		/// @return reference to a string representing the leaf geometry
-		/// this is a handle used for draw calls
+		/// @brief Get function for the leaf geometry name
+		/// @return Reference to a string representing the leaf geometry
+		/// This is a handle used for draw calls
 		//----------------------------------------------------------------------------------------------------------------------
 		static std::string& getLeafGeometryName(){return s_leafGeometryName;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief get function for s_keys
-		/// @return reference to the keys of the map, i.e. the names of the instances
+		/// @brief Get function for s_keys
+		/// @return Reference to the keys of the map, i.e. the names of the instances
+		/// This is used for the UI
 		//----------------------------------------------------------------------------------------------------------------------
 		static const std::unordered_set<std::string>& getKeys(){return s_keys;}
 
@@ -143,28 +145,28 @@ class PlantBlueprint
 
 	private:
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief a container for the instances of this class
+		/// @brief A container for the instances of this class
 		//----------------------------------------------------------------------------------------------------------------------
 		static std::unordered_map<std::string, PlantBlueprint*> s_instances;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief a container for the keys in the map
+		/// @brief A container for the keys in the map
 		/// This is needed by the UI
 		//----------------------------------------------------------------------------------------------------------------------
 		static std::unordered_set<std::string> s_keys;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief handle for the branch geometry
+		/// @brief Handle for the branch geometry
 		//----------------------------------------------------------------------------------------------------------------------
 		static std::string s_branchGeometryName;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief handle for the leaf geometry
+		/// @brief Handle for the leaf geometry
 		//----------------------------------------------------------------------------------------------------------------------
 		static std::string s_leafGeometryName;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief spatial visualisation of the environment
+		/// @brief Spatial visualisation of the environment
 		//----------------------------------------------------------------------------------------------------------------------
 		static rTree_t s_rTree;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief handle for the shader name
+		/// @brief Handle for the shader name
 		//----------------------------------------------------------------------------------------------------------------------
 		static std::string s_shaderProgramName;
 		//----------------------------------------------------------------------------------------------------------------------
@@ -172,27 +174,27 @@ class PlantBlueprint
 		//----------------------------------------------------------------------------------------------------------------------
 		std::string m_axiom;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief container for L-sytem production rules
+		/// @brief Container for L-sytem production rules
 		//----------------------------------------------------------------------------------------------------------------------
 		std::vector<ProductionRule> m_productionRules;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief the max number of iterations for the L-system string expansion
+		/// @brief The max number of iterations for the L-system string expansion
 		//----------------------------------------------------------------------------------------------------------------------
 		unsigned m_maxDepth;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief the angle to rotate when drawing
+		/// @brief The angle to rotate when drawing
 		//----------------------------------------------------------------------------------------------------------------------
 		float m_drawAngle;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief the length of one forward draw command
+		/// @brief The length of one forward draw command
 		//----------------------------------------------------------------------------------------------------------------------
 		float m_drawLength;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief the initial radius
+		/// @brief The initial radius
 		//----------------------------------------------------------------------------------------------------------------------
 		float m_rootRadius;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief the decay constant
+		/// @brief The decay constant
 		//----------------------------------------------------------------------------------------------------------------------
 		float m_decayConstant;
 };

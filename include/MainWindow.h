@@ -7,12 +7,12 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 /// @file MainWindow.h
-/// @brief this class is the main window, containing the NGLScene widget and UI functions
+/// @brief This class is the main window, containing the NGLScene widget and UI functions
 /// @author Neerav Nagda
-/// @version 0.1
-/// @date 18/03/17
-/// @class Plant
-/// @brief this class is the main window, containing widgets and UI functions
+/// @version 0.4
+/// @date 01/04/17
+/// @class MainWindow
+/// @brief This class is the main window, containing widgets and UI functions
 //----------------------------------------------------------------------------------------------------------------------
 
 namespace Ui {
@@ -23,48 +23,53 @@ class MainWindow : public QMainWindow
 {
 		Q_OBJECT
 
+	public:
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Constructor
+		/// @param parent This is set to 0 by default as everything will be a child of this class
+		//----------------------------------------------------------------------------------------------------------------------
+		explicit MainWindow(QWidget *parent = 0);
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Destructor
+		//----------------------------------------------------------------------------------------------------------------------
+		~MainWindow();
+
 	public slots:
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief slot to create a new plant object
+		/// @brief Quit the application
 		//----------------------------------------------------------------------------------------------------------------------
-		void createNewPlant();
+		void quit();
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief slot to open the plant blueprint dialog
+		/// @brief Open the plant blueprint dialog via the main UI
 		//----------------------------------------------------------------------------------------------------------------------
 		void openPlantBlueprintDialogFromUI();
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief slot to open the plant blueprint dialog
+		/// @brief Open the plant blueprint dialog from the menu bar
 		//----------------------------------------------------------------------------------------------------------------------
 		void openPlantBlueprintDialogFromMenubar();
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief slot to close the plant blueprint dialog
+		/// @brief Close the plant blueprint dialog
 		//----------------------------------------------------------------------------------------------------------------------
 		void closePlantBlueprintDialog();
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief slot to create a Plant Blueprint
-		/// This calls the PlantBlueprintDialog function with the same name
+		/// @brief Create a new plant object
+		//----------------------------------------------------------------------------------------------------------------------
+		void createNewPlant();
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Create a new Plant Blueprint
+		/// This calls the function from the class PlantBlueprintDialog with the same name
 		/// If the Dialog returns true, close the dialog, else keep it open
 		//----------------------------------------------------------------------------------------------------------------------
 		void createPlantBlueprint();
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief slot to update plants
-		/// This is forwarded to NGLScene
+		/// @brief Update the all plants in the scene
+		/// This is calls the function from the class NGLScene to update the plants
 		//----------------------------------------------------------------------------------------------------------------------
 		void updatePlants();
 
-	public:
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief constructor
-		//----------------------------------------------------------------------------------------------------------------------
-		explicit MainWindow(QWidget *parent = 0);
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief destructor
-		//----------------------------------------------------------------------------------------------------------------------
-		~MainWindow();
-
 	private:
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief the gui
+		/// @brief The GUI
 		//----------------------------------------------------------------------------------------------------------------------
 		Ui::MainWindow *m_ui;
 		//----------------------------------------------------------------------------------------------------------------------
