@@ -2,7 +2,7 @@
 # specify the executable name
 TARGET=PlantSim
 # were are going to default to a console app
-CONFIG += console
+#CONFIG += console
 # core Qt Libs to use add more here if needed.
 QT+=gui opengl core
 

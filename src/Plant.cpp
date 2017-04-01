@@ -1,7 +1,6 @@
 #include <cmath>
 #include <iostream>
 #include <stack>
-#include <ngl/Quaternion.h>
 #include <ngl/ShaderLib.h>
 #include <ngl/VAOPrimitives.h>
 #include <ngl/NGLStream.h>
@@ -63,8 +62,6 @@ ngl::Vec3 Plant::eulerToAxis(ngl::Vec3 _euler)
 //----------------------------------------------------------------------------------------------------------------------
 void Plant::draw(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _projectionMatrix)
 {
-	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
-	(*shader)[ m_blueprint->getShaderProgramName() ]->use();
 	ngl::VAOPrimitives *prim = ngl::VAOPrimitives::instance();
 
 	unsigned lastBranchDepth = 0;

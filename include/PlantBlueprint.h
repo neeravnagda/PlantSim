@@ -45,33 +45,9 @@ class PlantBlueprint
 		//----------------------------------------------------------------------------------------------------------------------
 		static void destroyAll();
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief initialise the geometry used to draw all plants
+		/// @brief initialise the shaders and geometry
 		//----------------------------------------------------------------------------------------------------------------------
-		static void initGeometry();
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief set the shader program to use an existing shader
-		/// @param _name the name of the shader program to use
-		//----------------------------------------------------------------------------------------------------------------------
-		void setShaderProgram(const std::string _name) {m_shaderProgramName = _name;}
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief create a new shader program with a given name
-		/// @param _name the name of the shader program to create
-		/// This is effectively a set function
-		//----------------------------------------------------------------------------------------------------------------------
-		void createShaderProgram(const std::string _name);
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief load in a shader file
-		/// @param _filePath the file to load in
-		/// @param _type the type of shader to make
-		/// This attaches, loads and compiles the shader
-		/// Therefore this should only be called once per shader type
-		//----------------------------------------------------------------------------------------------------------------------
-		void loadShader(const std::string _filePath, ngl::ShaderType _type);
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief link the shader program
-		/// note this must be called after all the shaders have been loaded in
-		//----------------------------------------------------------------------------------------------------------------------
-		void linkProgram();
+		static void init();
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief read the L-system grammar from a text file
 		/// @param _filePath file path to text file
@@ -144,27 +120,22 @@ class PlantBlueprint
 		//----------------------------------------------------------------------------------------------------------------------
 		float getDecayConstant(){return m_decayConstant;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief get function for the geometry name
-		/// @return reference to a string representing the geometry
+		/// @brief get function for the branch geometry name
+		/// @return reference to a string representing the branch geometry
 		/// this is a handle used for draw calls
 		//----------------------------------------------------------------------------------------------------------------------
-		const std::string& getGeometryName(){return s_geometryName;}
+		static std::string& getGeometryName(){return s_branchGeometryName;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief get function for the shader program name
-		/// @return reference to the name of the shader program
+		/// @brief get function for the leaf geometry name
+		/// @return reference to a string representing the leaf geometry
 		/// this is a handle used for draw calls
 		//----------------------------------------------------------------------------------------------------------------------
-		const std::string& getShaderProgramName(){return m_shaderProgramName;}
+		static std::string& getLeafGeometryName(){return s_leafGeometryName;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief get function for s_keys
 		/// @return reference to the keys of the map, i.e. the names of the instances
 		//----------------------------------------------------------------------------------------------------------------------
 		static const std::unordered_set<std::string>& getKeys(){return s_keys;}
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief get function for s_shaderNames
-		/// @return reference to the shaders used by blueprints
-		//----------------------------------------------------------------------------------------------------------------------
-		static const std::unordered_set<std::string>& getShaderNames(){return s_shaderNames;}
 
 	protected:
 		PlantBlueprint(){}
@@ -181,14 +152,13 @@ class PlantBlueprint
 		//----------------------------------------------------------------------------------------------------------------------
 		static std::unordered_set<std::string> s_keys;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief a container for the different shaders used
-		/// This is needed by the UI
+		/// @brief handle for the branch geometry
 		//----------------------------------------------------------------------------------------------------------------------
-		static std::unordered_set<std::string> s_shaderNames;
+		static std::string s_branchGeometryName;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief handle for the geometry
+		/// @brief handle for the leaf geometry
 		//----------------------------------------------------------------------------------------------------------------------
-		static std::string s_geometryName;
+		static std::string s_leafGeometryName;
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief spatial visualisation of the environment
 		//----------------------------------------------------------------------------------------------------------------------
@@ -196,7 +166,7 @@ class PlantBlueprint
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief handle for the shader name
 		//----------------------------------------------------------------------------------------------------------------------
-		std::string m_shaderProgramName;
+		static std::string s_shaderProgramName;
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief L-system axiom
 		//----------------------------------------------------------------------------------------------------------------------
@@ -224,7 +194,7 @@ class PlantBlueprint
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief the decay constant
 		//----------------------------------------------------------------------------------------------------------------------
-		float m_decayConstant = 1.0f;
+		float m_decayConstant;
 };
 
 #endif // PLANTBLUEPRINT_H_

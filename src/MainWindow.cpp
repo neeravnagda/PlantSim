@@ -56,7 +56,6 @@ void MainWindow::openPlantBlueprintDialogFromUI()
 //----------------------------------------------------------------------------------------------------------------------
 void MainWindow::openPlantBlueprintDialogFromMenubar()
 {
-	m_plantBlueprintDialog->updateShaders();
 	m_plantBlueprintDialog->show();
 }
 //----------------------------------------------------------------------------------------------------------------------

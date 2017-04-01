@@ -59,7 +59,7 @@ void NGLScene::initializeGL()
 
 	m_camera.setShape(45, static_cast<float>(width())/height(), 0.1f, 100.0f);
 
-	PlantBlueprint::initGeometry();
+	PlantBlueprint::init();
 	glViewport(0,0,width(),height());
 }
 

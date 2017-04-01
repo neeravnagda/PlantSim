@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>615</height>
+    <height>534</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,7 +33,7 @@
      </property>
     </widget>
    </item>
-   <item row="20" column="1">
+   <item row="18" column="1">
     <widget class="QPushButton" name="m_cancel">
      <property name="toolTip">
       <string>Cancel</string>
@@ -64,7 +64,7 @@
      </property>
     </widget>
    </item>
-   <item row="20" column="0">
+   <item row="18" column="0">
     <widget class="QPushButton" name="m_create">
      <property name="enabled">
       <bool>true</bool>
@@ -202,46 +202,33 @@ Note this must end with &quot;.txt&quot;</string>
      </property>
     </widget>
    </item>
-   <item row="15" column="0" colspan="2">
-    <widget class="QComboBox" name="m_shaderSelect">
-     <property name="toolTip">
-      <string>Pick a shader or chose to create a new one</string>
+   <item row="14" column="0">
+    <widget class="QLabel" name="s_woodTextureFileLabel">
+     <property name="text">
+      <string>Wood Texture File</string>
      </property>
-     <property name="editable">
-      <bool>false</bool>
-     </property>
-     <property name="currentText">
-      <string notr="true" extracomment="Chose Shader"/>
-     </property>
-     <property name="currentIndex">
-      <number>-1</number>
-     </property>
-     <item>
-      <property name="text">
-       <string notr="true">create new</string>
-      </property>
-     </item>
     </widget>
    </item>
-   <item row="14" column="0">
-    <widget class="QLabel" name="s_shaderNameLabel">
-     <property name="text">
-      <string>Shader Name</string>
+   <item row="15" column="0" colspan="2">
+    <widget class="QLineEdit" name="m_woodTextureFilePath">
+     <property name="toolTip">
+      <string>Wood texture file path</string>
      </property>
     </widget>
    </item>
    <item row="16" column="0" colspan="2">
-    <spacer name="s_horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+    <widget class="QLabel" name="s_leafTextureFileLabel">
+     <property name="text">
+      <string>Leaf Texture File</string>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
+    </widget>
+   </item>
+   <item row="17" column="0" colspan="2">
+    <widget class="QLineEdit" name="m_leafTextureFilePath">
+     <property name="toolTip">
+      <string>Leaf texture file path</string>
      </property>
-    </spacer>
+    </widget>
    </item>
   </layout>
  </widget>

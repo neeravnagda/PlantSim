@@ -6,9 +6,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 std::unordered_map<std::string, PlantBlueprint*> PlantBlueprint::s_instances;
 std::unordered_set<std::string> PlantBlueprint::s_keys;
-std::unordered_set<std::string> PlantBlueprint::s_shaderNames;
 rTree_t PlantBlueprint::s_rTree;
-std::string PlantBlueprint::s_geometryName = "plantGeometry";
+std::string PlantBlueprint::s_branchGeometryName = "branchGeometry";
+std::string PlantBlueprint::s_leafGeometryName = "leafGeometry";
+std::string PlantBlueprint::s_shaderProgramName = "Phong";
 //----------------------------------------------------------------------------------------------------------------------
 PlantBlueprint* PlantBlueprint::instance(const std::string _instanceID)
 {
@@ -44,44 +45,20 @@ void PlantBlueprint::destroyAll()
 	s_instances.clear();
 }
 //----------------------------------------------------------------------------------------------------------------------
-void PlantBlueprint::initGeometry()
+void PlantBlueprint::init()
 {
+	//Create the geometry
 	ngl::VAOPrimitives *prim = ngl::VAOPrimitives::instance();
-	prim->createCylinder(s_geometryName,1.0f,1.0f,16,0);
-	prim->createSphere("sphere",1.0f,20);
-}
-//----------------------------------------------------------------------------------------------------------------------
-void PlantBlueprint::createShaderProgram(const std::string _name)
-{
-	m_shaderProgramName = _name;
-	ngl::ShaderLib::instance()->createShaderProgram(m_shaderProgramName);
-	s_shaderNames.emplace(_name);
-}
-//----------------------------------------------------------------------------------------------------------------------
-void PlantBlueprint::loadShader(const std::string _filePath, ngl::ShaderType _type)
-{
-	ngl::ShaderLib *shaderlib = ngl::ShaderLib::instance();
-	std::string shader = m_shaderProgramName;
-	switch (_type)
-	{
-		case ngl::ShaderType::VERTEX : {shader+="Vertex"; break;}
-		case ngl::ShaderType::TESSCONTROL : {shader+="TessControl"; break;}
-		case ngl::ShaderType::TESSEVAL : {shader+="TessEval"; break;}
-		case ngl::ShaderType::GEOMETRY : {shader+="Geometry"; break;}
-		case ngl::ShaderType::FRAGMENT : {shader+="Fragment"; break;}
-		case ngl::ShaderType::COMPUTE : {shader+="Compute"; break;}
-		default:
-			break;
-	}
-	shaderlib->attachShader(shader, _type);
-	shaderlib->loadShaderSource(shader, _filePath);
-	shaderlib->compileShader(shader);
-	shaderlib->attachShaderToProgram(m_shaderProgramName, shader);
-}
-//----------------------------------------------------------------------------------------------------------------------
-void PlantBlueprint::linkProgram()
-{
-	ngl::ShaderLib::instance()->linkProgramObject(m_shaderProgramName);
+	prim->createCylinder(s_branchGeometryName,1.0f,1.0f,16,0);
+	prim->createTrianglePlane(s_leafGeometryName,1.0f,1.0f,1,1,ngl::Vec3::up());
+	//Load the shaders
+	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
+	shader->createShaderProgram(s_shaderProgramName);
+	const std::string vertexShader = "shaders/Phong.vertex.glsl";
+	const std::string fragmentShader = "shaders/Phong.fragment.glsl";
+	shader->loadShader(s_shaderProgramName,vertexShader, fragmentShader);
+	//Use the shader
+	(*shader)[s_shaderProgramName]->use();
 }
 //----------------------------------------------------------------------------------------------------------------------
 //Set the first line of the file as the axiom
