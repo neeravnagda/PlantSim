@@ -6,6 +6,7 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 #include "ui_PlantBlueprintDialog.h"
+#include "ui_LightsDialog.h"
 #include "PlantBlueprint.h"
 //----------------------------------------------------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget *parent) :
@@ -14,9 +15,11 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 	m_ui->setupUi(this);
 	m_gl = new NGLScene(this);
+
 	m_ui->s_mainWindowGridLayout->addWidget(m_gl,0,0,3,1);
 
 	m_plantBlueprintDialog = new PlantBlueprintDialog(this);
+	m_lightsDialog = new LightsDialog(this);
 
 	connect(m_ui->s_quit, SIGNAL(triggered(bool)), this, SLOT(quit()));
 	connect(m_ui->m_updateButton, SIGNAL(released()), this, SLOT(updatePlants()));
@@ -25,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(m_ui->s_newPlantBlueprint, SIGNAL(triggered(bool)), this, SLOT(openPlantBlueprintDialogFromMenubar()));
 	connect(m_plantBlueprintDialog->getUI().m_cancel, SIGNAL(released()), this, SLOT(closePlantBlueprintDialog()));
 	connect(m_plantBlueprintDialog->getUI().m_create, SIGNAL(released()), this, SLOT(createPlantBlueprint()));
+	connect(m_ui->m_lightsButton, SIGNAL(released()), this, SLOT(openLightsDialog()));
+	connect(m_lightsDialog->getUI().m_closeButton, SIGNAL(released()), this, SLOT(closeLightsDialog()));
 
 	for (std::string s : PlantBlueprint::getKeys())
 	{
@@ -91,5 +96,15 @@ void MainWindow::createPlantBlueprint()
 void MainWindow::updatePlants()
 {
 	m_gl->updatePlants();
+}
+//----------------------------------------------------------------------------------------------------------------------
+void MainWindow::openLightsDialog()
+{
+	m_lightsDialog->show();
+}
+//----------------------------------------------------------------------------------------------------------------------
+void MainWindow::closeLightsDialog()
+{
+	m_lightsDialog->hide();
 }
 //----------------------------------------------------------------------------------------------------------------------

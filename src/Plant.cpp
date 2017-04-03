@@ -27,15 +27,16 @@ void Plant::loadMatricesToShader(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix
 	ngl::Mat4 MV;
 	ngl::Mat4 MVP;
 	ngl::Mat3 N;
-	ngl::Mat4 M = m_transform.getMatrix() * _mouseGlobalTX;
+	ngl::Mat4 M;
+	M = m_transform.getMatrix() * _mouseGlobalTX;
 	MV = M * _viewMatrix;
 	MVP = M * _projectionMatrix;
 	N = MV;
 	N.inverse();
-	shader->setShaderParamFromMat4("MVP",MVP);
-	//shader->setShaderParamFromMat4("MV",MV);
-	shader->setShaderParamFromMat3("N",N);
-	//shader->setShaderParamFromMat4("M",M);
+	shader->setUniform("M", M);
+	shader->setUniform("MV", MV);
+	shader->setUniform("MVP", MVP);
+	shader->setUniform("N", N);
 }
 //----------------------------------------------------------------------------------------------------------------------
 void Plant::draw(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _projectionMatrix)

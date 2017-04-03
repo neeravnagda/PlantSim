@@ -2,34 +2,36 @@
 /// @brief the output colour
 layout (location = 0) out vec4 fragColour;
 
+#define MAX_LIGHTS 4
+/// @brief fragment position
 in vec3 fragPos;
+/// @brief fragment normal
 in vec3 fragNormal;
+/// @brief eye direction
+in vec3 eyeDirection;
+/// @brief array of half-vectors
+in vec3 halfVectors[MAX_LIGHTS];
+/// @brief array of light directions
+in vec3 lightDirections[MAX_LIGHTS];
 
 /// @struct LightInfo
 /// @brief a structure to hold light parameters
 struct LightInfo
 {
-	vec3 Position;//Light position
+	bool isActive;
 	vec3 La;//Ambient light intensity
 	vec3 Ld;//Diffuse light intensity
 	vec3 Ls;//Specular light intensity
 };
 
-/// @brief the light in the scene
-uniform LightInfo Light0 = LightInfo(
-			vec3(2.0f, 2.0f, -10.0f),//position
-			vec3(0.2f, 0.6f, 0.2f),//ambient intensity
-			vec3(1.0f, 1.0f, 1.0f),//diffuse intensity
-			vec3(1.0f, 1.0f, 1.0f)//specular intensity
-			);
+/// @brief An array of light positions
+uniform vec3 LightPositions[MAX_LIGHTS];
 
-uniform LightInfo Light1 = LightInfo(
-			vec3(-2.0f, -2.0f, -8.0f),//position
-			vec3(0.1f, 0.1f, 0.7f),//ambient intensity
-			vec3(1.0f, 1.0f, 1.0f),//diffuse intensity
-			vec3(1.0f, 1.0f, 1.0f)//specular intensity
-			);
+/// @brief the lights in the scene
+uniform LightInfo Lights[MAX_LIGHTS];
 
+/// @struct MaterialInfo
+/// @brief a structure to hold material parameters
 struct MaterialInfo
 {
 	vec3 Ka;//Ambient reflectivity
@@ -49,21 +51,33 @@ uniform MaterialInfo Material = MaterialInfo(
 //Calculate the vertex position
 vec3 v = normalize(fragPos);
 
-vec3 calculateLightContribution(in LightInfo _light)
+/// @brief calculate the light contribution of one light
+vec3 calculateLightContribution(in int _i)
 {
-	//Calculate the light vector
-	vec3 s = normalize(_light.Position - fragPos);
-	//Reflect the light around the vertex normal
-	vec3 r = reflect(-s, fragNormal);
-	//Compute the light from the ambient, diffuse and specular components
-	return vec3(
-				_light.La * Material.Ka +
-				_light.Ld * Material.Kd * max( dot(s, fragNormal), 0.0f) +
-				_light.Ls * Material.Ks * pow( max( dot(r,v), 0.0f), Material.Shininess));
+	float lambertTerm = dot(fragNormal, lightDirections[_i]);
+	if (lambertTerm > 0)
+	{
+		//Light vector
+		vec3 s = LightPositions[_i] - fragPos;
+		//Normal dot Half-vector
+		float NdotH = max(dot(fragNormal, halfVectors[_i]),0.0f);
+
+		return vec3(
+					Lights[_i].La * Material.Ka +//Ambient contribution
+					Lights[_i].Ld * Material.Kd * lambertTerm +//Diffuse contribution
+					Lights[_i].Ls * Material.Ks * pow(NdotH, Material.Shininess)//Specular contribution
+					);
+	}
+	else return vec3(0,0,0);
 }
 
 void main(void)
 {
-	vec3 totalColour = calculateLightContribution(Light0) + calculateLightContribution(Light1);
+	vec3 totalColour = vec3(0,0,0);
+	for (int i=0; i<MAX_LIGHTS; ++i)
+	{
+		if (Lights[i].isActive) totalColour += calculateLightContribution(i);
+	}
+
 	fragColour = vec4(totalColour,1.0f);
 }

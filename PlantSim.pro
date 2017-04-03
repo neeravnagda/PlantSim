@@ -36,7 +36,8 @@ SOURCES+= src/main.cpp \
     src/Plant.cpp \
     src/PlantBlueprint.cpp \
     src/MainWindow.cpp \
-    src/PlantBlueprintDialog.cpp
+    src/PlantBlueprintDialog.cpp \
+    src/LightsDialog.cpp
 
 # add .h files
 HEADERS+= include/NGLScene.h \
@@ -47,7 +48,8 @@ HEADERS+= include/NGLScene.h \
     include/Plant.h \
     include/PlantBlueprint.h \
     include/MainWindow.h \
-    include/PlantBlueprintDialog.h
+    include/PlantBlueprintDialog.h \
+    include/LightsDialog.h
 
 # add the readme and glsl shader files
 OTHER_FILES+= README.md \
@@ -57,7 +59,8 @@ OTHER_FILES+= README.md \
 
 # add the ui form
 FORMS += ui/MainWindow.ui \
-    ui/PlantBlueprintDialog.ui
+    ui/PlantBlueprintDialog.ui \
+    ui/LightsDialog.ui
 
 #Sort out NGL stuff
 NGLPATH=$$(NGLDIR)

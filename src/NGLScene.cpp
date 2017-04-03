@@ -2,6 +2,7 @@
 #include <QMouseEvent>
 #include <QGuiApplication>
 #include <ngl/NGLInit.h>
+#include <ngl/ShaderLib.h>
 #include "NGLScene.h"
 
 NGLScene::NGLScene(QWidget *_parent) : QOpenGLWidget(_parent)
@@ -53,19 +54,23 @@ void NGLScene::initializeGL()
 	// enable multisampling for smoother drawing
 	glEnable(GL_MULTISAMPLE);
 
+	PlantBlueprint::init();
+
 	ngl::Vec3 from = ngl::Vec3(0.0f, 4.0f, -10.0f);
 	ngl::Vec3 to = ngl::Vec3::zero();
 	ngl::Vec3 up = ngl::Vec3::up();
 	m_camera.set(from, to, up);
-
 	m_camera.setShape(45, static_cast<float>(width())/height(), 0.1f, 100.0f);
+	ngl::ShaderLib::instance()->setUniform("viewerPos", m_camera.getEye().toVec3());
 
-	PlantBlueprint::init();
 	glViewport(0,0,width(),height());
 }
 
 void NGLScene::drawScene()
 {
+//	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
+//	shader->setUniform("viewerPos", m_camera.getEye().toVec3());
+
 	ngl::Mat4 rotX;
 	ngl::Mat4 rotY;
 	rotX.rotateX(m_win.spinXFace);
