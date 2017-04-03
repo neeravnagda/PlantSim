@@ -24,7 +24,6 @@
 
 class NGLScene : public QOpenGLWidget
 {
-
 	public:
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief ctor for our NGL drawing class
@@ -88,6 +87,10 @@ class NGLScene : public QOpenGLWidget
 		/// @brief Draw the meshes in the scene
 		//----------------------------------------------------------------------------------------------------------------------
 		void drawScene();
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Send uniforms to the shader to draw the ground plane
+		//----------------------------------------------------------------------------------------------------------------------
+		void sendUniformsToShader();
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Qt Event called when a key is pressed
 		/// @param [in] _event the Qt event to query for size etc

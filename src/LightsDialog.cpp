@@ -1,5 +1,6 @@
 #include <string>
 #include <ngl/ShaderLib.h>
+#include "PlantBlueprint.h"
 #include "include/LightsDialog.h"
 #include "ui_LightsDialog.h"
 //----------------------------------------------------------------------------------------------------------------------
@@ -9,23 +10,6 @@ LightsDialog::LightsDialog(QWidget *parent) :
 {
 	m_ui->setupUi(this);
 
-	//Initialise the shader
-	//ngl::ShaderLib *shader = ngl::ShaderLib::instance();
-
-/*
-	//Initialise the lights in the shader
-	for (unsigned i=0; i<m_lights.size(); ++i)
-	{
-		std::string lightPos = "LightPositions[" + std::to_string(i) + "]";
-		shader->setUniform(lightPos, m_lights[i].m_position);
-
-		std::string lights = "Lights[" + std::to_string(i) + "]";
-		shader->setUniform(lights+".isActive", m_lights[i].m_isActive);
-		shader->setUniform(lights+".La", m_lights[i].m_ambient);
-		shader->setUniform(lights+".Ld", m_lights[i].m_diffuse);
-		shader->setUniform(lights+".Ls", m_lights[i].m_specular);
-	}
-*/
 	//Connect signals and slots
 	connect(m_ui->m_lightSelect, SIGNAL(valueChanged(int)), this, SLOT(changeLightInfo(int)));
 	connect(m_ui->m_active, SIGNAL(toggled(bool)), this, SLOT(setActiveStatus()));
@@ -75,38 +59,53 @@ void LightsDialog::changeLightInfo(int _index)
 void LightsDialog::setActiveStatus()
 {
 	m_lights[m_currentIndex].m_isActive = m_ui->m_active->isChecked();
-	ngl::ShaderLib::instance()->setUniform("Lights["+std::to_string(m_currentIndex)+"].isActive", m_lights[m_currentIndex].m_isActive);
+	std::string activeStatus = "Lights["+std::to_string(m_currentIndex)+"].isActive";
+
+	ngl::ShaderLib::instance()->setUniform(activeStatus, m_lights[m_currentIndex].m_isActive);
+	update();
 }
 //----------------------------------------------------------------------------------------------------------------------
 void LightsDialog::setPos()
 {
+	std::string pos = "LightPositions["+std::to_string(m_currentIndex)+"]";
 	m_lights[m_currentIndex].m_position.m_x = static_cast<float>(m_ui->m_posX->value());
 	m_lights[m_currentIndex].m_position.m_y = static_cast<float>(m_ui->m_posY->value());
 	m_lights[m_currentIndex].m_position.m_z = static_cast<float>(m_ui->m_posZ->value());
-	ngl::ShaderLib::instance()->setUniform("LightPositions["+std::to_string(m_currentIndex)+"]", m_lights[m_currentIndex].m_position);
+
+	ngl::ShaderLib::instance()->setUniform(pos, m_lights[m_currentIndex].m_position);
+	update();
 }
 //----------------------------------------------------------------------------------------------------------------------
 void LightsDialog::setAmbient()
 {
+	std::string ambient = "Lights["+std::to_string(m_currentIndex)+"].La";
 	m_lights[m_currentIndex].m_ambient.m_r = static_cast<float>(m_ui->m_ambientR->value());
 	m_lights[m_currentIndex].m_ambient.m_g = static_cast<float>(m_ui->m_ambientG->value());
 	m_lights[m_currentIndex].m_ambient.m_b = static_cast<float>(m_ui->m_ambientB->value());
-	ngl::ShaderLib::instance()->setUniform("Lights["+std::to_string(m_currentIndex)+"].La", m_lights[m_currentIndex].m_ambient);
+
+	ngl::ShaderLib::instance()->setUniform(ambient, m_lights[m_currentIndex].m_ambient);
+	update();
 }
 //----------------------------------------------------------------------------------------------------------------------
 void LightsDialog::setDiffuse()
 {
+	std::string diffuse = "Lights["+std::to_string(m_currentIndex)+"].Ld";
 	m_lights[m_currentIndex].m_diffuse.m_r = static_cast<float>(m_ui->m_diffuseR->value());
 	m_lights[m_currentIndex].m_diffuse.m_g = static_cast<float>(m_ui->m_diffuseG->value());
 	m_lights[m_currentIndex].m_diffuse.m_b = static_cast<float>(m_ui->m_diffuseB->value());
-	ngl::ShaderLib::instance()->setUniform("Lights["+std::to_string(m_currentIndex)+"].Ld", m_lights[m_currentIndex].m_diffuse);
+
+	ngl::ShaderLib::instance()->setUniform(diffuse, m_lights[m_currentIndex].m_diffuse);
+	update();
 }
 //----------------------------------------------------------------------------------------------------------------------
 void LightsDialog::setSpecular()
 {
+	std::string specular = "Lights["+std::to_string(m_currentIndex)+"].Ls";
 	m_lights[m_currentIndex].m_specular.m_r = static_cast<float>(m_ui->m_specularR->value());
 	m_lights[m_currentIndex].m_specular.m_g = static_cast<float>(m_ui->m_specularG->value());
 	m_lights[m_currentIndex].m_specular.m_b = static_cast<float>(m_ui->m_specularB->value());
-	ngl::ShaderLib::instance()->setUniform("Lights["+std::to_string(m_currentIndex)+"].Ls", m_lights[m_currentIndex].m_specular);
+
+	ngl::ShaderLib::instance()->setUniform(specular, m_lights[m_currentIndex].m_specular);
+	update();
 }
 //----------------------------------------------------------------------------------------------------------------------

@@ -3,6 +3,7 @@
 #include <QGuiApplication>
 #include <ngl/NGLInit.h>
 #include <ngl/ShaderLib.h>
+#include <ngl/VAOPrimitives.h>
 #include "NGLScene.h"
 
 NGLScene::NGLScene(QWidget *_parent) : QOpenGLWidget(_parent)
@@ -64,12 +65,13 @@ void NGLScene::initializeGL()
 	ngl::ShaderLib::instance()->setUniform("viewerPos", m_camera.getEye().toVec3());
 
 	glViewport(0,0,width(),height());
+
+	ngl::VAOPrimitives::instance()->createTrianglePlane("groundPlane", 1, 1, 1, 1, ngl::Vec3::up());
 }
 
-void NGLScene::drawScene()
+void NGLScene::sendUniformsToShader()
 {
-//	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
-//	shader->setUniform("viewerPos", m_camera.getEye().toVec3());
+	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
 
 	ngl::Mat4 rotX;
 	ngl::Mat4 rotY;
@@ -80,6 +82,25 @@ void NGLScene::drawScene()
 	m_mouseGlobalTX.m_31 = m_modelPos.m_y;
 	m_mouseGlobalTX.m_32 = m_modelPos.m_z;
 
+	ngl::Mat4 MV;
+	ngl::Mat4 MVP;
+	ngl::Mat3 N;
+	ngl::Mat4 M;
+	M = m_mouseGlobalTX;
+	MV = M * m_camera.getViewMatrix();
+	MVP = M * m_camera.getProjectionMatrix();
+	N = MV;
+	N.inverse();
+	shader->setUniform("M", M);
+	shader->setUniform("MV", MV);
+	shader->setUniform("MVP", MVP);
+	shader->setUniform("N", N);
+}
+
+void NGLScene::drawScene()
+{
+	sendUniformsToShader();
+	ngl::VAOPrimitives::instance()->draw("groundPlane");
 	for (Plant &p : m_plants)
 	{
 		p.draw(m_mouseGlobalTX, m_camera.getViewMatrix(), m_camera.getProjectionMatrix());
