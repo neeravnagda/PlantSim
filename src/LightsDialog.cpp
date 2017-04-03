@@ -10,6 +10,8 @@ LightsDialog::LightsDialog(QWidget *parent) :
 {
 	m_ui->setupUi(this);
 
+	m_ui->m_lightSelect->setMaximum(NumLights-1);
+
 	//Connect signals and slots
 	connect(m_ui->m_lightSelect, SIGNAL(valueChanged(int)), this, SLOT(changeLightInfo(int)));
 	connect(m_ui->m_active, SIGNAL(toggled(bool)), this, SLOT(setActiveStatus()));

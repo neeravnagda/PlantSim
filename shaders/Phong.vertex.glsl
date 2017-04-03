@@ -6,7 +6,7 @@ layout (location = 1) in vec2 inUV;
 /// @brief The normal passed in
 layout (location = 2) in vec3 inNormal;
 
-#define MAX_LIGHTS 4
+#define MAX_LIGHTS 1
 
 uniform 	vec3 viewerPos;
 /// @brief model matrix

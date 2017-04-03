@@ -62,7 +62,20 @@ void NGLScene::initializeGL()
 	ngl::Vec3 up = ngl::Vec3::up();
 	m_camera.set(from, to, up);
 	m_camera.setShape(45, static_cast<float>(width())/height(), 0.1f, 100.0f);
-	ngl::ShaderLib::instance()->setUniform("viewerPos", m_camera.getEye().toVec3());
+	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
+
+	shader->setUniform("viewerPos", m_camera.getEye().toVec3());
+
+	std::string activeStatus = "Lights[0].isActive";
+	shader->setUniform(activeStatus, true);
+	std::string pos = "LightPositions[0]";
+	shader->setUniform(pos, ngl::Vec3(-2.0f,2.0f,0.0f));
+	std::string ambient = "Lights[0].La";
+	shader->setUniform(ambient, ngl::Vec3(1.0f,0.0f,0.0f));
+	std::string diffuse = "Lights[0].Ld";
+	shader->setUniform(diffuse, ngl::Vec3(1.0f,1.0f,1.0f));
+	std::string specular = "Lights[0].Ls";
+	shader->setUniform(specular, ngl::Vec3(1.0f,1.0f,1.0f));
 
 	glViewport(0,0,width(),height());
 
@@ -86,7 +99,7 @@ void NGLScene::sendUniformsToShader()
 	ngl::Mat4 MVP;
 	ngl::Mat3 N;
 	ngl::Mat4 M;
-	M = m_mouseGlobalTX;
+	M *= m_mouseGlobalTX;
 	MV = M * m_camera.getViewMatrix();
 	MVP = M * m_camera.getProjectionMatrix();
 	N = MV;

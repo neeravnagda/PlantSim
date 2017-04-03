@@ -63,7 +63,7 @@ class LightsDialog : public QDialog
 		/// @brief Set the max number of lights
 		/// This must be also defined in the shaders
 		//----------------------------------------------------------------------------------------------------------------------
-		static constexpr int NumLights = 4;
+		static constexpr int NumLights = 1;
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Container of light information
 		//----------------------------------------------------------------------------------------------------------------------

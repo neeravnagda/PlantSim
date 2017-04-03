@@ -2,7 +2,7 @@
 /// @brief the output colour
 layout (location = 0) out vec4 fragColour;
 
-#define MAX_LIGHTS 4
+#define MAX_LIGHTS 1
 /// @brief fragment position
 in vec3 fragPos;
 /// @brief fragment normal
