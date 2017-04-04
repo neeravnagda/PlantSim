@@ -1,6 +1,3 @@
-#include <string>
-#include <ngl/ShaderLib.h>
-#include "PlantBlueprint.h"
 #include "include/LightsDialog.h"
 #include "ui_LightsDialog.h"
 //----------------------------------------------------------------------------------------------------------------------
@@ -14,7 +11,7 @@ LightsDialog::LightsDialog(QWidget *parent) :
 
 	//Connect signals and slots
 	connect(m_ui->m_lightSelect, SIGNAL(valueChanged(int)), this, SLOT(changeLightInfo(int)));
-	connect(m_ui->m_active, SIGNAL(toggled(bool)), this, SLOT(setActiveStatus()));
+	connect(m_ui->m_active, SIGNAL(toggled(bool)), this, SLOT(setActiveStatus(bool)));
 	connect(m_ui->m_posX, SIGNAL(valueChanged(double)), this, SLOT(setPos()));
 	connect(m_ui->m_posY, SIGNAL(valueChanged(double)), this, SLOT(setPos()));
 	connect(m_ui->m_posZ, SIGNAL(valueChanged(double)), this, SLOT(setPos()));
@@ -58,56 +55,66 @@ void LightsDialog::changeLightInfo(int _index)
 	m_ui->m_specularB->setValue(m_lights[_index].m_specular.m_b);
 }
 //----------------------------------------------------------------------------------------------------------------------
-void LightsDialog::setActiveStatus()
+void LightsDialog::setActiveStatus(bool _status)
 {
-	m_lights[m_currentIndex].m_isActive = m_ui->m_active->isChecked();
-	std::string activeStatus = "Lights["+std::to_string(m_currentIndex)+"].isActive";
+	m_lights[m_currentIndex].m_isActive = _status;
 
-	ngl::ShaderLib::instance()->setUniform(activeStatus, m_lights[m_currentIndex].m_isActive);
-	update();
+	emit lightActive(m_currentIndex, m_lights[m_currentIndex].m_isActive);
+	//Resend all the data if the light has been turned on
+	if (_status)
+	{
+		emit positionChanged(m_currentIndex, m_lights[m_currentIndex].m_position);
+		emit ambientChanged(m_currentIndex, m_lights[m_currentIndex].m_ambient);
+		emit diffuseChanged(m_currentIndex, m_lights[m_currentIndex].m_diffuse);
+		emit specularChanged(m_currentIndex, m_lights[m_currentIndex].m_specular);
+	}
 }
 //----------------------------------------------------------------------------------------------------------------------
 void LightsDialog::setPos()
 {
-	std::string pos = "LightPositions["+std::to_string(m_currentIndex)+"]";
 	m_lights[m_currentIndex].m_position.m_x = static_cast<float>(m_ui->m_posX->value());
 	m_lights[m_currentIndex].m_position.m_y = static_cast<float>(m_ui->m_posY->value());
 	m_lights[m_currentIndex].m_position.m_z = static_cast<float>(m_ui->m_posZ->value());
 
-	ngl::ShaderLib::instance()->setUniform(pos, m_lights[m_currentIndex].m_position);
-	update();
+	if (m_lights[m_currentIndex].m_isActive)
+	{
+		emit positionChanged(m_currentIndex, m_lights[m_currentIndex].m_position);
+	}
 }
 //----------------------------------------------------------------------------------------------------------------------
 void LightsDialog::setAmbient()
 {
-	std::string ambient = "Lights["+std::to_string(m_currentIndex)+"].La";
 	m_lights[m_currentIndex].m_ambient.m_r = static_cast<float>(m_ui->m_ambientR->value());
 	m_lights[m_currentIndex].m_ambient.m_g = static_cast<float>(m_ui->m_ambientG->value());
 	m_lights[m_currentIndex].m_ambient.m_b = static_cast<float>(m_ui->m_ambientB->value());
 
-	ngl::ShaderLib::instance()->setUniform(ambient, m_lights[m_currentIndex].m_ambient);
-	update();
+	if (m_lights[m_currentIndex].m_isActive)
+	{
+		emit ambientChanged(m_currentIndex, m_lights[m_currentIndex].m_ambient);
+	}
 }
 //----------------------------------------------------------------------------------------------------------------------
 void LightsDialog::setDiffuse()
 {
-	std::string diffuse = "Lights["+std::to_string(m_currentIndex)+"].Ld";
 	m_lights[m_currentIndex].m_diffuse.m_r = static_cast<float>(m_ui->m_diffuseR->value());
 	m_lights[m_currentIndex].m_diffuse.m_g = static_cast<float>(m_ui->m_diffuseG->value());
 	m_lights[m_currentIndex].m_diffuse.m_b = static_cast<float>(m_ui->m_diffuseB->value());
 
-	ngl::ShaderLib::instance()->setUniform(diffuse, m_lights[m_currentIndex].m_diffuse);
-	update();
+	if (m_lights[m_currentIndex].m_isActive)
+	{
+		emit diffuseChanged(m_currentIndex, m_lights[m_currentIndex].m_diffuse);
+	}
 }
 //----------------------------------------------------------------------------------------------------------------------
 void LightsDialog::setSpecular()
 {
-	std::string specular = "Lights["+std::to_string(m_currentIndex)+"].Ls";
 	m_lights[m_currentIndex].m_specular.m_r = static_cast<float>(m_ui->m_specularR->value());
 	m_lights[m_currentIndex].m_specular.m_g = static_cast<float>(m_ui->m_specularG->value());
 	m_lights[m_currentIndex].m_specular.m_b = static_cast<float>(m_ui->m_specularB->value());
 
-	ngl::ShaderLib::instance()->setUniform(specular, m_lights[m_currentIndex].m_specular);
-	update();
+	if (m_lights[m_currentIndex].m_isActive)
+	{
+		emit specularChanged(m_currentIndex, m_lights[m_currentIndex].m_specular);
+	}
 }
 //----------------------------------------------------------------------------------------------------------------------

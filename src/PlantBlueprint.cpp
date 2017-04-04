@@ -54,27 +54,11 @@ void PlantBlueprint::init()
 	//Load the shaders
 	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
 	shader->createShaderProgram(s_shaderProgramName);
-	const std::string vertexShader = "shaders/Phong.vertex.glsl";
-	const std::string fragmentShader = "shaders/Phong.fragment.glsl";
+	const std::string vertexShader = "shaders/BlinnPhong.vertex.glsl";
+	const std::string fragmentShader = "shaders/BlinnPhong.fragment.glsl";
 	shader->loadShader(s_shaderProgramName,vertexShader, fragmentShader);
 	//Use the shader
 	(*shader)[s_shaderProgramName]->use();
-
-//	//Set default light settings
-//	for (int i=0; i<4; ++i)
-//	{
-//		std::string activeStatus = "Lights["+std::to_string(i)+"].isActive";
-//		std::string pos = "LightPositions["+std::to_string(i)+"]";
-//		std::string ambient = "Lights["+std::to_string(i)+"].La";
-//		std::string diffuse = "Lights["+std::to_string(i)+"].Ld";
-//		std::string specular = "Lights["+std::to_string(i)+"].Ls";
-
-//		shader->setUniform(activeStatus, true);
-//		shader->setUniform(pos, ngl::Vec3(2.0f, 2.0f, -10.0f));
-//		shader->setUniform(ambient, ngl::Vec3::up());
-//		shader->setUniform(diffuse, ngl::Vec3(1,1,1));
-//		shader->setUniform(specular, ngl::Vec3(1,1,1));
-//	}
 }
 //----------------------------------------------------------------------------------------------------------------------
 //Set the first line of the file as the axiom

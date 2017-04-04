@@ -142,6 +142,7 @@
      <string>PlantSim</string>
     </property>
     <addaction name="s_newPlantBlueprint"/>
+    <addaction name="s_editLights"/>
     <addaction name="separator"/>
     <addaction name="s_quit"/>
    </widget>
@@ -156,6 +157,11 @@
   <action name="s_quit">
    <property name="text">
     <string>Quit</string>
+   </property>
+  </action>
+  <action name="s_editLights">
+   <property name="text">
+    <string>Edit Lights</string>
    </property>
   </action>
  </widget>

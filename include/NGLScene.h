@@ -1,6 +1,7 @@
 #ifndef NGLSCENE_H_
 #define NGLSCENE_H_
 
+#include <array>
 #include <string>
 #include <vector>
 #include <ngl/Camera.h>
@@ -59,6 +60,36 @@ class NGLScene : public QOpenGLWidget
 		/// @param _z The z coordinate to place the object at
 		//----------------------------------------------------------------------------------------------------------------------
 		void createPlant(std::string _type, float _x, float _z);
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Set the light active status
+		/// @param _lightIndex The light index to change
+		/// @param _status The status of the light (on/off)
+		//----------------------------------------------------------------------------------------------------------------------
+		void setLightActive(int _light, bool _status);
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Set the light position
+		/// @param _lightIndex The light index to change
+		/// @param _position The new light position
+		//----------------------------------------------------------------------------------------------------------------------
+		void setLightPosition(int _light, ngl::Vec3 _position);
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Set the light ambient colour
+		/// @param _lightIndex The light index to change
+		/// @param _ambient The new ambient colour
+		//----------------------------------------------------------------------------------------------------------------------
+		void setLightAmbient(int _light, ngl::Vec3 _ambient);
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Set the light diffuse colour
+		/// @param _lightIndex The light index to change
+		/// @param _diffuse The new diffuse colour
+		//----------------------------------------------------------------------------------------------------------------------
+		void setLightDiffuse(int _light, ngl::Vec3 _diffuse);
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Set the light ambient colour
+		/// @param _lightIndex The light index to change
+		/// @param _specular The new specular colour
+		//----------------------------------------------------------------------------------------------------------------------
+		void setLightSpecular(int _light, ngl::Vec3 _specular);
 
 	private:
 		//----------------------------------------------------------------------------------------------------------------------

@@ -138,6 +138,11 @@ class PlantBlueprint
 		/// This is used for the UI
 		//----------------------------------------------------------------------------------------------------------------------
 		static const std::unordered_set<std::string>& getKeys(){return s_keys;}
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Get function for the shader name
+		/// @return Reference to the shader name
+		//----------------------------------------------------------------------------------------------------------------------
+		static const std::string& getShaderName(){return s_shaderProgramName;}
 
 	protected:
 		PlantBlueprint(){}

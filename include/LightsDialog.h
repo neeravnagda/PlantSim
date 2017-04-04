@@ -4,6 +4,7 @@
 #include <array>
 #include <QDialog>
 #include <ngl/Vec3.h>
+#include "Light.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 /// @file LightsDialog.h
@@ -12,19 +13,6 @@
 /// @version 0.1
 /// @date 02/04/17
 //----------------------------------------------------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------------------------------------------------
-/// @struct Light
-/// @brief Contains light information used by the shaders
-//----------------------------------------------------------------------------------------------------------------------
-typedef struct Light
-{
-		bool m_isActive = false;///< Check if the light is active
-		ngl::Vec3 m_position = ngl::Vec3::zero();///< Position of the light
-		ngl::Vec3 m_ambient = ngl::Vec3(0.5f,0.5f,0.5f);///< Ambient colour
-		ngl::Vec3 m_diffuse = ngl::Vec3(1.0f,1.0f,1.0f);///< Diffuse colour
-		ngl::Vec3 m_specular = ngl::Vec3(1.0f,1.0f,1.0f);///< Specular colour
-} Light;
 
 namespace Ui {
 class LightsDialog;
@@ -54,6 +42,39 @@ class LightsDialog : public QDialog
 		//----------------------------------------------------------------------------------------------------------------------
 		const Ui::LightsDialog& getUI() {return *m_ui;}
 
+	signals:
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Signal when the light is toggled on or off
+		/// @param[out] _lightIndex The light to change
+		/// @param[out] _status The active status of the light
+		//----------------------------------------------------------------------------------------------------------------------
+		void lightActive(int _lightIndex, bool _status);
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Signal when the light position is changed
+		/// @param[out] _lightIndex The light to change
+		/// @param[out] _position The new position of the light
+		//----------------------------------------------------------------------------------------------------------------------
+		void positionChanged(int _lightIndex, ngl::Vec3 _position);
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Signal when the light ambient colour is changed
+		/// @param[out] _lightIndex The light to change
+		/// @param[out] _ambient The new ambient colour of the light
+		//----------------------------------------------------------------------------------------------------------------------
+		void ambientChanged(int _lightIndex, ngl::Vec3 _ambient);
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Signal when the light diffuse colour is changed
+		/// @param[out] _lightIndex The light to change
+		/// @param[out] _diffuse The new diffuse colour of the light
+		//----------------------------------------------------------------------------------------------------------------------
+		void diffuseChanged(int _lightIndex, ngl::Vec3 _diffuse);
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Signal when the light specular colour is changed
+		/// @param[out] _lightIndex The light to change
+		/// @param[out] _specular The new specular colour of the light
+		//----------------------------------------------------------------------------------------------------------------------
+		void specularChanged(int _lightIndex, ngl::Vec3 _specular);
+
+
 	private:
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief The UI of this class
@@ -63,7 +84,7 @@ class LightsDialog : public QDialog
 		/// @brief Set the max number of lights
 		/// This must be also defined in the shaders
 		//----------------------------------------------------------------------------------------------------------------------
-		static constexpr int NumLights = 1;
+		static constexpr int NumLights = 4;
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Container of light information
 		//----------------------------------------------------------------------------------------------------------------------
@@ -82,8 +103,9 @@ class LightsDialog : public QDialog
 		void changeLightInfo(int _index);
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Change the isActive status
+		/// @param _status The new isActive status
 		//----------------------------------------------------------------------------------------------------------------------
-		void setActiveStatus();
+		void setActiveStatus(bool _status);
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Set the position
 		//----------------------------------------------------------------------------------------------------------------------

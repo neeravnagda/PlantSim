@@ -1,6 +1,6 @@
-#include <sys/stat.h>
-#include <QRegExp>
-#include <QRegExpValidator>
+#include <QFileInfo>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <unordered_set>
 #include "PlantBlueprint.h"
 #include "PlantBlueprintDialog.h"
@@ -23,20 +23,20 @@ PlantBlueprintDialog::PlantBlueprintDialog(QWidget *parent) :
 	const QString fileRegExp = "(/\\w+)?((../)|(\\w+/))*(\\w+\\.)";
 
 	//Add a validator to the plant blueprint name
-	QRegExp pbNameExp("\\w+");//Must be at least one char
-	QRegExpValidator *pbNameValidator = new QRegExpValidator(pbNameExp, this);
+	QRegularExpression pbNameExp("\\w+");//Must be at least one char
+	QRegularExpressionValidator *pbNameValidator = new QRegularExpressionValidator(pbNameExp, this);
 	m_ui->m_blueprintName->setValidator(pbNameValidator);
 
 	//Add a validator to the QLineEdit for L-system grammar text file
 	QString txtFileExp = fileRegExp + "(txt)";
-	QRegExp txtFileRegExp(txtFileExp);
-	QRegExpValidator *txtFileValidator = new QRegExpValidator(txtFileRegExp, this);
+	QRegularExpression txtFileRegExp(txtFileExp);
+	QRegularExpressionValidator *txtFileValidator = new QRegularExpressionValidator(txtFileRegExp, this);
 	m_ui->m_grammarFilePath->setValidator(txtFileValidator);
 
 	//Add a validator for the image paths
 	QString imageFileExp = fileRegExp + "((exr)|(gif)|(jpeg)|(jpg)|(png)|(tif)|(tiff))";
-	QRegExp imageFileRegExp(imageFileExp);
-	QRegExpValidator *imageFileValidator = new QRegExpValidator(imageFileRegExp, this);
+	QRegularExpression imageFileRegExp(imageFileExp);
+	QRegularExpressionValidator *imageFileValidator = new QRegularExpressionValidator(imageFileRegExp, this);
 	m_ui->m_woodTextureFilePath->setValidator(imageFileValidator);
 	m_ui->m_leafTextureFilePath->setValidator(imageFileValidator);
 
@@ -162,7 +162,7 @@ void PlantBlueprintDialog::resetLeafTextureFileTextColour()
 //----------------------------------------------------------------------------------------------------------------------
 bool PlantBlueprintDialog::checkFileExists(QString _fileName)
 {
-	struct stat buffer;
-	return (stat(_fileName.toStdString().c_str(), &buffer) == 0);
+	QFileInfo file(_fileName);
+	return (file.exists());
 }
 //----------------------------------------------------------------------------------------------------------------------

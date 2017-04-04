@@ -1,8 +1,8 @@
-#version 330
+#version 330 core
 /// @brief the output colour
 layout (location = 0) out vec4 fragColour;
 
-#define MAX_LIGHTS 1
+#define MAX_LIGHTS 4
 /// @brief fragment position
 in vec3 fragPos;
 /// @brief fragment normal
@@ -19,13 +19,11 @@ in vec3 lightDirections[MAX_LIGHTS];
 struct LightInfo
 {
 	bool isActive;
+	vec3 Position;//World position of the light
 	vec3 La;//Ambient light intensity
 	vec3 Ld;//Diffuse light intensity
 	vec3 Ls;//Specular light intensity
 };
-
-/// @brief An array of light positions
-uniform vec3 LightPositions[MAX_LIGHTS];
 
 /// @brief the lights in the scene
 uniform LightInfo Lights[MAX_LIGHTS];
@@ -48,9 +46,6 @@ uniform MaterialInfo Material = MaterialInfo(
 			10.0f//Specular shininess
 			);
 
-//Calculate the vertex position
-vec3 v = normalize(fragPos);
-
 /// @brief calculate the light contribution of one light
 vec3 calculateLightContribution(in int _i)
 {
@@ -58,7 +53,7 @@ vec3 calculateLightContribution(in int _i)
 	if (lambertTerm > 0)
 	{
 		//Light vector
-		vec3 s = LightPositions[_i] - fragPos;
+		vec3 s = Lights[_i].Position - fragPos;
 		//Normal dot Half-vector
 		float NdotH = max(dot(fragNormal, halfVectors[_i]),0.0f);
 
@@ -76,7 +71,8 @@ void main(void)
 	vec3 totalColour = vec3(0,0,0);
 	for (int i=0; i<MAX_LIGHTS; ++i)
 	{
-		if (Lights[i].isActive) totalColour += calculateLightContribution(i);
+		//if (Lights[i].isActive)
+		totalColour += calculateLightContribution(i);
 	}
 
 	fragColour = vec4(totalColour,1.0f);

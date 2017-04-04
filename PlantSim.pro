@@ -4,7 +4,7 @@ TARGET=PlantSim
 # were are going to default to a console app
 CONFIG += console
 # core Qt Libs to use add more here if needed.
-QT+=gui opengl core
+QT+=gui opengl core widgets
 
 #Configure folders and file paths
 # where our exe is going to live (root of project)
@@ -49,13 +49,14 @@ HEADERS+= include/NGLScene.h \
     include/PlantBlueprint.h \
     include/MainWindow.h \
     include/PlantBlueprintDialog.h \
-    include/LightsDialog.h
+    include/LightsDialog.h \
+    include/Light.h
 
 # add the readme and glsl shader files
 OTHER_FILES+= README.md \
-                          shaders/Phong.vertex.glsl \
-                          shaders/Phong.fragment.glsl \
-                          rules.txt
+                          rules.txt \
+                          shaders/BlinnPhong.fragment.glsl \
+                          shaders/BlinnPhong.vertex.glsl
 
 # add the ui form
 FORMS += ui/MainWindow.ui \

@@ -6,7 +6,18 @@ layout (location = 1) in vec2 inUV;
 /// @brief The normal passed in
 layout (location = 2) in vec3 inNormal;
 
-#define MAX_LIGHTS 1
+#define MAX_LIGHTS 4
+
+/// @struct LightInfo
+/// @brief a structure to hold light parameters
+struct LightInfo
+{
+	bool isActive;
+	vec3 Position;//World position of the light
+	vec3 La;//Ambient light intensity
+	vec3 Ld;//Diffuse light intensity
+	vec3 Ls;//Specular light intensity
+};
 
 uniform 	vec3 viewerPos;
 /// @brief model matrix
@@ -17,8 +28,8 @@ uniform mat4 MV;
 uniform mat4 MVP;
 /// @brief normal matrix
 uniform mat3 N;
-/// @brief An array of light positions
-uniform vec3 LightPositions[MAX_LIGHTS];
+/// @brief An array of lights
+uniform LightInfo Lights[MAX_LIGHTS];
 
 /// @brief fragment position
 out vec3 fragPos;
@@ -47,7 +58,10 @@ void main(void)
 	//Calculate half-vectors and light directions
 	for (int i=0; i<MAX_LIGHTS; ++i)
 	{
-		lightDirections[i] = normalize(vec3(LightPositions[i] - eyePos.xyz));
-		halfVectors[i] = normalize(eyeDirection + lightDirections[i]);
+		if (Lights[i].isActive)
+		{
+			lightDirections[i] = normalize(vec3(Lights[i].Position - eyePos.xyz));
+			halfVectors[i] = normalize(eyeDirection + lightDirections[i]);
+		}
 	}
 }

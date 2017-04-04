@@ -5,21 +5,20 @@
 #include <ngl/ShaderLib.h>
 #include <ngl/VAOPrimitives.h>
 #include "NGLScene.h"
-
+//----------------------------------------------------------------------------------------------------------------------
 NGLScene::NGLScene(QWidget *_parent) : QOpenGLWidget(_parent)
 {
 	// re-size the widget to that of the parent (in this case the GLFrame passed in on construction)
 	setFocus();
 	this->resize(_parent->size());
 }
-
-
+//----------------------------------------------------------------------------------------------------------------------
 NGLScene::~NGLScene()
 {
 	PlantBlueprint::destroyAll();//Clear all Plant Blueprints
 	std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
 }
-
+//----------------------------------------------------------------------------------------------------------------------
 void NGLScene::updatePlants()
 {
 	for (auto &p : m_plants)
@@ -28,21 +27,20 @@ void NGLScene::updatePlants()
 	}
 	update();
 }
-
+//----------------------------------------------------------------------------------------------------------------------
 void NGLScene::createPlant(std::string _type, float _x, float _z)
 {
 	m_plants.emplace_back(_type, ngl::Vec3(_x,0.0f,_z));
 	update();
 }
-
+//----------------------------------------------------------------------------------------------------------------------
 void NGLScene::resizeGL(int _w , int _h)
 {
 	m_camera.setShape(45, static_cast<float>(width())/height(), 0.1f, 100.0f);
 	m_win.width  = static_cast<int>( _w * devicePixelRatio() );
 	m_win.height = static_cast<int>( _h * devicePixelRatio() );
 }
-
-
+//----------------------------------------------------------------------------------------------------------------------
 void NGLScene::initializeGL()
 {
 	// we need to initialise the NGL lib which will load all of the OpenGL functions, this must
@@ -57,7 +55,18 @@ void NGLScene::initializeGL()
 
 	PlantBlueprint::init();
 
-	ngl::Vec3 from = ngl::Vec3(0.0f, 4.0f, -10.0f);
+		//Create a default blueprint
+		//Will need to delete this later
+		PlantBlueprint *pb = PlantBlueprint::instance("test");
+		pb->readGrammarFromFile("rules.txt");
+		pb->setDecay(1.6f);
+		pb->setRootRadius(0.1f);
+		pb->setMaxDepth(5);
+		pb->setDrawAngle(45.0f);
+		pb->setDrawLength(1);
+		createPlant(static_cast<std::string>("test"), 0.0f, 0.0f);
+
+	ngl::Vec3 from = ngl::Vec3(2.0f, 2.0f, 10.0f);
 	ngl::Vec3 to = ngl::Vec3::zero();
 	ngl::Vec3 up = ngl::Vec3::up();
 	m_camera.set(from, to, up);
@@ -66,22 +75,21 @@ void NGLScene::initializeGL()
 
 	shader->setUniform("viewerPos", m_camera.getEye().toVec3());
 
-	std::string activeStatus = "Lights[0].isActive";
-	shader->setUniform(activeStatus, true);
-	std::string pos = "LightPositions[0]";
-	shader->setUniform(pos, ngl::Vec3(-2.0f,2.0f,0.0f));
-	std::string ambient = "Lights[0].La";
-	shader->setUniform(ambient, ngl::Vec3(1.0f,0.0f,0.0f));
-	std::string diffuse = "Lights[0].Ld";
-	shader->setUniform(diffuse, ngl::Vec3(1.0f,1.0f,1.0f));
-	std::string specular = "Lights[0].Ls";
-	shader->setUniform(specular, ngl::Vec3(1.0f,1.0f,1.0f));
+	//Set default light settings
+	for (int i=0; i<4; ++i)
+	{
+		setLightActive(i, false);
+		setLightPosition(i, ngl::Vec3::zero());
+		setLightAmbient(i, ngl::Vec3(0.5f,0.5f,0.5f));
+		setLightDiffuse(i, ngl::Vec3(1.0f,1.0f,1.0f));
+		setLightSpecular(i, ngl::Vec3(1.0f,1.0f,1.0f));
+	}
 
 	glViewport(0,0,width(),height());
 
 	ngl::VAOPrimitives::instance()->createTrianglePlane("groundPlane", 1, 1, 1, 1, ngl::Vec3::up());
 }
-
+//----------------------------------------------------------------------------------------------------------------------
 void NGLScene::sendUniformsToShader()
 {
 	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
@@ -109,7 +117,7 @@ void NGLScene::sendUniformsToShader()
 	shader->setUniform("MVP", MVP);
 	shader->setUniform("N", N);
 }
-
+//----------------------------------------------------------------------------------------------------------------------
 void NGLScene::drawScene()
 {
 	sendUniformsToShader();
@@ -119,7 +127,7 @@ void NGLScene::drawScene()
 		p.draw(m_mouseGlobalTX, m_camera.getViewMatrix(), m_camera.getProjectionMatrix());
 	}
 }
-
+//----------------------------------------------------------------------------------------------------------------------
 void NGLScene::paintGL()
 {
 	// clear the screen and depth buffer
@@ -127,9 +135,52 @@ void NGLScene::paintGL()
 	glViewport(0,0,m_win.width,m_win.height);
 	drawScene();
 }
-
 //----------------------------------------------------------------------------------------------------------------------
-
+void NGLScene::setLightActive(int _light, bool _status)
+{
+	std::string lightParam = "Lights[" + std::to_string(_light) + "].isActive";
+	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
+	(*shader)["Phong"]->use();
+	shader->setUniform(lightParam, _status);
+	update();
+}
+//----------------------------------------------------------------------------------------------------------------------
+void NGLScene::setLightPosition(int _light, ngl::Vec3 _position)
+{
+	std::string lightParam = "Lights[" + std::to_string(_light) + "].Position";
+	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
+	(*shader)["Phong"]->use();
+	shader->setUniform(lightParam, _position);
+	update();
+}
+//----------------------------------------------------------------------------------------------------------------------
+void NGLScene::setLightAmbient(int _light, ngl::Vec3 _ambient)
+{
+	std::string lightParam = "Lights[" + std::to_string(_light) + "].La";
+	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
+	(*shader)["Phong"]->use();
+	shader->setUniform(lightParam, _ambient);
+	update();
+}
+//----------------------------------------------------------------------------------------------------------------------
+void NGLScene::setLightDiffuse(int _light, ngl::Vec3 _diffuse)
+{
+	std::string lightParam = "Lights[" + std::to_string(_light) + "].Ld";
+	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
+	(*shader)["Phong"]->use();
+	shader->setUniform(lightParam, _diffuse);
+	update();
+}
+//----------------------------------------------------------------------------------------------------------------------
+void NGLScene::setLightSpecular(int _light, ngl::Vec3 _specular)
+{
+	std::string lightParam = "Lights[" + std::to_string(_light) + "].Ls";
+	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
+	(*shader)["Phong"]->use();
+	shader->setUniform(lightParam, _specular);
+	update();
+}
+//----------------------------------------------------------------------------------------------------------------------
 void NGLScene::keyPressEvent(QKeyEvent *_event)
 {
 	// this method is called every time the main window recives a key event.
@@ -153,3 +204,4 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
 
 	update();
 }
+//----------------------------------------------------------------------------------------------------------------------
