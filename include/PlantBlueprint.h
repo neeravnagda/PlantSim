@@ -125,13 +125,13 @@ class PlantBlueprint
 		/// @return Reference to a string representing the branch geometry
 		/// This is a handle used for draw calls
 		//----------------------------------------------------------------------------------------------------------------------
-		static std::string& getGeometryName(){return s_branchGeometryName;}
+		static const std::string& getGeometryName(){return s_branchGeometryName;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for the leaf geometry name
 		/// @return Reference to a string representing the leaf geometry
 		/// This is a handle used for draw calls
 		//----------------------------------------------------------------------------------------------------------------------
-		static std::string& getLeafGeometryName(){return s_leafGeometryName;}
+		static const std::string& getLeafGeometryName(){return s_leafGeometryName;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for s_keys
 		/// @return Reference to the keys of the map, i.e. the names of the instances

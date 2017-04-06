@@ -4,7 +4,7 @@
 #include <random>
 #include <string>
 #include <vector>
-#include <ngl/Transformation.h>
+#include <ngl/Mat4.h>
 #include <ngl/Vec3.h>
 #include "Branch.h"
 #include "PlantBlueprint.h"
@@ -83,9 +83,9 @@ class Plant
 		//----------------------------------------------------------------------------------------------------------------------
 		std::vector<Branch> m_branches;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Transformation stack for draw calls
+		/// @brief Transformation for draw calls
 		//----------------------------------------------------------------------------------------------------------------------
-		ngl::Transformation m_transform;
+		ngl::Mat4 m_transform;
 
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Generate a random number for stochastic L-systems
@@ -136,6 +136,13 @@ class Plant
 		/// @param _projectionMatrix The projection matrix from the camera
 		//----------------------------------------------------------------------------------------------------------------------
 		void loadMatricesToShader(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _projectionMatrix);
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Calculate axis-angle rotation matrix
+		/// @param _angle The angle to rotate in radians
+		/// @param _axis The axis to rotate around
+		/// This is a function "euler" in ngl::Mat4, but this is reimplemented to avoid converting from radians to degrees and back to radians
+		//----------------------------------------------------------------------------------------------------------------------
+		ngl::Mat4 axisAngleRotationMatrix(float _angle, ngl::Vec3 _axis); //whatever im fabulous. idgaf
 };
 
 #endif // PLANT_H_

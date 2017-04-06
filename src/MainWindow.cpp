@@ -7,13 +7,11 @@
 #include "ui_MainWindow.h"
 #include "ui_PlantBlueprintDialog.h"
 #include "ui_LightsDialog.h"
-#include "ui_About.h"
 #include "PlantBlueprint.h"
 //----------------------------------------------------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
-	m_ui(new Ui::MainWindow),
-	m_about(new Ui::About)
+	m_ui(new Ui::MainWindow)
 {
 	m_ui->setupUi(this);
 	m_gl = new NGLScene(this);

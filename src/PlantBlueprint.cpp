@@ -4,6 +4,7 @@
 #include <ngl/VAOPrimitives.h>
 #include "PlantBlueprint.h"
 //----------------------------------------------------------------------------------------------------------------------
+// Set the static members
 std::unordered_map<std::string, PlantBlueprint*> PlantBlueprint::s_instances;
 std::unordered_set<std::string> PlantBlueprint::s_keys;
 rTree_t PlantBlueprint::s_rTree;

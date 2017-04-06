@@ -18,7 +18,6 @@
 
 namespace Ui {
 class MainWindow;
-class About;
 }
 
 class MainWindow : public QMainWindow
@@ -132,7 +131,7 @@ class MainWindow : public QMainWindow
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Dialog box to manage lights in the scene
 		//----------------------------------------------------------------------------------------------------------------------
-		LightsDialog *m_lightsDialog;
+		LightsDialog *m_lightsDialog; // IM AM A MOTHER FUCKING KINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG YOZZZSSSSSSS!!!
 };
 
 #endif // MAINWINDOW_H_

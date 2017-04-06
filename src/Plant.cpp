@@ -28,7 +28,7 @@ void Plant::loadMatricesToShader(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix
 	ngl::Mat4 MVP;
 	ngl::Mat3 N;
 	ngl::Mat4 M;
-	M = m_transform.getMatrix() * _mouseGlobalTX;
+	M = m_transform * _mouseGlobalTX;
 	MV = M * _viewMatrix;
 	MVP = M * _projectionMatrix;
 	N = MV;
@@ -39,16 +39,49 @@ void Plant::loadMatricesToShader(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix
 	shader->setUniform("N", N);
 }
 //----------------------------------------------------------------------------------------------------------------------
+//Rotation matrix found from https://en.wikipedia.org/wiki/Rotation_matrix
+ngl::Mat4 Plant::axisAngleRotationMatrix(float _angle, ngl::Vec3 _axis)
+{
+	const float cosTheta = cos(_angle);
+	const float oneMinusCosTheta = 1 - cosTheta;
+	const float sinTheta = sin(_angle);
+	ngl::Mat4 rot;
+	rot.m_00 = cosTheta + _axis.m_x * _axis.m_x * oneMinusCosTheta;
+	rot.m_01 = _axis.m_y * _axis.m_x * oneMinusCosTheta + _axis.m_z * sinTheta;
+	rot.m_02 = _axis.m_z * _axis.m_x * oneMinusCosTheta - _axis.m_y * sinTheta;
+	rot.m_03 = 0.0f;
+
+	rot.m_10 = _axis.m_x * _axis.m_y * oneMinusCosTheta - _axis.m_z * sinTheta;
+	rot.m_11 = cosTheta + _axis.m_y * _axis.m_y * oneMinusCosTheta;
+	rot.m_12 = _axis.m_z * _axis.m_y * oneMinusCosTheta + _axis.m_x * sinTheta;
+	rot.m_13 = 0.0f;
+
+	rot.m_20 = _axis.m_x * _axis.m_z * oneMinusCosTheta + _axis.m_y * sinTheta;
+	rot.m_21 = _axis.m_y * _axis.m_z * oneMinusCosTheta - _axis.m_x * sinTheta;
+	rot.m_22 = cosTheta + _axis.m_z * _axis.m_z * oneMinusCosTheta;
+	rot.m_23 = 0.0f;
+
+	rot.m_30 = 0.0f;
+	rot.m_31 = 0.0f;
+	rot.m_32 = 0.0f;
+	rot.m_33 = 1.0f;
+
+	return rot;
+}
+//----------------------------------------------------------------------------------------------------------------------
 void Plant::draw(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _projectionMatrix)
 {
 	ngl::VAOPrimitives *prim = ngl::VAOPrimitives::instance();
+
+	const float cosTheta = cos(m_blueprint->getDrawAngleRadians());
+	const float sinTheta = sin(m_blueprint->getDrawAngleRadians());
 
 	unsigned lastBranchDepth = 0;
 	float decay = 1.0f;
 	std::stack<ngl::Vec3> positionStack;
 	positionStack.emplace(m_position);
 	std::stack<ngl::Vec3> rotationStack;
-	rotationStack.emplace(ngl::Vec3(90,0,0));
+	rotationStack.emplace(ngl::Vec3(0.0f,0.0f,1.0f));
 
 	for (auto &b : m_branches)
 	{
@@ -71,15 +104,17 @@ void Plant::draw(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _pro
 		}
 
 		//Set initial scale
-		ngl::Vec3 branchScale = ngl::Vec3(m_blueprint->getRootRadius(), m_blueprint->getRootRadius(), m_blueprint->getDrawLength());
-		branchScale *= decay;
-		m_transform.setScale(branchScale);
+		ngl::Mat4 scaleMatrix;
+		scaleMatrix.scale(m_blueprint->getRootRadius()*decay, m_blueprint->getRootRadius()*decay, m_blueprint->getDrawLength()*decay);
 
 		//Set the initial transformation
-		m_transform.setPosition(positionStack.top() / 2);
+		//m_transform.setPosition(positionStack.top() / 2);
+		ngl::Vec3 position = positionStack.top();
 
 		//Set the initial direction
-		m_transform.setRotation(rotationStack.top());
+		//m_transform.setRotation(rotationStack.top());
+		ngl::Mat4 rotationMatrix;
+		ngl::Vec3 rotation = ngl::Vec3(0.0f,1.0f,0.0f);
 
 		for (char &c : b.m_string)
 		{
@@ -87,52 +122,82 @@ void Plant::draw(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _pro
 			{
 				case 'F' :
 				{
+					std::cout<<"vec1: "<<rotation<<" vec2: "<<rotationStack.top()<<"\n";
+					float angle = acos(rotation.dot(rotationStack.top()));
+					ngl::Vec3 axis;
+					axis.cross(rotation, rotationStack.top());
+					std::cout<<"Angle: "<<angle<<" Axis: "<<axis<<"\n";
+					rotationMatrix = axisAngleRotationMatrix(angle, axis);
 					//Draw the cylinder
-					m_transform.setScale(branchScale);
+					m_transform = scaleMatrix * rotationMatrix;
+					m_transform.m_30 = position.m_x;
+					m_transform.m_31 = position.m_y;
+					m_transform.m_32 = position.m_z;
 					loadMatricesToShader(_mouseGlobalTX, _viewMatrix, _projectionMatrix);
 					prim->draw(m_blueprint->getGeometryName());
 
 					//Update the position
-					//										ngl::Vec3 newPos = m_blueprint->getDrawLength() * eulerToAxis(m_transform.getRotation()) * decay / 2;
-					//										m_transform.addPosition(newPos);
-					/*
-										//Draw the sphere
-										ngl::Vec3 sphereScale = ngl::Vec3(m_blueprint->getRootRadius(),m_blueprint->getRootRadius(),m_blueprint->getRootRadius());
-										sphereScale *= decay;
-										m_transform.setScale(sphereScale);
-										loadMatricesToShader(_mouseGlobalTX, _viewMatrix, _projectionMatrix);
-										prim->draw("sphere");
-*/
+					position += m_blueprint->getDrawLength()*rotation*decay;
 					break;
 				}
-				case '/' :
+				//rotate the direction vector by +theta on the xy plane
+				case static_cast<char>('/') :
 				{
-					m_transform.addRotation(0,0,m_blueprint->getDrawAngle());
+					float x = cosTheta*rotation.m_x - sinTheta*rotation.m_y;
+					float y = sinTheta*rotation.m_x + cosTheta*rotation.m_y;
+					rotation.m_x = x;
+					rotation.m_y = y;
+					//rotation.normalize();
 					break;
 				}
-				case '\\' :
+				//rotate the direction vector by -theta on the xy plane
+				case static_cast<char>('\\') :
 				{
-					m_transform.addRotation(0,0,-(m_blueprint->getDrawAngle()));
+					float x = cosTheta*rotation.m_x + sinTheta*rotation.m_y;
+					float y = cosTheta*rotation.m_y - sinTheta*rotation.m_x;
+					rotation.m_x = x;
+					rotation.m_y = y;
+					rotation.normalize();
 					break;
 				}
-				case '+' :
+				//rotate the direction vector by +theta on the yz plane
+				case static_cast<char>('+') :
 				{
-					m_transform.addRotation(m_blueprint->getDrawAngle(),0,0);
+					float y = cosTheta*rotation.m_y - sinTheta*rotation.m_z;
+					float z = sinTheta*rotation.m_y + cosTheta*rotation.m_z;
+					rotation.m_y = y;
+					rotation.m_z = z;
+					rotation.normalize();
 					break;
 				}
-				case '-' :
+				//rotate the direction vector by -theta on the yz plane
+				case static_cast<char>('-') :
 				{
-					m_transform.addRotation(-(m_blueprint->getDrawAngle()),0,0);
+					float y = cosTheta*rotation.m_y + sinTheta*rotation.m_z;
+					float z = cosTheta*rotation.m_z - sinTheta*rotation.m_y;
+					rotation.m_y = y;
+					rotation.m_z = z;
+					rotation.normalize();
 					break;
 				}
-				case '&' :
+				//rotate the direction vector by +theta on the xz plane
+				case static_cast<char>('&') :
 				{
-					m_transform.addRotation(0,m_blueprint->getDrawAngle(),0);
+					float x = cosTheta*rotation.m_x + sinTheta*rotation.m_z;
+					float z = cosTheta*rotation.m_z - sinTheta*rotation.m_x;
+					rotation.m_x = x;
+					rotation.m_z = z;
+					rotation.normalize();
 					break;
 				}
-				case '^' :
+				//rotate the direction vector by -theta on the xz plane
+				case static_cast<char>('^') :
 				{
-					m_transform.addRotation(0,-(m_blueprint->getDrawAngle()),0);
+					float x = cosTheta*rotation.m_x - sinTheta*rotation.m_z;
+					float z = cosTheta*rotation.m_z - sinTheta*rotation.m_x;
+					rotation.m_x = x;
+					rotation.m_z = z;
+					rotation.normalize();
 					break;
 				}
 				default : break;
@@ -140,8 +205,8 @@ void Plant::draw(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _pro
 		}//End for loop [char]
 
 		//Update the variables
-		positionStack.push(b.m_endPosition);
-		rotationStack.push(m_transform.getRotation());
+		positionStack.push(position);
+		rotationStack.push(rotation);
 		lastBranchDepth = b.m_creationDepth;
 	}//End for loop [branches]
 }
