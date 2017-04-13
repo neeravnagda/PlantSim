@@ -115,13 +115,9 @@ class NGLScene : public QOpenGLWidget
 		std::vector<Plant> m_plants;
 
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Draw the meshes in the scene
+		/// @brief Draw the ground plane and the plants in the scene
 		//----------------------------------------------------------------------------------------------------------------------
 		void drawScene();
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Send uniforms to the shader to draw the ground plane
-		//----------------------------------------------------------------------------------------------------------------------
-		void sendUniformsToShader();
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Qt Event called when a key is pressed
 		/// @param [in] _event the Qt event to query for size etc

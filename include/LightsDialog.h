@@ -10,7 +10,7 @@
 /// @file LightsDialog.h
 /// @brief This class contains the user interface required to manage lights in the scene
 /// @author Neerav Nagda
-/// @version 0.1
+/// @version 1.0
 /// @date 02/04/17
 //----------------------------------------------------------------------------------------------------------------------
 

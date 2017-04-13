@@ -6,8 +6,8 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
+#include <ngl/Obj.h>
 #include <ngl/ShaderLib.h>
-#include <ngl/Util.h>
 #include "ProductionRule.h"
 #include "RTreeTypes.h"
 
@@ -48,8 +48,13 @@ class PlantBlueprint
 		static void destroyAll();
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Initialise the shaders and geometry
+		/// Note this can only be performed after a valid GL context has been created
 		//----------------------------------------------------------------------------------------------------------------------
 		static void init();
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Draw the cylinder
+		//----------------------------------------------------------------------------------------------------------------------
+		static void drawCylinder();
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Read the L-system grammar from a text file
 		/// @param _filePath File path to the text file containing L-system grammar and axiom
@@ -81,57 +86,60 @@ class PlantBlueprint
 		//----------------------------------------------------------------------------------------------------------------------
 		void setDecay(float _decayConstant){m_decayConstant = _decayConstant;}
 		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Set function for m_leavesPerBranch
+		/// @param _numLeaves New number of leaves per branch
+		//----------------------------------------------------------------------------------------------------------------------
+		void setNodesPerBranch(unsigned _numNodes){m_nodesPerBranch = _numNodes;}
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Set function for m_maxDeviation
+		/// @param _deviation New max deviation for space colonisation
+		//----------------------------------------------------------------------------------------------------------------------
+		void setMaxDeviation(float _deviation){m_maxDeviation = _deviation;}
+		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_axiom
 		/// @return Reference of the axiom for the L-system
 		//----------------------------------------------------------------------------------------------------------------------
-		const std::string& getAxiom(){return m_axiom;}
+		const std::string& getAxiom() const {return m_axiom;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_maxDepth
 		/// @return Reference of the max depth of the L-system
 		//----------------------------------------------------------------------------------------------------------------------
-		const unsigned& getMaxDepth(){return m_maxDepth;}
+		const unsigned& getMaxDepth() const {return m_maxDepth;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_productionRules
 		/// @return Reference to the container of Production Rules
 		//----------------------------------------------------------------------------------------------------------------------
-		const std::vector<ProductionRule>& getProductionRules(){return m_productionRules;}
+		const std::vector<ProductionRule>& getProductionRules() const {return m_productionRules;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_drawLength
 		/// @return Reference to the draw length
 		//----------------------------------------------------------------------------------------------------------------------
-		const float& getDrawLength(){return m_drawLength;}
+		const float& getDrawLength() const {return m_drawLength;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_drawAngle
 		/// @return Reference to the draw angle
 		//----------------------------------------------------------------------------------------------------------------------
-		const float& getDrawAngle(){return m_drawAngle;}
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Get function for m_drawAngle
-		/// @return The draw angle in radians
-		//----------------------------------------------------------------------------------------------------------------------
-		float getDrawAngleRadians() const {return ngl::radians(m_drawAngle);}
+		const float& getDrawAngle() const {return m_drawAngle;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_rootRadius
 		/// @return Reference to the initial radius
 		//----------------------------------------------------------------------------------------------------------------------
-		const float& getRootRadius(){return m_rootRadius;}
+		const float& getRootRadius() const {return m_rootRadius;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_decayConstant
 		/// @return The decay constant
 		//----------------------------------------------------------------------------------------------------------------------
-		float getDecayConstant(){return m_decayConstant;}
+		const float& getDecayConstant() const {return m_decayConstant;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Get function for the branch geometry name
-		/// @return Reference to a string representing the branch geometry
-		/// This is a handle used for draw calls
+		/// @brief Get function for m_leavesPerBranch
+		/// @return The number of leaves per branch
 		//----------------------------------------------------------------------------------------------------------------------
-		static const std::string& getGeometryName(){return s_branchGeometryName;}
+		const unsigned& getNodesPerBranch() const {return m_nodesPerBranch;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Get function for the leaf geometry name
-		/// @return Reference to a string representing the leaf geometry
-		/// This is a handle used for draw calls
+		/// @brief Get function for m_maxDeviation
+		/// @return The maximum deviation for space colonisation
 		//----------------------------------------------------------------------------------------------------------------------
-		static const std::string& getLeafGeometryName(){return s_leafGeometryName;}
+		const float& getMaxDeviation() const {return m_maxDeviation;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for s_keys
 		/// @return Reference to the keys of the map, i.e. the names of the instances
@@ -141,11 +149,20 @@ class PlantBlueprint
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for the shader name
 		/// @return Reference to the shader name
+		/// This is needed for draw calls
 		//----------------------------------------------------------------------------------------------------------------------
 		static const std::string& getShaderName(){return s_shaderProgramName;}
 
 	protected:
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief constructor
+		/// Made protected as this is a multiton
+		//----------------------------------------------------------------------------------------------------------------------
 		PlantBlueprint(){}
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief destructor
+		/// Made protected as this is a multiton
+		//----------------------------------------------------------------------------------------------------------------------
 		~PlantBlueprint(){}
 
 	private:
@@ -159,14 +176,6 @@ class PlantBlueprint
 		//----------------------------------------------------------------------------------------------------------------------
 		static std::unordered_set<std::string> s_keys;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Handle for the branch geometry
-		//----------------------------------------------------------------------------------------------------------------------
-		static std::string s_branchGeometryName;
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Handle for the leaf geometry
-		//----------------------------------------------------------------------------------------------------------------------
-		static std::string s_leafGeometryName;
-		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Spatial visualisation of the environment
 		//----------------------------------------------------------------------------------------------------------------------
 		static rTree_t s_rTree;
@@ -174,6 +183,10 @@ class PlantBlueprint
 		/// @brief Handle for the shader name
 		//----------------------------------------------------------------------------------------------------------------------
 		static std::string s_shaderProgramName;
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief The cylinder mesh
+		//----------------------------------------------------------------------------------------------------------------------
+		static std::unique_ptr<ngl::Obj> s_cylinder;
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief L-system axiom
 		//----------------------------------------------------------------------------------------------------------------------
@@ -202,6 +215,14 @@ class PlantBlueprint
 		/// @brief The decay constant
 		//----------------------------------------------------------------------------------------------------------------------
 		float m_decayConstant;
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief The number of leaves in a branch
+		//----------------------------------------------------------------------------------------------------------------------
+		unsigned m_nodesPerBranch;
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief The maximum deviation of nodes for space colonisation
+		//----------------------------------------------------------------------------------------------------------------------
+		float m_maxDeviation;
 };
 
 #endif // PLANTBLUEPRINT_H_

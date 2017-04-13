@@ -3,6 +3,8 @@
 layout (location = 0) out vec4 fragColour;
 
 #define MAX_LIGHTS 4
+/// @brief the UV coordinates
+in vec2 uvCoord;
 /// @brief fragment position
 in vec3 fragPos;
 /// @brief fragment normal
@@ -13,6 +15,9 @@ in vec3 eyeDirection;
 in vec3 halfVectors[MAX_LIGHTS];
 /// @brief array of light directions
 in vec3 lightDirections[MAX_LIGHTS];
+
+/// @brief the texture
+uniform sampler2D tex;
 
 /// @struct LightInfo
 /// @brief a structure to hold light parameters
@@ -46,9 +51,11 @@ uniform MaterialInfo Material = MaterialInfo(
 			10.0f//Specular shininess
 			);
 
+
 /// @brief calculate the light contribution of one light
 vec3 calculateLightContribution(in int _i)
 {
+	vec3 diffuseColour = texture(tex, uvCoord).xyz;
 	float lambertTerm = dot(fragNormal, lightDirections[_i]);
 	if (lambertTerm > 0)
 	{
@@ -59,7 +66,7 @@ vec3 calculateLightContribution(in int _i)
 
 		return vec3(
 					Lights[_i].La * Material.Ka +//Ambient contribution
-					Lights[_i].Ld * Material.Kd * lambertTerm +//Diffuse contribution
+					Lights[_i].Ld * diffuseColour * lambertTerm +//Diffuse contribution
 					Lights[_i].Ls * Material.Ks * pow(NdotH, Material.Shininess)//Specular contribution
 					);
 	}

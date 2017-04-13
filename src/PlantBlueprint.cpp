@@ -1,16 +1,14 @@
 #include <iostream>
 #include <algorithm>
 #include <fstream>
-#include <ngl/VAOPrimitives.h>
 #include "PlantBlueprint.h"
 //----------------------------------------------------------------------------------------------------------------------
 // Set the static members
 std::unordered_map<std::string, PlantBlueprint*> PlantBlueprint::s_instances;
 std::unordered_set<std::string> PlantBlueprint::s_keys;
 rTree_t PlantBlueprint::s_rTree;
-std::string PlantBlueprint::s_branchGeometryName = "branchGeometry";
-std::string PlantBlueprint::s_leafGeometryName = "leafGeometry";
 std::string PlantBlueprint::s_shaderProgramName = "Phong";
+std::unique_ptr<ngl::Obj> PlantBlueprint::s_cylinder;
 //----------------------------------------------------------------------------------------------------------------------
 PlantBlueprint* PlantBlueprint::instance(const std::string _instanceID)
 {
@@ -49,9 +47,9 @@ void PlantBlueprint::destroyAll()
 void PlantBlueprint::init()
 {
 	//Create the geometry
-	ngl::VAOPrimitives *prim = ngl::VAOPrimitives::instance();
-	prim->createCylinder(s_branchGeometryName,1.0f,1.0f,16,0);
-	prim->createTrianglePlane(s_leafGeometryName,1.0f,1.0f,1,1,ngl::Vec3::up());
+	s_cylinder.reset(new ngl::Obj("models/Cylinder.obj", "textures/treeTex.jpg"));
+	s_cylinder->createVAO();
+
 	//Load the shaders
 	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
 	shader->createShaderProgram(s_shaderProgramName);
@@ -60,6 +58,13 @@ void PlantBlueprint::init()
 	shader->loadShader(s_shaderProgramName,vertexShader, fragmentShader);
 	//Use the shader
 	(*shader)[s_shaderProgramName]->use();
+}
+//----------------------------------------------------------------------------------------------------------------------
+void PlantBlueprint::drawCylinder()
+{
+	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
+	(*shader)[s_shaderProgramName]->use();
+	s_cylinder->draw();
 }
 //----------------------------------------------------------------------------------------------------------------------
 //Set the first line of the file as the axiom

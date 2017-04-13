@@ -58,10 +58,17 @@ PlantBlueprintDialog::~PlantBlueprintDialog()
 //----------------------------------------------------------------------------------------------------------------------
 bool PlantBlueprintDialog::createPlantBlueprint()
 {
+	//Initialise to true as these have not been implemented yet
+	m_validationChecks[ValidationVariables::WOODTEXTURE] = true;
+	m_validationChecks[ValidationVariables::LEAFTEXTURE] = true;
+
+	//Return if any validation failed
 	for (bool &b : m_validationChecks)
 	{
 		if (b == false) {return false;}//Exit and do not create a new Plant Blueprint
 	}
+
+	//Create a new blueprint
 	PlantBlueprint *pb = PlantBlueprint::instance(m_ui->m_blueprintName->text().toStdString());
 	pb->readGrammarFromFile(m_ui->m_grammarFilePath->text().toStdString());
 	pb->setMaxDepth(m_ui->m_maxDepth->value());
@@ -69,6 +76,8 @@ bool PlantBlueprintDialog::createPlantBlueprint()
 	pb->setDrawAngle(static_cast<float>(m_ui->m_drawAngle->value()));
 	pb->setRootRadius(static_cast<float>(m_ui->m_rootRadius->value()));
 	pb->setDecay(static_cast<float>(m_ui->m_decay->value()));
+	pb->setMaxDeviation(static_cast<float>(m_ui->m_maxDeviation->value()));
+	pb->setNodesPerBranch(m_ui->m_numNodes->value());
 
 	return true;
 }

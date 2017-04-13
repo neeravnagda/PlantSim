@@ -2,16 +2,17 @@
 #define BRANCH_H_
 
 #include <string>
+#include <vector>
 #include <ngl/Vec3.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 /// @file Branch.h
 /// @brief This struct is used to contain precomputed branch information
 /// @author Neerav Nagda
-/// @version 1.2
-/// @date 01/04/17
+/// @version 2.0
+/// @date 10/04/17
 /// @struct Branch
-/// @brief Struct to contain precomputed branch information
+/// @brief Struct to contain precomputed branch information for drawing
 //----------------------------------------------------------------------------------------------------------------------
 typedef struct Branch
 {
@@ -24,20 +25,19 @@ typedef struct Branch
 		//----------------------------------------------------------------------------------------------------------------------
 		unsigned m_creationDepth;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief End position of the branch
-		//----------------------------------------------------------------------------------------------------------------------
-		ngl::Vec3 m_endPosition;
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief L-system string of the branch
+		/// @brief L-system string
 		//----------------------------------------------------------------------------------------------------------------------
 		std::string m_string;
 		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Positions of the branch nodes
+		//----------------------------------------------------------------------------------------------------------------------
+		std::vector<ngl::Vec3> m_positions;
+		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Constructor
 		//----------------------------------------------------------------------------------------------------------------------
-		Branch(int _ID, int _depth, ngl::Vec3 _endPos = ngl::Vec3::zero(), std::string _string = "") :
+		Branch(unsigned _ID, unsigned _depth, std::string _string = "") :
 			m_ID(_ID),
 			m_creationDepth(_depth),
-			m_endPosition(_endPos),
 			m_string(_string){}
 } Branch;
 

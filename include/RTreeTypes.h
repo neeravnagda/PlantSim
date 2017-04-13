@@ -1,7 +1,7 @@
 #ifndef RTREETYPES_H_
 #define RTREETYPES_H_
 
-#include <boost/tuple/tuple.hpp>
+#include <tuple>
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/geometries/segment.hpp>
 #include <boost/geometry/geometries/box.hpp>
@@ -27,9 +27,9 @@ typedef bg::model::box<point_t> box_t;
 //Define the tuple for values to add to the R-tree
 //The first is the geometry type
 //The second and third are IDs of the plant and branch
-typedef std::tuple<box_t,unsigned,unsigned> rTreeElement;
+typedef std::tuple<segment_t,unsigned,unsigned> rTreeElement;
 
-//Define the R-tree to store rTreeElement values with a quadratic algorithm
+//Define a R-tree with segments
 typedef bgi::rtree<rTreeElement, bgi::quadratic<16> > rTree_t;
 
 #endif // RTREETYPES_H_

@@ -31,6 +31,8 @@ uniform mat3 N;
 /// @brief An array of lights
 uniform LightInfo Lights[MAX_LIGHTS];
 
+/// @brief the UV coordinates
+out vec2 uvCoord;
 /// @brief fragment position
 out vec3 fragPos;
 /// @brief fragment normal
@@ -44,6 +46,8 @@ out vec3 lightDirections[MAX_LIGHTS];
 
 void main(void)
 {
+	uvCoord = inUV;
+
 	vec4 worldPosition = M * vec4(inVert, 1.0f);
 	eyeDirection = normalize(viewerPos - worldPosition.xyz);
 

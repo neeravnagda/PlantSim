@@ -1,10 +1,14 @@
 #include <cmath>
 #include <iostream>
 #include <stack>
+#include <ngl/Mat3.h>
+#include <ngl/Vec4.h>
 #include <ngl/ShaderLib.h>
-#include <ngl/VAOPrimitives.h>
 #include <ngl/NGLStream.h>
+#include <ngl/VAOPrimitives.h>
+#include <ngl/Util.h>
 #include "Plant.h"
+#include "RTreeTypes.h"
 //----------------------------------------------------------------------------------------------------------------------
 //Initialise random device and number generator
 std::random_device Plant::s_randomDevice;//Seed
@@ -12,11 +16,14 @@ std::mt19937 Plant::s_numberGenerator(Plant::s_randomDevice());//Mersienne Twist
 //----------------------------------------------------------------------------------------------------------------------
 Plant::Plant(std::string _blueprint, ngl::Vec3 _position)
 {
+	//Initialise the object
 	m_blueprint = PlantBlueprint::instance(_blueprint);
 	m_string = m_blueprint->getAxiom();
 	m_position = _position;
-	stringToBranches();//Initialise the struct m_branches
-	evaluateBranches();//Perform the first evaluation
+
+	//Initialise the simulation
+	stringToBranches();
+	evaluateBranches();
 }
 //----------------------------------------------------------------------------------------------------------------------
 Plant::~Plant(){}
@@ -24,15 +31,13 @@ Plant::~Plant(){}
 void Plant::loadMatricesToShader(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _projectionMatrix)
 {
 	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
-	ngl::Mat4 MV;
-	ngl::Mat4 MVP;
-	ngl::Mat3 N;
-	ngl::Mat4 M;
-	M = m_transform * _mouseGlobalTX;
-	MV = M * _viewMatrix;
-	MVP = M * _projectionMatrix;
-	N = MV;
+	//Create the matrices
+	ngl::Mat4 M = m_transform * _mouseGlobalTX;
+	ngl::Mat4 MV = M * _viewMatrix;
+	ngl::Mat4 MVP = M * _projectionMatrix;
+	ngl::Mat3 N = MV;
 	N.inverse();
+	//Set the uniforms
 	shader->setUniform("M", M);
 	shader->setUniform("MV", MV);
 	shader->setUniform("MVP", MVP);
@@ -42,9 +47,12 @@ void Plant::loadMatricesToShader(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix
 //Rotation matrix found from https://en.wikipedia.org/wiki/Rotation_matrix
 ngl::Mat4 Plant::axisAngleRotationMatrix(float _angle, ngl::Vec3 _axis)
 {
+	//Precompute trig functions
 	const float cosTheta = cos(_angle);
 	const float oneMinusCosTheta = 1 - cosTheta;
 	const float sinTheta = sin(_angle);
+
+	//Generate the rotation matrix
 	ngl::Mat4 rot;
 	rot.m_00 = cosTheta + _axis.m_x * _axis.m_x * oneMinusCosTheta;
 	rot.m_01 = _axis.m_y * _axis.m_x * oneMinusCosTheta + _axis.m_z * sinTheta;
@@ -71,160 +79,50 @@ ngl::Mat4 Plant::axisAngleRotationMatrix(float _angle, ngl::Vec3 _axis)
 //----------------------------------------------------------------------------------------------------------------------
 void Plant::draw(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _projectionMatrix)
 {
-	ngl::VAOPrimitives *prim = ngl::VAOPrimitives::instance();
-
-	const float cosTheta = cos(m_blueprint->getDrawAngleRadians());
-	const float sinTheta = sin(m_blueprint->getDrawAngleRadians());
-
-	unsigned lastBranchDepth = 0;
+	//Set some initial parameters
 	float decay = 1.0f;
-	std::stack<ngl::Vec3> positionStack;
-	positionStack.emplace(m_position);
-	std::stack<ngl::Vec3> rotationStack;
-	rotationStack.emplace(ngl::Vec3(0.0f,0.0f,1.0f));
+	ngl::Vec3 initialDir = ngl::Vec3(0.0f,1.0f,0.0f);
 
-	for (auto &b : m_branches)
+	//Draw each branch
+	for (Branch &b : m_branches)
 	{
-		//Pop transforms off the stacks if necessary
-		for (unsigned i=b.m_creationDepth; i<=lastBranchDepth; ++i)
+		decay = calculateDecay(b.m_creationDepth);
+		for (unsigned i=1; i<b.m_positions.size(); ++i)
 		{
-			if (positionStack.size() > 1)
-			{
-				positionStack.pop();
-			}
-			if (rotationStack.size() > 1)
-			{
-				rotationStack.pop();
-			}
+			//Calculate the direction and length of the segment
+			ngl::Vec3 dir = b.m_positions[i] - b.m_positions[i-1];
+			float length = dir.length();
+
+			//Scale the branch
+			ngl::Mat4 scaleMatrix;
+			scaleMatrix.scale(m_blueprint->getRootRadius()*decay, length, m_blueprint->getRootRadius()*decay);
+
+			//Calculate the axis and angle for the rotation matrix
+			dir.normalize();
+			float angle = acos(initialDir.dot(dir));
+			ngl::Vec3 axis;
+			axis.cross(initialDir, dir);
+			axis.normalize();
+			ngl::Mat4 rotationMatrix = axisAngleRotationMatrix(angle, axis);
+
+			//Update the position
+			ngl::Vec3 position = b.m_positions[i-1] + dir*length/2;
+			m_transform =  scaleMatrix * rotationMatrix;
+			m_transform.m_30 = position.m_x;
+			m_transform.m_31 = position.m_y;
+			m_transform.m_32 = position.m_z;
+
+			//Load the matrices to the shader and draw
+			loadMatricesToShader(_mouseGlobalTX, _viewMatrix, _projectionMatrix);
+			PlantBlueprint::drawCylinder();
 		}
-		//Recalculate the decay constant if the branch is at a different depth
-		if (b.m_creationDepth != lastBranchDepth)
-		{
-			decay = calculateDecay(b.m_creationDepth);
-		}
-
-		//Set initial scale
-		ngl::Mat4 scaleMatrix;
-		scaleMatrix.scale(m_blueprint->getRootRadius()*decay, m_blueprint->getRootRadius()*decay, m_blueprint->getDrawLength()*decay);
-
-		//Set the initial transformation
-		//m_transform.setPosition(positionStack.top() / 2);
-		ngl::Vec3 position = positionStack.top();
-
-		//Set the initial direction
-		//m_transform.setRotation(rotationStack.top());
-		ngl::Mat4 rotationMatrix;
-		ngl::Vec3 rotation = ngl::Vec3(0.0f,1.0f,0.0f);
-
-		for (char &c : b.m_string)
-		{
-			switch (c)
-			{
-				case 'F' :
-				{
-					std::cout<<"vec1: "<<rotation<<" vec2: "<<rotationStack.top()<<"\n";
-					float angle = acos(rotation.dot(rotationStack.top()));
-					ngl::Vec3 axis;
-					axis.cross(rotation, rotationStack.top());
-					std::cout<<"Angle: "<<angle<<" Axis: "<<axis<<"\n";
-					rotationMatrix = axisAngleRotationMatrix(angle, axis);
-					//Draw the cylinder
-					m_transform = scaleMatrix * rotationMatrix;
-					m_transform.m_30 = position.m_x;
-					m_transform.m_31 = position.m_y;
-					m_transform.m_32 = position.m_z;
-					loadMatricesToShader(_mouseGlobalTX, _viewMatrix, _projectionMatrix);
-					prim->draw(m_blueprint->getGeometryName());
-
-					//Update the position
-					position += m_blueprint->getDrawLength()*rotation*decay;
-					break;
-				}
-				//rotate the direction vector by +theta on the xy plane
-				case static_cast<char>('/') :
-				{
-					float x = cosTheta*rotation.m_x - sinTheta*rotation.m_y;
-					float y = sinTheta*rotation.m_x + cosTheta*rotation.m_y;
-					rotation.m_x = x;
-					rotation.m_y = y;
-					//rotation.normalize();
-					break;
-				}
-				//rotate the direction vector by -theta on the xy plane
-				case static_cast<char>('\\') :
-				{
-					float x = cosTheta*rotation.m_x + sinTheta*rotation.m_y;
-					float y = cosTheta*rotation.m_y - sinTheta*rotation.m_x;
-					rotation.m_x = x;
-					rotation.m_y = y;
-					rotation.normalize();
-					break;
-				}
-				//rotate the direction vector by +theta on the yz plane
-				case static_cast<char>('+') :
-				{
-					float y = cosTheta*rotation.m_y - sinTheta*rotation.m_z;
-					float z = sinTheta*rotation.m_y + cosTheta*rotation.m_z;
-					rotation.m_y = y;
-					rotation.m_z = z;
-					rotation.normalize();
-					break;
-				}
-				//rotate the direction vector by -theta on the yz plane
-				case static_cast<char>('-') :
-				{
-					float y = cosTheta*rotation.m_y + sinTheta*rotation.m_z;
-					float z = cosTheta*rotation.m_z - sinTheta*rotation.m_y;
-					rotation.m_y = y;
-					rotation.m_z = z;
-					rotation.normalize();
-					break;
-				}
-				//rotate the direction vector by +theta on the xz plane
-				case static_cast<char>('&') :
-				{
-					float x = cosTheta*rotation.m_x + sinTheta*rotation.m_z;
-					float z = cosTheta*rotation.m_z - sinTheta*rotation.m_x;
-					rotation.m_x = x;
-					rotation.m_z = z;
-					rotation.normalize();
-					break;
-				}
-				//rotate the direction vector by -theta on the xz plane
-				case static_cast<char>('^') :
-				{
-					float x = cosTheta*rotation.m_x - sinTheta*rotation.m_z;
-					float z = cosTheta*rotation.m_z - sinTheta*rotation.m_x;
-					rotation.m_x = x;
-					rotation.m_z = z;
-					rotation.normalize();
-					break;
-				}
-				default : break;
-			}//End switch
-		}//End for loop [char]
-
-		//Update the variables
-		positionStack.push(position);
-		rotationStack.push(rotation);
-		lastBranchDepth = b.m_creationDepth;
-	}//End for loop [branches]
+	}
 }
 //----------------------------------------------------------------------------------------------------------------------
 void Plant::update()
 {
 	stringRewrite();
-	stringToBranches();
 	evaluateBranches();
-	branchesToString();
-	/*
-				for (auto &b : m_branches)
-		{
-				std::cout<<"{"<<b.m_ID<<","<<b.m_creationDepth<<","<<b.m_string<<",";
-				std::cout<<"("<<b.m_endPosition.m_x<<","<<b.m_endPosition.m_y<<","<<b.m_endPosition.m_z<<")"<<"}";
-		}
-		std::cout<<"\n";
-				*/
 }
 //----------------------------------------------------------------------------------------------------------------------
 float Plant::genRand()
@@ -233,52 +131,11 @@ float Plant::genRand()
 	return distribute(s_numberGenerator);
 }
 //----------------------------------------------------------------------------------------------------------------------
-float Plant::calculateDecay(unsigned _depth)
-{
-	//Return 1 if the decay constant = 1. This avoids computing a pow
-	if (m_blueprint->getDecayConstant() == 1.0f) return 1.0f;
-	//Return decayConstant ^ _depth
-	else return 1.0f / static_cast<float>(pow(m_blueprint->getDecayConstant(), _depth));
-}
-//----------------------------------------------------------------------------------------------------------------------
-void Plant::stringRewrite()
-{
-	if (m_depth < m_blueprint->getMaxDepth())//Only rewrite the string if the current depth is less than the max
-	{
-		std::string temp;//Temp string to store rewritten string
-
-		bool isReplaced = false;//Check if a production rule was executed
-		for (unsigned i=0, branchCount=0; i<m_string.length(); ++i)//Loop through each char in the string
-		{
-			isReplaced = false;
-			for (ProductionRule r : m_blueprint->getProductionRules())//Loop through the production rules
-			{
-				if(r.m_predecessor == m_string.substr(i,r.m_predecessor.length()))//Check if a substring matches the rule predecessor
-				{
-					//Only calculate a random number if the probability is not 1
-					if( (r.m_probability == 1.0f) || (r.m_probability > genRand()) )
-					{
-						temp += r.m_successor;//Add the replaced rule
-						i += r.m_predecessor.length() - 1;//Iterate further through the original string if predecessor length > 1 char
-						isReplaced = true;
-						addBranches(countBranches(r.m_successor), branchCount);//Add to the container m_branches
-					}
-					break;//Avoid checking other rules
-				}
-			}
-			if (isReplaced == false) { temp += m_string[i]; }//No replacement was made, so add the original char
-			branchCount = countBranches(temp);
-		}
-		m_string = temp;//Assign the temp string to the member variable
-		++m_depth;//Increment the depth of the expansion
-	}
-}
-//----------------------------------------------------------------------------------------------------------------------
-//Count the number of '[' in a string
 unsigned Plant::countBranches(std::string _string)
 {
-	int branchCount = 0;
-	for (char c : _string)
+	//Count the number of '[' in a string
+	unsigned branchCount = 0;
+	for (char c: _string)
 	{
 		if (c == '[') ++branchCount;
 	}
@@ -289,9 +146,7 @@ void Plant::addBranches(unsigned _number, unsigned _position)
 {
 	for (unsigned i=0; i<_number; ++i, ++_position)
 	{
-		m_branches.emplace(m_branches.begin()+_position,
-											 m_branches.size(),
-											 m_depth+1);
+		m_branches.emplace(m_branches.begin()+_position, m_branches.size(), m_depth);
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -299,187 +154,222 @@ void Plant::stringToBranches()
 {
 	unsigned numBranches = countBranches(m_string);
 
-	std::size_t branchStartPos=0;
-	std::size_t branchEndPos=0;
+	//Initialise the start and end positions of branches in the string
+	std::size_t branchStartPos = 0;
+	std::size_t branchEndPos = 0;
+
 	for (unsigned i=0; i<numBranches; ++i)
 	{
-		//Find start and end position in a string of the branches
+		//The branch starts at the first character that's not a bracket
 		branchStartPos = m_string.find_first_not_of("[]", branchStartPos);
+		//The branch ends at the next bracket - open or closed
 		branchEndPos = m_string.find_first_of("[]", branchStartPos+1);
+		//Find a substring
 		std::string branchString = m_string.substr(branchStartPos, branchEndPos - branchStartPos);
 
-		if (i < m_branches.size())
+		//If the branch already exists, update the string
+		if (i<m_branches.size())
 		{
 			m_branches[i].m_string = branchString;
 		}
+		//Otherwise create a new branch with the string
 		else
 		{
-			m_branches.emplace_back(m_branches.size(), m_depth, ngl::Vec3::zero(), branchString);
+			m_branches.emplace_back(m_branches.size(), m_depth, branchString);
 		}
-
 		branchStartPos = branchEndPos+1;
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
-void Plant::branchesToString()
+void Plant::stringRewrite()
 {
-	std::string temp;
-	//Add all but the last branch
-	for (unsigned i=0; i<m_branches.size()-1; ++i)
+	//Only rewrite the string if the current depth is less than the max
+	if (m_depth < m_blueprint->getMaxDepth())
 	{
-		temp += "[" + m_branches[i].m_string;//Start a branch and add its string
-		//If the next branch was created at the same depth or earlier, end this branch
-		for (int j=0; j<=static_cast<int>(m_branches[i].m_creationDepth - m_branches[i+1].m_creationDepth); ++j)
+		++m_depth;//Increment the depth of the expansion
+
+		std::string newString;
+		bool isReplaced = false;//Check if a production rule was executed
+
+		for (unsigned i=0, branchCount=0; i<m_string.length(); ++i)//Loop through each char in the string
 		{
-			temp += "]";
+			isReplaced = false;
+			for (ProductionRule r : m_blueprint->getProductionRules())//Loop through the production rules
+			{
+				if(r.m_predecessor == m_string.substr(i,r.m_predecessor.length()))//Check if a substring matches the rule predecessor
+				{
+					//Only calculate a random number if the probability is not 1
+					if( (r.m_probability == 1.0f) || (r.m_probability > genRand()) )
+					{
+						newString += r.m_successor;//Add the replaced rule
+						i += r.m_predecessor.length() - 1;//Iterate further through the original string if predecessor length > 1 char
+						isReplaced = true;
+						//Add new branches to the container
+						addBranches(countBranches(r.m_successor), branchCount);
+					}
+					break;//Avoid checking other rules
+				}
+			}
+			if (isReplaced == false) { newString += m_string[i]; }//No replacement was made, so add the original char
+			branchCount = countBranches(newString);
 		}
+		m_string = newString;//Assign the temp string to the member variable
+
+		//Update the string in each branch
+		stringToBranches();
 	}
-	//Add the last branch as the above would require accessing an element out of bounds
-	temp += "[" + m_branches.back().m_string;
-	for (int j=0; j<=static_cast<int>(m_branches.back().m_creationDepth); ++j)
+}
+//----------------------------------------------------------------------------------------------------------------------
+float Plant::calculateDecay(unsigned _depth)
+{
+	//Return 1 if the decay constant = 1. This avoids computing a pow
+	if (m_blueprint->getDecayConstant() == 1.0f) return 1.0f;
+	//Return decayConstant ^ _depth
+	else return 1.0f / static_cast<float>(pow(m_blueprint->getDecayConstant(), _depth));
+}
+//----------------------------------------------------------------------------------------------------------------------
+void Plant::spaceColonisation(Branch &_branch, ngl::Vec3 &_direction)
+{
+	float maxLength = m_blueprint->getDrawLength() * calculateDecay(_branch.m_creationDepth);	//Max length of the branch bit
+	ngl::Vec3 pos = _branch.m_positions.back();//Initialise position for this branch bit
+
+	//Create some segments
+	for (unsigned i=1; i<m_blueprint->getNodesPerBranch(); ++i)
 	{
-		temp += "]";
+		//Generate a random length, radius and angle to create a random point inside a cone
+		float h = genRand();
+		float r = genRand() * h * m_blueprint->getMaxDeviation();
+		float alpha = genRand() * ngl::TWO_PI;
+		h *= maxLength / m_blueprint->getNodesPerBranch();
+
+		//Convert the cylindrical coordinates to cartesian
+		ngl::Vec3 randPoint;
+		randPoint.m_x = r * cos(alpha);
+		randPoint.m_y = h;
+		randPoint.m_z = r * sin(alpha);
+
+		//Calculate a rotation matrix for the position
+		float angle = acos(_direction.dot(ngl::Vec3::up()));
+		ngl::Vec3 axis;
+		axis.cross(_direction, ngl::Vec3::up());
+		ngl::Mat4 rotationMatrix = axisAngleRotationMatrix(angle, axis);
+
+		//Calculate the new position and direction
+		ngl::Vec4 newPos = rotationMatrix * ngl::Vec4(randPoint, 1.0f);
+		pos += newPos.toVec3();
+		//Make sure the branch doesn't go below ground
+		if (pos.m_y <= 0.0f) pos.m_y *=-1;
+		_direction = pos - _branch.m_positions.back();
+		_direction.normalize();
+
+		//Add the position to the end of the array
+		_branch.m_positions.emplace_back(pos);
 	}
-	m_string = temp;
 }
 //----------------------------------------------------------------------------------------------------------------------
 void Plant::evaluateBranches()
 {
-	//Precompute sin and cos functions for 2d rotation matrices
-	const float cosTheta = cos(m_blueprint->getDrawAngleRadians());
-	const float sinTheta = sin(m_blueprint->getDrawAngleRadians());
-
-	const float drawLength = m_blueprint->getDrawLength();
-	unsigned lastBranchDepth = 0;//This is needed as a range based for loop is being used
-	float decay = 1;
-
-	//Make a transformation stack for positions and direction vectors
+	//Create a stack of positions used to start new branches
 	std::stack<ngl::Vec3> positionStack;
-	positionStack.emplace(m_position);//Initialise with the root position
+	positionStack.emplace(m_position);//Initialise with plant position
+	//Create a stack of directions for branch starting directions
 	std::stack<ngl::Vec3> directionStack;
-	directionStack.emplace(ngl::Vec3(0.0f, m_blueprint->getDrawLength(), 0.0f));//Initialise to go up
+	directionStack.emplace(ngl::Vec3::up());//Initialise with the up vector
 
+	unsigned lastBranchDepth = 0;
 	for (auto &b : m_branches)
 	{
+		//Pop values off the stack
 		for (unsigned i=b.m_creationDepth; i<=lastBranchDepth; ++i)
 		{
-			if (positionStack.size() > 1)
-			{
-				positionStack.pop();
-			}
-			if (positionStack.size() > 1)
-			{
-				directionStack.pop();
-			}
+			if (positionStack.size() > 1) positionStack.pop();
+			if (directionStack.size() > 1) directionStack.pop();
 		}
 
-		//Recalculate decay constant if necessary
-		if (b.m_creationDepth != lastBranchDepth)
+		//Add the last position to the position stack
+		//This is to avoid resimulating the branch
+		if (!b.m_positions.empty())
 		{
-			decay = calculateDecay(b.m_creationDepth);
+			ngl::Vec3 direction = b.m_positions.back() - b.m_positions.front();
+			directionStack.push(direction);
+			positionStack.push(b.m_positions.back());
 		}
-
-		//If the branch end position has already been calculated, don't recalculate it
-		if (b.m_endPosition != ngl::Vec3::zero())
-		{
-			ngl::Vec3 rot = b.m_endPosition - positionStack.top();
-			rot.normalize();
-			directionStack.push(rot);
-			positionStack.push(b.m_endPosition);
-		}
-		//This calculates the end position of a branch
+		//Perform the space colonisation algorithm
 		else
 		{
-			ngl::Vec3 currentPos = positionStack.top();
-			ngl::Vec3 currentRot = directionStack.top();
-			//Evaluate each character to update position and directions
+			b.m_positions.emplace_back(positionStack.top());//Initialise the start position of the branch
+			ngl::Vec3 direction = directionStack.top();//Create a temporary variable for the direction of the branch nodes
+
+			// evaluate the string to find the new direction
 			for (char c : b.m_string)
 			{
 				switch (c)
 				{
-					//calculate a new position in the forward direction
-					//halve the draw length for each iteration in the L-system
-					case static_cast<char>('F') :
+					//Rotate by +theta on the xy plane
+					case '/' :
 					{
-						currentPos += drawLength * currentRot * decay;
+						ngl::Mat3 r;
+						r.rotateZ(m_blueprint->getDrawAngle());
+						direction = r * direction;
 						break;
 					}
-						//rotate the direction vector by +theta on the xy plane
-					case static_cast<char>('/') :
+					//Rotate by -theta on the xy plane
+					case '\\' :
 					{
-						float x = cosTheta*currentRot.m_x - sinTheta*currentRot.m_y;
-						float y = sinTheta*currentRot.m_x + cosTheta*currentRot.m_y;
-						currentRot.m_x = x;
-						currentRot.m_y = y;
-						currentRot.normalize();
+						ngl::Mat3 r;
+						r.rotateZ(-m_blueprint->getDrawAngle());
+						direction = r * direction;
 						break;
 					}
-						//rotate the direction vector by -theta on the xy plane
-					case static_cast<char>('\\') :
+					//Rotate by +theta on the yz plane
+					case '+' :
 					{
-						float x = cosTheta*currentRot.m_x + sinTheta*currentRot.m_y;
-						float y = cosTheta*currentRot.m_y - sinTheta*currentRot.m_x;
-						currentRot.m_x = x;
-						currentRot.m_y = y;
-						currentRot.normalize();
+						ngl::Mat3 r;
+						r.rotateX(m_blueprint->getDrawAngle());
+						direction = r * direction;
 						break;
 					}
-						//rotate the direction vector by +theta on the yz plane
-					case static_cast<char>('+') :
+					//Rotate by -theta on the yz plane
+					case '-' :
 					{
-						float y = cosTheta*currentRot.m_y - sinTheta*currentRot.m_z;
-						float z = sinTheta*currentRot.m_y + cosTheta*currentRot.m_z;
-						currentRot.m_y = y;
-						currentRot.m_z = z;
-						currentRot.normalize();
+						ngl::Mat3 r;
+						r.rotateX(-m_blueprint->getDrawAngle());
+						direction = r * direction;
 						break;
 					}
-						//rotate the direction vector by -theta on the yz plane
-					case static_cast<char>('-') :
+					//Rotate by +theta on the xz plane
+					case '&' :
 					{
-						float y = cosTheta*currentRot.m_y + sinTheta*currentRot.m_z;
-						float z = cosTheta*currentRot.m_z - sinTheta*currentRot.m_y;
-						currentRot.m_y = y;
-						currentRot.m_z = z;
-						currentRot.normalize();
+						ngl::Mat3 r;
+						r.rotateY(m_blueprint->getDrawAngle());
+						direction = r * direction;
 						break;
 					}
-						//rotate the direction vector by +theta on the xz plane
-					case static_cast<char>('&') :
+					//Rotate by -theta on the xz plane
+					case '^' :
 					{
-						float x = cosTheta*currentRot.m_x + sinTheta*currentRot.m_z;
-						float z = cosTheta*currentRot.m_z - sinTheta*currentRot.m_x;
-						currentRot.m_x = x;
-						currentRot.m_z = z;
-						currentRot.normalize();
+						ngl::Mat3 r;
+						r.rotateY(-m_blueprint->getDrawAngle());
+						direction = r * direction;
 						break;
 					}
-						//rotate the direction vector by -theta on the xz plane
-					case static_cast<char>('^') :
+					//Do some space colonisation in the current direction
+					case 'F' :
 					{
-						float x = cosTheta*currentRot.m_x - sinTheta*currentRot.m_z;
-						float z = cosTheta*currentRot.m_z - sinTheta*currentRot.m_x;
-						currentRot.m_x = x;
-						currentRot.m_z = z;
-						currentRot.normalize();
+						direction.normalize();
+						spaceColonisation(b, direction);
 						break;
 					}
-					default:
-						break;
-				}//End switch statement
-			}//End for loop [chars]
+					default : break;
+				}//End switch
+			}//End for [char]
 
-			//Check for collisions in R-tree
-			//Update string
-			//Recompute values
-			//Add to R-tree
+			// update the stacks
+			positionStack.push(b.m_positions.back());
+			directionStack.push(b.m_positions.back() - b.m_positions.front());
 
-			//Push new values to the stacks
-			positionStack.push(currentPos);
-			directionStack.push(currentRot);
-			b.m_endPosition = currentPos;//Update the value in the branch struct
 		}//End else condition
 		lastBranchDepth = b.m_creationDepth;
-	}//End for loop [branches]
-}//End function
+	}//End for [branches]
+}
 //----------------------------------------------------------------------------------------------------------------------

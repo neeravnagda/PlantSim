@@ -13,12 +13,12 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 /// @file Plant.h
-/// @brief This class simulates one Plant
+/// @brief This class simulates and draws one Plant
 /// @author Neerav Nagda
-/// @version 0.1
-/// @date 01/04/17
+/// @version 1.0
+/// @date 13/04/17
 /// @class Plant
-/// @brief This class manages the simulation of one plant
+/// @brief This class manages the simulation and drawing of one plant
 //----------------------------------------------------------------------------------------------------------------------
 
 class Plant
@@ -35,11 +35,6 @@ class Plant
 		//----------------------------------------------------------------------------------------------------------------------
 		~Plant();
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Update function to evaluate the Plant simulation
-		/// This expands the L-system, converts the string to tokens, and adds bounding boxes to a R-tree
-		//----------------------------------------------------------------------------------------------------------------------
-		void update();
-		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Draw the plant
 		/// @param _mouseGlobalTX The global mouse transformation
 		/// @param _viewMatrix The view matrix from the camera
@@ -47,10 +42,14 @@ class Plant
 		//----------------------------------------------------------------------------------------------------------------------
 		void draw(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _projectionMatrix);
 		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Update function to evaluate the Plant simulation
+		//----------------------------------------------------------------------------------------------------------------------
+		void update();
+		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for the L-system string
 		/// @return The L-system string
 		//----------------------------------------------------------------------------------------------------------------------
-		std::string getString() const {return m_string;}
+		const std::string& getString() {return m_string;}
 
 	private:
 		//----------------------------------------------------------------------------------------------------------------------
@@ -88,48 +87,6 @@ class Plant
 		ngl::Mat4 m_transform;
 
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Generate a random number for stochastic L-systems
-		/// @return Random float in the range [0,1]
-		//----------------------------------------------------------------------------------------------------------------------
-		float genRand();
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Calculate a scalar decay value
-		/// @return Float in the range [0,1]
-		/// This is used to shorten branches, and must be multiplied to a length
-		//----------------------------------------------------------------------------------------------------------------------
-		float calculateDecay(unsigned _depth);
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Expand the string using the L-system rules
-		//----------------------------------------------------------------------------------------------------------------------
-		void stringRewrite();
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Count the number of branches in a given string
-		/// @param _string A valid L-system string
-		/// @return The number of branches within the string
-		//----------------------------------------------------------------------------------------------------------------------
-		unsigned countBranches(std::string _string);
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Add to the container m_branches
-		/// @param _number The number of new branches to add
-		/// @param _position The position in the container
-		/// This creates the struct branch with only two of the four attributes
-		//----------------------------------------------------------------------------------------------------------------------
-		void addBranches(unsigned _number, unsigned _position);
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Split the L-system string to branches
-		/// This adds the string member to each branch struct in the container m_branches
-		//----------------------------------------------------------------------------------------------------------------------
-		void stringToBranches();
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Convert branch structs back to one single string
-		//----------------------------------------------------------------------------------------------------------------------
-		void branchesToString();
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Evaluate branches to add end positions
-		/// This is calculated once per L-system update for collision detection
-		//----------------------------------------------------------------------------------------------------------------------
-		void evaluateBranches();
-		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Calculate and load the matrices to the shader
 		/// @param _mouseGlobalTX The global mouse transformation
 		/// @param _viewMatrix The view matrix from the camera
@@ -143,6 +100,52 @@ class Plant
 		/// This is a function "euler" in ngl::Mat4, but this is reimplemented to avoid converting from radians to degrees and back to radians
 		//----------------------------------------------------------------------------------------------------------------------
 		ngl::Mat4 axisAngleRotationMatrix(float _angle, ngl::Vec3 _axis); //whatever im fabulous. idgaf
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Generate a random number for stochastic L-systems
+		/// @return Random float in the range [0,1]
+		//----------------------------------------------------------------------------------------------------------------------
+		float genRand();
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Count the number of branches in a string
+		/// @param _string The string to count branches from
+		/// @return The number of branches in the string
+		//----------------------------------------------------------------------------------------------------------------------
+		unsigned countBranches(std::string _string);
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Add branches to the container
+		/// @param _number The number of branches to add
+		/// @param _position The position in the container to add at
+		//----------------------------------------------------------------------------------------------------------------------
+		void addBranches(unsigned _number, unsigned _position);
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Convert the string to branches
+		/// This is used once to initialise the container of branches,
+		/// and once per update to populate the strings in each struct
+		//----------------------------------------------------------------------------------------------------------------------
+		void stringToBranches();
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Expand the string using the L-system rules
+		//----------------------------------------------------------------------------------------------------------------------
+		void stringRewrite();
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Calculate a scalar decay value
+		/// @return Float in the range [0,1]
+		/// This is used to shorten branches, and must be multiplied to a length
+		//----------------------------------------------------------------------------------------------------------------------
+		float calculateDecay(unsigned _depth);
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Calculate the branch positions using space colonisation
+		/// @param _branch A reference to the branch to calculate
+		/// @param _direction The direction to perform space colonisation in
+		/// This is used to shorten branches, and must be multiplied to a length
+		//----------------------------------------------------------------------------------------------------------------------
+		void spaceColonisation(Branch &_branch, ngl::Vec3 &_direction);
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Evaluate the L-system string to calculate branches
+		/// This is calculated once per L-system update as it is an expensive operation
+		//----------------------------------------------------------------------------------------------------------------------
+		void evaluateBranches();
+
 };
 
 #endif // PLANT_H_

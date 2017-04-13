@@ -13,11 +13,14 @@ MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	m_ui(new Ui::MainWindow)
 {
+	//Initialise the UI and OpenGL widget (NGLScene)
 	m_ui->setupUi(this);
 	m_gl = new NGLScene(this);
 
+	//Position the OpenGL widget
 	m_ui->s_mainWindowGridLayout->addWidget(m_gl,0,0,3,1);
 
+	//Create new dialogs
 	m_plantBlueprintDialog = new PlantBlueprintDialog(this);
 	m_lightsDialog = new LightsDialog(this);
 
@@ -46,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(m_lightsDialog, SIGNAL(diffuseChanged(int,ngl::Vec3)), this, SLOT(setLightDiffuse(int,ngl::Vec3)));
 	connect(m_lightsDialog, SIGNAL(specularChanged(int,ngl::Vec3)), this, SLOT(setLightSpecular(int,ngl::Vec3)));
 
-	m_ui->m_plantType->addItem(QString("test"));
+	//Add all the names of the instances of PlantBlueprint
 	for (std::string s : PlantBlueprint::getKeys())
 	{
 		m_ui->m_plantType->addItem(QString::fromStdString(s));
@@ -65,6 +68,7 @@ void MainWindow::quit()
 //----------------------------------------------------------------------------------------------------------------------
 void MainWindow::createNewPlant()
 {
+	//Check if the selection is not blank
 	if (m_ui->m_plantType->currentIndex() > 0)
 	{
 		const float x = static_cast<float>(m_ui->m_positionX->value());
@@ -78,7 +82,7 @@ void MainWindow::openPlantBlueprintDialogFromUI()
 {
 	if (m_ui->m_plantType->currentText() == "create new")
 	{
-	openPlantBlueprintDialogFromMenubar();
+		openPlantBlueprintDialogFromMenubar();
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -94,6 +98,7 @@ void MainWindow::closePlantBlueprintDialog()
 //----------------------------------------------------------------------------------------------------------------------
 void MainWindow::createPlantBlueprint()
 {
+	//If the validation from PlantBlueprintDialog passed, create a new PlantBlueprint
 	if (m_plantBlueprintDialog->createPlantBlueprint() == true)
 	{
 		closePlantBlueprintDialog();

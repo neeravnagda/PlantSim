@@ -5,6 +5,7 @@
 #include <ngl/ShaderLib.h>
 #include <ngl/VAOPrimitives.h>
 #include "NGLScene.h"
+#include "PlantBlueprint.h"
 //----------------------------------------------------------------------------------------------------------------------
 NGLScene::NGLScene(QWidget *_parent) : QOpenGLWidget(_parent)
 {
@@ -21,10 +22,12 @@ NGLScene::~NGLScene()
 //----------------------------------------------------------------------------------------------------------------------
 void NGLScene::updatePlants()
 {
-	for (auto &p : m_plants)
+	//Update all the plants
+	for (Plant &p : m_plants)
 	{
 		p.update();
 	}
+	//Force a window update
 	update();
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -53,29 +56,34 @@ void NGLScene::initializeGL()
 	// enable multisampling for smoother drawing
 	glEnable(GL_MULTISAMPLE);
 
+	//Initialise the PlantBlueprint. This initialises the shader and the geometry needed for drawing
 	PlantBlueprint::init();
 
-		//Create a default blueprint
-		//Will need to delete this later
+	//Initialise test plant - need to delete this later
+	{
 		PlantBlueprint *pb = PlantBlueprint::instance("test");
 		pb->readGrammarFromFile("rules.txt");
 		pb->setDecay(1.6f);
-		pb->setRootRadius(0.1f);
+		pb->setDrawAngle(45);
+		pb->setDrawLength(0.8f);
 		pb->setMaxDepth(5);
-		pb->setDrawAngle(45.0f);
-		pb->setDrawLength(1);
-		createPlant(static_cast<std::string>("test"), 0.0f, 0.0f);
+		pb->setMaxDeviation(0.3f);
+		pb->setNodesPerBranch(4);
+		pb->setRootRadius(0.03f);
+		createPlant("test", 0.0f, 0.0f);
+	}
 
-	ngl::Vec3 from = ngl::Vec3(2.0f, 2.0f, 10.0f);
-	ngl::Vec3 to = ngl::Vec3::zero();
-	ngl::Vec3 up = ngl::Vec3::up();
-	m_camera.set(from, to, up);
+	//Initialise the camera
+	m_camera.set(ngl::Vec3(2.0f, 2.0f, 10.0f),//from
+							 ngl::Vec3::zero(),//to
+							 ngl::Vec3::up());//up
 	m_camera.setShape(45, static_cast<float>(width())/height(), 0.1f, 100.0f);
-	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
 
+	//Send the viewer position to the shader
+	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
 	shader->setUniform("viewerPos", m_camera.getEye().toVec3());
 
-	//Set default light settings
+	//Initialise the lights in the shader
 	for (int i=0; i<4; ++i)
 	{
 		setLightActive(i, false);
@@ -84,16 +92,18 @@ void NGLScene::initializeGL()
 		setLightDiffuse(i, ngl::Vec3(1.0f,1.0f,1.0f));
 		setLightSpecular(i, ngl::Vec3(1.0f,1.0f,1.0f));
 	}
+	setLightActive(0, true);//Set one light initially on
 
 	glViewport(0,0,width(),height());
 
+	//Create the ground plane geometry
 	ngl::VAOPrimitives::instance()->createTrianglePlane("groundPlane", 1, 1, 1, 1, ngl::Vec3::up());
 }
 //----------------------------------------------------------------------------------------------------------------------
-void NGLScene::sendUniformsToShader()
+void NGLScene::drawScene()
 {
+	//Calculate the matrices for the ground plane
 	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
-
 	ngl::Mat4 rotX;
 	ngl::Mat4 rotY;
 	rotX.rotateX(m_win.spinXFace);
@@ -102,26 +112,19 @@ void NGLScene::sendUniformsToShader()
 	m_mouseGlobalTX.m_30 = m_modelPos.m_x;
 	m_mouseGlobalTX.m_31 = m_modelPos.m_y;
 	m_mouseGlobalTX.m_32 = m_modelPos.m_z;
-
-	ngl::Mat4 MV;
-	ngl::Mat4 MVP;
-	ngl::Mat3 N;
 	ngl::Mat4 M;
 	M *= m_mouseGlobalTX;
-	MV = M * m_camera.getViewMatrix();
-	MVP = M * m_camera.getProjectionMatrix();
-	N = MV;
+	ngl::Mat4 MV = M * m_camera.getViewMatrix();
+	ngl::Mat4 MVP = M * m_camera.getProjectionMatrix();
+	ngl::Mat3 N = MV;
 	N.inverse();
 	shader->setUniform("M", M);
 	shader->setUniform("MV", MV);
 	shader->setUniform("MVP", MVP);
 	shader->setUniform("N", N);
-}
-//----------------------------------------------------------------------------------------------------------------------
-void NGLScene::drawScene()
-{
-	sendUniformsToShader();
+	//Draw the ground
 	ngl::VAOPrimitives::instance()->draw("groundPlane");
+	//Draw the plants
 	for (Plant &p : m_plants)
 	{
 		p.draw(m_mouseGlobalTX, m_camera.getViewMatrix(), m_camera.getProjectionMatrix());
@@ -196,6 +199,7 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
 			m_modelPos.set(ngl::Vec3::zero());
 			break;
 		}
+		// change the rendering mode {wireframe or shaded}
 		case Qt::Key_W : glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
 		case Qt::Key_S : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
 		default : break;
