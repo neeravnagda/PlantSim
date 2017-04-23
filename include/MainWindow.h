@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include "NGLScene.h"
 #include "PlantBlueprintDialog.h"
-#include "LightsDialog.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 /// @file MainWindow.h
@@ -67,49 +66,6 @@ class MainWindow : public QMainWindow
 		/// This is calls the function from the class NGLScene to update the plants
 		//----------------------------------------------------------------------------------------------------------------------
 		void updatePlants();
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Open the dialog to edit lights
-		//----------------------------------------------------------------------------------------------------------------------
-		void openLightsDialog();
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Close the dialog to edit lights
-		//----------------------------------------------------------------------------------------------------------------------
-		void closeLightsDialog();
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Set the light active status
-		/// @param _lightIndex The light index to change
-		/// @param _status The status of the light (on/off)
-		/// This forwards parameters to NGLScene
-		//----------------------------------------------------------------------------------------------------------------------
-		void setLightActive(int _light, bool _status);
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Set the light position
-		/// @param _lightIndex The light index to change
-		/// @param _position The new light position
-		/// This forwards parameters to NGLScene
-		//----------------------------------------------------------------------------------------------------------------------
-		void setLightPosition(int _light, ngl::Vec3 _position);
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Set the light ambient colour
-		/// @param _lightIndex The light index to change
-		/// @param _ambient The new ambient colour
-		/// This forwards parameters to NGLScene
-		//----------------------------------------------------------------------------------------------------------------------
-		void setLightAmbient(int _light, ngl::Vec3 _ambient);
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Set the light diffuse colour
-		/// @param _lightIndex The light index to change
-		/// @param _diffuse The new diffuse colour
-		/// This forwards parameters to NGLScene
-		//----------------------------------------------------------------------------------------------------------------------
-		void setLightDiffuse(int _light, ngl::Vec3 _diffuse);
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Set the light ambient colour
-		/// @param _lightIndex The light index to change
-		/// @param _specular The new specular colour
-		/// This forwards parameters to NGLScene
-		//----------------------------------------------------------------------------------------------------------------------
-		void setLightSpecular(int _light, ngl::Vec3 _specular);
 
 	private:
 		//----------------------------------------------------------------------------------------------------------------------
@@ -124,10 +80,6 @@ class MainWindow : public QMainWindow
 		/// @brief Dialog box to create a new Plant Blueprint Instance
 		//----------------------------------------------------------------------------------------------------------------------
 		PlantBlueprintDialog *m_plantBlueprintDialog;
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Dialog box to manage lights in the scene
-		//----------------------------------------------------------------------------------------------------------------------
-		LightsDialog *m_lightsDialog;
 };
 
 #endif // MAINWINDOW_H_

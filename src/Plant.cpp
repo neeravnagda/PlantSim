@@ -10,11 +10,12 @@
 #include "Plant.h"
 #include "RTreeTypes.h"
 //----------------------------------------------------------------------------------------------------------------------
-//Initialise random device and number generator
-std::random_device Plant::s_randomDevice;//Seed
-std::mt19937 Plant::s_numberGenerator(Plant::s_randomDevice());//Mersienne Twister algorithm
+//Define static members
+std::random_device Plant::s_randomDevice;
+std::mt19937 Plant::s_numberGenerator(Plant::s_randomDevice());
+boost::uuids::random_generator Plant::s_IDGenerator;
 //----------------------------------------------------------------------------------------------------------------------
-Plant::Plant(std::string _blueprint, ngl::Vec3 _position)
+Plant::Plant(const std::string& _blueprint, const ngl::Vec3& _position)
 {
 	//Initialise the object
 	m_blueprint = PlantBlueprint::instance(_blueprint);
@@ -28,7 +29,7 @@ Plant::Plant(std::string _blueprint, ngl::Vec3 _position)
 //----------------------------------------------------------------------------------------------------------------------
 Plant::~Plant(){}
 //----------------------------------------------------------------------------------------------------------------------
-void Plant::loadMatricesToShader(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _projectionMatrix)
+void Plant::loadMatricesToShader(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, const ngl::Mat4 _projectionMatrix) const
 {
 	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
 	//Create the matrices
@@ -45,7 +46,7 @@ void Plant::loadMatricesToShader(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix
 }
 //----------------------------------------------------------------------------------------------------------------------
 //Rotation matrix found from https://en.wikipedia.org/wiki/Rotation_matrix
-ngl::Mat4 Plant::axisAngleRotationMatrix(float _angle, ngl::Vec3 _axis)
+ngl::Mat4 Plant::axisAngleRotationMatrix(const float& _angle, const ngl::Vec3& _axis) const
 {
 	//Precompute trig functions
 	const float cosTheta = cos(_angle);
@@ -77,7 +78,7 @@ ngl::Mat4 Plant::axisAngleRotationMatrix(float _angle, ngl::Vec3 _axis)
 	return rot;
 }
 //----------------------------------------------------------------------------------------------------------------------
-void Plant::draw(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _projectionMatrix)
+void Plant::draw(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, const ngl::Mat4 _projectionMatrix)
 {
 	//Set some initial parameters
 	float decay = 1.0f;
@@ -125,13 +126,13 @@ void Plant::update()
 	evaluateBranches();
 }
 //----------------------------------------------------------------------------------------------------------------------
-float Plant::genRand()
+float Plant::generateRandomFloat() const
 {
 	std::uniform_real_distribution<float> distribute(0,1);
 	return distribute(s_numberGenerator);
 }
 //----------------------------------------------------------------------------------------------------------------------
-unsigned Plant::countBranches(std::string _string)
+unsigned Plant::countBranches(const std::string& _string) const
 {
 	//Count the number of '[' in a string
 	unsigned branchCount = 0;
@@ -142,11 +143,11 @@ unsigned Plant::countBranches(std::string _string)
 	return branchCount;
 }
 //----------------------------------------------------------------------------------------------------------------------
-void Plant::addBranches(unsigned _number, unsigned _position)
+void Plant::addBranches(const unsigned& _number, unsigned& _position)
 {
 	for (unsigned i=0; i<_number; ++i, ++_position)
 	{
-		m_branches.emplace(m_branches.begin()+_position, m_branches.size(), m_depth);
+		m_branches.emplace(m_branches.begin()+_position, s_IDGenerator(), m_depth);
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -175,7 +176,7 @@ void Plant::stringToBranches()
 		//Otherwise create a new branch with the string
 		else
 		{
-			m_branches.emplace_back(m_branches.size(), m_depth, branchString);
+			m_branches.emplace_back(s_IDGenerator(), m_depth, branchString);
 		}
 		branchStartPos = branchEndPos+1;
 	}
@@ -199,7 +200,7 @@ void Plant::stringRewrite()
 				if(r.m_predecessor == m_string.substr(i,r.m_predecessor.length()))//Check if a substring matches the rule predecessor
 				{
 					//Only calculate a random number if the probability is not 1
-					if( (r.m_probability == 1.0f) || (r.m_probability > genRand()) )
+					if( (r.m_probability == 1.0f) || (r.m_probability > generateRandomFloat()) )
 					{
 						newString += r.m_successor;//Add the replaced rule
 						i += r.m_predecessor.length() - 1;//Iterate further through the original string if predecessor length > 1 char
@@ -220,7 +221,7 @@ void Plant::stringRewrite()
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
-float Plant::calculateDecay(unsigned _depth)
+float Plant::calculateDecay(const unsigned& _depth) const
 {
 	//Return 1 if the decay constant = 1. This avoids computing a pow
 	if (m_blueprint->getDecayConstant() == 1.0f) return 1.0f;
@@ -228,18 +229,20 @@ float Plant::calculateDecay(unsigned _depth)
 	else return 1.0f / static_cast<float>(pow(m_blueprint->getDecayConstant(), _depth));
 }
 //----------------------------------------------------------------------------------------------------------------------
-void Plant::spaceColonisation(Branch &_branch, ngl::Vec3 &_direction)
+void Plant::spaceColonisation(Branch& _branch, ngl::Vec3& _direction)
 {
 	float maxLength = m_blueprint->getDrawLength() * calculateDecay(_branch.m_creationDepth);	//Max length of the branch bit
 	ngl::Vec3 pos = _branch.m_positions.back();//Initialise position for this branch bit
+
+	point_t startPoint(pos.m_x, pos.m_y, pos.m_z);
 
 	//Create some segments
 	for (unsigned i=1; i<m_blueprint->getNodesPerBranch(); ++i)
 	{
 		//Generate a random length, radius and angle to create a random point inside a cone
-		float h = genRand();
-		float r = genRand() * h * m_blueprint->getMaxDeviation();
-		float alpha = genRand() * ngl::TWO_PI;
+		float h = generateRandomFloat();
+		float r = generateRandomFloat() * h * m_blueprint->getMaxDeviation();
+		float alpha = generateRandomFloat() * ngl::TWO_PI;
 		h *= maxLength / m_blueprint->getNodesPerBranch();
 
 		//Convert the cylindrical coordinates to cartesian
@@ -262,8 +265,19 @@ void Plant::spaceColonisation(Branch &_branch, ngl::Vec3 &_direction)
 		_direction = pos - _branch.m_positions.back();
 		_direction.normalize();
 
+		//Add to the R-Tree
+		//Need to check for collision detection here
+		point_t endPoint(pos.m_x, pos.m_y, pos.m_z);
+		segment_t branchSegment(startPoint, endPoint);
+		rTreeElement branchElement(branchSegment, _branch.m_ID, i-1);
+		PlantBlueprint::getRTree().insert(branchElement);
+
+		std::cout<<PlantBlueprint::getRTree().size()<<" - R-Tree size\n";
+
+		startPoint = endPoint;
+
 		//Add the position to the end of the array
-		_branch.m_positions.emplace_back(pos);
+		_branch.m_positions.emplace_back(pos);		
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------

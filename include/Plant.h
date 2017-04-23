@@ -4,6 +4,8 @@
 #include <random>
 #include <string>
 #include <vector>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
 #include <ngl/Mat4.h>
 #include <ngl/Vec3.h>
 #include "Branch.h"
@@ -29,7 +31,7 @@ class Plant
 		/// @param _blueprint The name of the PlantBlueprint that this object uses
 		/// @param _position The position of the Plant on the ground. Note that the y coordinate is always 0 to be on the ground
 		//----------------------------------------------------------------------------------------------------------------------
-		Plant(std::string _blueprint, ngl::Vec3 _position);
+		Plant(const std::string& _blueprint, const ngl::Vec3& _position);
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Destructor
 		//----------------------------------------------------------------------------------------------------------------------
@@ -40,7 +42,7 @@ class Plant
 		/// @param _viewMatrix The view matrix from the camera
 		/// @param _projectionMatrix The projection matrix from the camera
 		//----------------------------------------------------------------------------------------------------------------------
-		void draw(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _projectionMatrix);
+		void draw(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, const ngl::Mat4 _projectionMatrix);
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Update function to evaluate the Plant simulation
 		//----------------------------------------------------------------------------------------------------------------------
@@ -49,7 +51,7 @@ class Plant
 		/// @brief Get function for the L-system string
 		/// @return The L-system string
 		//----------------------------------------------------------------------------------------------------------------------
-		const std::string& getString() {return m_string;}
+		const std::string& getString() const {return m_string;}
 
 	private:
 		//----------------------------------------------------------------------------------------------------------------------
@@ -82,6 +84,10 @@ class Plant
 		//----------------------------------------------------------------------------------------------------------------------
 		std::vector<Branch> m_branches;
 		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief ID generator for branches
+		//----------------------------------------------------------------------------------------------------------------------
+		static boost::uuids::random_generator s_IDGenerator;
+		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Transformation for draw calls
 		//----------------------------------------------------------------------------------------------------------------------
 		ngl::Mat4 m_transform;
@@ -92,31 +98,34 @@ class Plant
 		/// @param _viewMatrix The view matrix from the camera
 		/// @param _projectionMatrix The projection matrix from the camera
 		//----------------------------------------------------------------------------------------------------------------------
-		void loadMatricesToShader(ngl::Mat4 _mouseGlobalTX, ngl::Mat4 _viewMatrix, ngl::Mat4 _projectionMatrix);
+		void loadMatricesToShader(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, const ngl::Mat4 _projectionMatrix) const;
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Calculate axis-angle rotation matrix
 		/// @param _angle The angle to rotate in radians
 		/// @param _axis The axis to rotate around
 		/// This is a function "euler" in ngl::Mat4, but this is reimplemented to avoid converting from radians to degrees and back to radians
+		/// Since this is called multiple times in one draw call, it saves a lot of divide operations
 		//----------------------------------------------------------------------------------------------------------------------
-		ngl::Mat4 axisAngleRotationMatrix(float _angle, ngl::Vec3 _axis); //whatever im fabulous. idgaf
+		ngl::Mat4 axisAngleRotationMatrix(const float& _angle, const ngl::Vec3& _axis) const;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Generate a random number for stochastic L-systems
+		/// @brief Generate a random number
+		/// This is used for stochastic L-systems during string rewriting.
+		/// It is also used for space colonisation to generate random points.
 		/// @return Random float in the range [0,1]
 		//----------------------------------------------------------------------------------------------------------------------
-		float genRand();
+		float generateRandomFloat() const;
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Count the number of branches in a string
 		/// @param _string The string to count branches from
 		/// @return The number of branches in the string
 		//----------------------------------------------------------------------------------------------------------------------
-		unsigned countBranches(std::string _string);
+		unsigned countBranches(const std::string& _string) const;
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Add branches to the container
 		/// @param _number The number of branches to add
 		/// @param _position The position in the container to add at
 		//----------------------------------------------------------------------------------------------------------------------
-		void addBranches(unsigned _number, unsigned _position);
+		void addBranches(const unsigned& _number, unsigned& _position);
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Convert the string to branches
 		/// This is used once to initialise the container of branches,
@@ -132,14 +141,13 @@ class Plant
 		/// @return Float in the range [0,1]
 		/// This is used to shorten branches, and must be multiplied to a length
 		//----------------------------------------------------------------------------------------------------------------------
-		float calculateDecay(unsigned _depth);
+		float calculateDecay(const unsigned& _depth) const;
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Calculate the branch positions using space colonisation
 		/// @param _branch A reference to the branch to calculate
 		/// @param _direction The direction to perform space colonisation in
-		/// This is used to shorten branches, and must be multiplied to a length
 		//----------------------------------------------------------------------------------------------------------------------
-		void spaceColonisation(Branch &_branch, ngl::Vec3 &_direction);
+		void spaceColonisation(Branch& _branch, ngl::Vec3& _direction);
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Evaluate the L-system string to calculate branches
 		/// This is calculated once per L-system update as it is an expensive operation

@@ -6,19 +6,6 @@ layout (location = 1) in vec2 inUV;
 /// @brief The normal passed in
 layout (location = 2) in vec3 inNormal;
 
-#define MAX_LIGHTS 4
-
-/// @struct LightInfo
-/// @brief a structure to hold light parameters
-struct LightInfo
-{
-	bool isActive;
-	vec3 Position;//World position of the light
-	vec3 La;//Ambient light intensity
-	vec3 Ld;//Diffuse light intensity
-	vec3 Ls;//Specular light intensity
-};
-
 uniform 	vec3 viewerPos;
 /// @brief model matrix
 uniform mat4 M;
@@ -28,8 +15,8 @@ uniform mat4 MV;
 uniform mat4 MVP;
 /// @brief normal matrix
 uniform mat3 N;
-/// @brief An array of lights
-uniform LightInfo Lights[MAX_LIGHTS];
+/// @brief the sun position
+uniform vec3 sunPosition = vec3(0.0f, 100.0f, 0.0f);
 
 /// @brief the UV coordinates
 out vec2 uvCoord;
@@ -39,10 +26,10 @@ out vec3 fragPos;
 out vec3 fragNormal;
 /// @brief eye direction
 out vec3 eyeDirection;
-/// @brief array of half-vectors
-out vec3 halfVectors[MAX_LIGHTS];
-/// @brief array of light directions
-out vec3 lightDirections[MAX_LIGHTS];
+/// @brief sunlight direction
+out vec3 sunDirection;
+/// @brief half vector
+out vec3 halfVector;
 
 void main(void)
 {
@@ -59,13 +46,7 @@ void main(void)
 	//Calculate the fragment normal
 	fragNormal = normalize(N * inNormal);
 
-	//Calculate half-vectors and light directions
-	for (int i=0; i<MAX_LIGHTS; ++i)
-	{
-		if (Lights[i].isActive)
-		{
-			lightDirections[i] = normalize(vec3(Lights[i].Position - eyePos.xyz));
-			halfVectors[i] = normalize(eyeDirection + lightDirections[i]);
-		}
-	}
+	//Calculate half-vector and sunlight direction
+	sunDirection = normalize(vec3(sunPosition - eyePos.xyz));
+	halfVector = normalize(eyeDirection + sunDirection);
 }

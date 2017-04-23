@@ -2,7 +2,6 @@
 /// @brief the output colour
 layout (location = 0) out vec4 fragColour;
 
-#define MAX_LIGHTS 4
 /// @brief the UV coordinates
 in vec2 uvCoord;
 /// @brief fragment position
@@ -11,10 +10,10 @@ in vec3 fragPos;
 in vec3 fragNormal;
 /// @brief eye direction
 in vec3 eyeDirection;
-/// @brief array of half-vectors
-in vec3 halfVectors[MAX_LIGHTS];
-/// @brief array of light directions
-in vec3 lightDirections[MAX_LIGHTS];
+/// @brief sunlight direction
+in vec3 sunDirection;
+/// @brief half vector
+in vec3 halfVector;
 
 /// @brief the texture
 uniform sampler2D tex;
@@ -30,8 +29,13 @@ struct LightInfo
 	vec3 Ls;//Specular light intensity
 };
 
-/// @brief the lights in the scene
-uniform LightInfo Lights[MAX_LIGHTS];
+/// @brief the sunlight
+uniform LightInfo Sun = LightInfo(
+			true,
+			vec3(0.0f, 100.0f, 0.0f),
+			vec3(0.5f),
+			vec3(1.0f),
+			vec3(1.0f));
 
 /// @struct MaterialInfo
 /// @brief a structure to hold material parameters
@@ -53,21 +57,21 @@ uniform MaterialInfo Material = MaterialInfo(
 
 
 /// @brief calculate the light contribution of one light
-vec3 calculateLightContribution(in int _i)
+vec3 calculateLightContribution()
 {
 	vec3 diffuseColour = texture(tex, uvCoord).xyz;
-	float lambertTerm = dot(fragNormal, lightDirections[_i]);
+	float lambertTerm = dot(fragNormal, sunDirection);
 	if (lambertTerm > 0)
 	{
 		//Light vector
-		vec3 s = Lights[_i].Position - fragPos;
+		vec3 s = Sun.Position - fragPos;
 		//Normal dot Half-vector
-		float NdotH = max(dot(fragNormal, halfVectors[_i]),0.0f);
+		float NdotH = max(dot(fragNormal, halfVector),0.0f);
 
 		return vec3(
-					Lights[_i].La * Material.Ka +//Ambient contribution
-					Lights[_i].Ld * diffuseColour * lambertTerm +//Diffuse contribution
-					Lights[_i].Ls * Material.Ks * pow(NdotH, Material.Shininess)//Specular contribution
+					Sun.La * Material.Ka +//Ambient contribution
+					Sun.Ld * diffuseColour * lambertTerm +//Diffuse contribution
+					Sun.Ls * Material.Ks * pow(NdotH, Material.Shininess)//Specular contribution
 					);
 	}
 	else return vec3(0,0,0);
@@ -75,12 +79,7 @@ vec3 calculateLightContribution(in int _i)
 
 void main(void)
 {
-	vec3 totalColour = vec3(0,0,0);
-	for (int i=0; i<MAX_LIGHTS; ++i)
-	{
-		//if (Lights[i].isActive)
-		totalColour += calculateLightContribution(i);
-	}
+	vec3 totalColour = calculateLightContribution();
 
 	fragColour = vec4(totalColour,1.0f);
 }
