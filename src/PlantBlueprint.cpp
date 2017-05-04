@@ -6,7 +6,6 @@
 // Set the static members
 std::unordered_map<std::string, PlantBlueprint*> PlantBlueprint::s_instances;
 std::unordered_set<std::string> PlantBlueprint::s_keys;
-rTree_t PlantBlueprint::s_rTree;
 std::string PlantBlueprint::s_shaderProgramName = "Phong";
 std::unique_ptr<ngl::Obj> PlantBlueprint::s_cylinder;
 ngl::Vec3 PlantBlueprint::s_sunPosition = ngl::Vec3(0.0f, 100.0f, 0.0f);

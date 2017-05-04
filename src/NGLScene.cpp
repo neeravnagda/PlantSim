@@ -44,6 +44,12 @@ void NGLScene::setPlantVisibility(unsigned _index, bool _state)
 	update();
 }
 //----------------------------------------------------------------------------------------------------------------------
+void NGLScene::deletePlant(unsigned _index)
+{
+	m_plants.erase(m_plants.begin() + _index);
+	update();
+}
+//----------------------------------------------------------------------------------------------------------------------
 void NGLScene::resizeGL(int _w , int _h)
 {
 	m_camera.setShape(45, static_cast<float>(width())/height(), 0.1f, 100.0f);
@@ -74,15 +80,17 @@ void NGLScene::initializeGL()
 	{
 		PlantBlueprint *pb = PlantBlueprint::instance("test");
 		pb->readGrammarFromFile("rules.txt");
-		pb->setDecay(1.6f);
+		pb->setDecay(1.4f);
 		pb->setDrawAngle(45);
 		pb->setDrawLength(0.8f);
 		pb->setMaxDepth(5);
 		pb->setMaxDeviation(0.1f);
-		pb->setNodesPerBranch(4);
+		pb->setLeavesPerBranch(30);
+		pb->setLeavesStartDepth(0);
+		pb->setNodesPerBranch(6);
 		pb->setRootRadius(0.03f);
-		pb->setPhototropismScaleFactor(1.0f);
-		pb->setGravitropismScaleFactor(0.3f);
+		pb->setPhototropismScaleFactor(0.00f);
+		pb->setGravitropismScaleFactor(0.0f);
 		createPlant("test", 0.0f, 0.0f);
 	}
 

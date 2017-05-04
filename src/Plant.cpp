@@ -8,7 +8,6 @@
 #include <ngl/VAOPrimitives.h>
 #include <ngl/Util.h>
 #include "Plant.h"
-#include "RTreeTypes.h"
 //----------------------------------------------------------------------------------------------------------------------
 //Define static members
 std::random_device Plant::s_randomDevice;
@@ -93,18 +92,26 @@ void Plant::draw(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, c
 			//Calculate the direction and length of the segment
 			ngl::Vec3 dir = b.m_positions[i] - b.m_positions[i-1];
 			float length = dir.length();
+			dir.normalize();
 
 			//Scale the branch
 			ngl::Mat4 scaleMatrix;
 			scaleMatrix.scale(m_blueprint->getRootRadius()*decay, length, m_blueprint->getRootRadius()*decay);
 
 			//Calculate the axis and angle for the rotation matrix
-			dir.normalize();
 			float angle = acos(initialDir.dot(dir));
-			ngl::Vec3 axis;
-			axis.cross(initialDir, dir);
-			axis.normalize();
-			ngl::Mat4 rotationMatrix = axisAngleRotationMatrix(angle, axis);
+			ngl::Mat4 rotationMatrix;
+			if (angle > 0)
+			{
+				ngl::Vec3 axis;
+				axis.cross(initialDir, dir);
+				axis.normalize();
+				rotationMatrix = axisAngleRotationMatrix(angle, axis);
+			}
+			else
+			{
+				rotationMatrix.identity();
+			}
 
 			//Update the position
 			ngl::Vec3 position = b.m_positions[i-1] + dir*length/2;
@@ -235,8 +242,6 @@ void Plant::spaceColonisation(Branch& _branch, ngl::Vec3& _direction)
 	float maxLength = m_blueprint->getDrawLength() * decay;//Max length of the branch bit
 	ngl::Vec3 pos = _branch.m_positions.back();//Initialise position for this branch bit
 
-	point_t startPoint(pos.m_x, pos.m_y, pos.m_z);
-
 	//Create some segments
 	for (unsigned i=1; i<m_blueprint->getNodesPerBranch(); ++i)
 	{
@@ -266,26 +271,18 @@ void Plant::spaceColonisation(Branch& _branch, ngl::Vec3& _direction)
 		_direction = pos - _branch.m_positions.back();
 
 		//Add a tropism toward the sun
-		ngl::Vec3 phototropism = PlantBlueprint::getSunPosition() - pos;//Calculate the direction to the sun
-		phototropism.normalize();
-		phototropism *= m_blueprint->getPhototropismScaleFactor();
+		if ((m_blueprint->getPhototropismScaleFactor() > 0) || (m_blueprint->getGravitropismScaleFactor() > 0))
+		{
+			ngl::Vec3 phototropism = PlantBlueprint::getSunPosition() - pos;//Calculate the direction to the sun
+			phototropism.normalize();
+			phototropism *= m_blueprint->getPhototropismScaleFactor();
 
-		//Add a tropism due to gravity and scale with the size of the branch
-		ngl::Vec3 gravitropism = ngl::Vec3::down() * m_blueprint->getGravitropismScaleFactor() * decay;
+			//Add a tropism due to gravity and scale with the size of the branch
+			ngl::Vec3 gravitropism = ngl::Vec3::down() * m_blueprint->getGravitropismScaleFactor() * decay;
 
-		_direction += phototropism + gravitropism;
+			_direction += phototropism + gravitropism;
+		}
 		_direction.normalize();
-
-		//Add to the R-Tree
-		//Need to check for collision detection here
-		point_t endPoint(pos.m_x, pos.m_y, pos.m_z);
-		segment_t branchSegment(startPoint, endPoint);
-		rTreeElement branchElement(branchSegment, _branch.m_ID, i-1);
-		PlantBlueprint::getRTree().insert(branchElement);
-
-		std::cout<<PlantBlueprint::getRTree().size()<<" - R-Tree size\n";
-
-		startPoint = endPoint;
 
 		//Add the position to the end of the array
 		_branch.m_positions.emplace_back(pos);		

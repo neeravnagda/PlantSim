@@ -14,6 +14,8 @@ SceneManagerDialog::SceneManagerDialog(QWidget *parent) :
 	connect(m_ui->m_tableWidget, SIGNAL(currentCellChanged(int,int,int,int)), this, SLOT(setCurrentRow(int,int,int,int)));
 	//Toggle the plant visibility
 	connect(m_ui->m_toggleVisibilityButton, SIGNAL(released()), this, SLOT(togglePlantVisibility()));
+	// Remove plant
+	connect(m_ui->m_deleteButton, SIGNAL(released()), this, SLOT(removePlant()));
 
 	//Add the test plant
 	addRow("test",0,0,0);
@@ -48,10 +50,22 @@ void SceneManagerDialog::setCurrentRow(int _r, int _c, int _pr, int _pc)
 
 void SceneManagerDialog::togglePlantVisibility()
 {
-	QString q = m_ui->m_tableWidget->item(m_currentRow,2)->text();
-	bool changedState = (q == "true") ? false : true;
-	emit plantVisibility(m_currentRow, changedState);
+	if (m_ui->m_tableWidget->rowCount() > 0)
+	{
+		QString q = m_ui->m_tableWidget->item(m_currentRow,2)->text();
+		bool changedState = (q == "true") ? false : true;
+		emit plantVisibility(m_currentRow, changedState);
 
-	QString newText = (changedState == true) ? "true" : "false";
-	m_ui->m_tableWidget->item(m_currentRow, 2)->setText(newText);
+		QString newText = (changedState == true) ? "true" : "false";
+		m_ui->m_tableWidget->item(m_currentRow, 2)->setText(newText);
+	}
+}
+
+void SceneManagerDialog::removePlant()
+{
+	if (m_ui->m_tableWidget->rowCount() > 0)
+	{
+		emit deletePlantSignal(static_cast<unsigned>(m_currentRow));
+		m_ui->m_tableWidget->removeRow(m_currentRow);
+	}
 }

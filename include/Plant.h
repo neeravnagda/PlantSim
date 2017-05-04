@@ -11,7 +11,6 @@
 #include "Branch.h"
 #include "PlantBlueprint.h"
 #include "ProductionRule.h"
-#include "RTreeTypes.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 /// @file Plant.h

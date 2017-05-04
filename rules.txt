@@ -1,2 +1,2 @@
-FA
+FFA
 A=[+FA][-FA][/FA][\FA]

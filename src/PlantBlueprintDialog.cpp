@@ -33,22 +33,12 @@ PlantBlueprintDialog::PlantBlueprintDialog(QWidget *parent) :
 	QRegularExpressionValidator *txtFileValidator = new QRegularExpressionValidator(txtFileRegExp, this);
 	m_ui->m_grammarFilePath->setValidator(txtFileValidator);
 
-	//Add a validator for the image paths
-	QString imageFileExp = fileRegExp + "((exr)|(gif)|(jpeg)|(jpg)|(png)|(tif)|(tiff))";
-	QRegularExpression imageFileRegExp(imageFileExp);
-	QRegularExpressionValidator *imageFileValidator = new QRegularExpressionValidator(imageFileRegExp, this);
-	m_ui->m_woodTextureFilePath->setValidator(imageFileValidator);
-	m_ui->m_leafTextureFilePath->setValidator(imageFileValidator);
-
 	//Connect signals and slots
 	connect(m_ui->m_blueprintName, SIGNAL(editingFinished()), this, SLOT(checkBlueprintExists()));
 	connect(m_ui->m_blueprintName, SIGNAL(textChanged(QString)), this, SLOT(checkBlueprintExists()));
 	connect(m_ui->m_grammarFilePath, SIGNAL(editingFinished()), this, SLOT(checkGrammarFileExists()));
 	connect(m_ui->m_grammarFilePath, SIGNAL(textChanged(QString)), this, SLOT(resetGrammarFileTextColour()));
-	connect(m_ui->m_woodTextureFilePath, SIGNAL(editingFinished()), this, SLOT(checkWoodTextureFileExists()));
-	connect(m_ui->m_woodTextureFilePath, SIGNAL(textChanged(QString)), this, SLOT(resetWoodTextureFileTextColour()));
-	connect(m_ui->m_leafTextureFilePath, SIGNAL(editingFinished()), this, SLOT(checkLeafTextureFileExists()));
-	connect(m_ui->m_leafTextureFilePath, SIGNAL(textChanged(QString)), this, SLOT(resetLeafTextureFileTextColour()));
+	connect(m_ui->m_maxDepth, SIGNAL(valueChanged(int)), this, SLOT(setMaxLeavesStartDepth()));
 }
 //----------------------------------------------------------------------------------------------------------------------
 PlantBlueprintDialog::~PlantBlueprintDialog()
@@ -58,9 +48,6 @@ PlantBlueprintDialog::~PlantBlueprintDialog()
 //----------------------------------------------------------------------------------------------------------------------
 bool PlantBlueprintDialog::createPlantBlueprint()
 {
-	//Initialise to true as these have not been implemented yet
-	m_validationChecks[ValidationVariables::WOODTEXTURE] = true;
-	m_validationChecks[ValidationVariables::LEAFTEXTURE] = true;
 
 	//Return if any validation failed
 	for (bool &b : m_validationChecks)
@@ -71,12 +58,14 @@ bool PlantBlueprintDialog::createPlantBlueprint()
 	//Create a new blueprint
 	PlantBlueprint *pb = PlantBlueprint::instance(m_ui->m_blueprintName->text().toStdString());
 	pb->readGrammarFromFile(m_ui->m_grammarFilePath->text().toStdString());
-	pb->setMaxDepth(m_ui->m_maxDepth->value());
+	pb->setMaxDepth(static_cast<unsigned>(m_ui->m_maxDepth->value()));
 	pb->setDrawLength(static_cast<float>(m_ui->m_drawLength->value()));
 	pb->setDrawAngle(static_cast<float>(m_ui->m_drawAngle->value()));
 	pb->setRootRadius(static_cast<float>(m_ui->m_rootRadius->value()));
 	pb->setDecay(static_cast<float>(m_ui->m_decay->value()));
 	pb->setMaxDeviation(static_cast<float>(m_ui->m_maxDeviation->value()));
+	pb->setLeavesPerBranch(static_cast<unsigned>(m_ui->m_leafCount->value()));
+	pb->setLeavesStartDepth(static_cast<unsigned>(m_ui->m_leavesStartDepth->value()));
 	pb->setNodesPerBranch(m_ui->m_numNodes->value());
 	pb->setPhototropismScaleFactor(static_cast<float>(m_ui->m_phototropismScaleFactor->value()));
 	pb->setGravitropismScaleFactor(static_cast<float>(m_ui->m_gravitropismScaleFactor->value()));
@@ -95,12 +84,12 @@ void PlantBlueprintDialog::checkBlueprintExists()
 	else if (check == PlantBlueprint::getKeys().end())
 	{
 		palette.setColor(QPalette::Text, Qt::green);//Set text to green if OK
-		m_validationChecks[ValidationVariables::BLUEPRINTNAME] = true;
+		m_validationChecks[VALIDATION::BLUEPRINTNAME] = true;
 	}
 	else
 	{
 		palette.setColor(QPalette::Text, Qt::red);//Set text to red if already exists
-		m_validationChecks[ValidationVariables::BLUEPRINTNAME] = false;
+		m_validationChecks[VALIDATION::BLUEPRINTNAME] = false;
 	}
 	m_ui->m_blueprintName->setPalette(palette);
 }
@@ -112,12 +101,12 @@ void PlantBlueprintDialog::checkGrammarFileExists()
 	if (checkFileExists(m_ui->m_grammarFilePath->text()))
 	{
 		palette.setColor(QPalette::Text,Qt::green);//Set text to green if OK
-		m_validationChecks[ValidationVariables::GRAMMARFILE] = true;
+		m_validationChecks[VALIDATION::GRAMMARFILE] = true;
 	}
 	else
 	{
 		palette.setColor(QPalette::Text,Qt::red);//Set text to red if invalid
-		m_validationChecks[ValidationVariables::GRAMMARFILE] = false;
+		m_validationChecks[VALIDATION::GRAMMARFILE] = false;
 	}
 	m_ui->m_grammarFilePath->setPalette(palette);
 }
@@ -127,53 +116,21 @@ void PlantBlueprintDialog::resetGrammarFileTextColour()
 	m_ui->m_grammarFilePath->setPalette(c_defaultPalette);
 }
 //----------------------------------------------------------------------------------------------------------------------
-void PlantBlueprintDialog::checkWoodTextureFileExists()
-{
-	QPalette palette = c_defaultPalette;
-
-	if (checkFileExists(m_ui->m_woodTextureFilePath->text()))
-	{
-		palette.setColor(QPalette::Text,Qt::green);//Set text to green if OK
-		m_validationChecks[ValidationVariables::WOODTEXTURE] = true;
-	}
-	else
-	{
-		palette.setColor(QPalette::Text,Qt::red);//Set text to red if invalid
-		m_validationChecks[ValidationVariables::WOODTEXTURE] = false;
-	}
-	m_ui->m_woodTextureFilePath->setPalette(palette);
-}
-//----------------------------------------------------------------------------------------------------------------------
-void PlantBlueprintDialog::resetWoodTextureFileTextColour()
-{
-	m_ui->m_woodTextureFilePath->setPalette(c_defaultPalette);
-}
-//----------------------------------------------------------------------------------------------------------------------
-void PlantBlueprintDialog::checkLeafTextureFileExists()
-{
-	QPalette palette = c_defaultPalette;
-
-	if (checkFileExists(m_ui->m_leafTextureFilePath->text()))
-	{
-		palette.setColor(QPalette::Text,Qt::green);//Set text to green if OK
-		m_validationChecks[ValidationVariables::LEAFTEXTURE] = true;
-	}
-	else
-	{
-		palette.setColor(QPalette::Text,Qt::red);//Set text to red if invalid
-		m_validationChecks[ValidationVariables::LEAFTEXTURE] = false;
-	}
-	m_ui->m_leafTextureFilePath->setPalette(palette);
-}
-//----------------------------------------------------------------------------------------------------------------------
-void PlantBlueprintDialog::resetLeafTextureFileTextColour()
-{
-	m_ui->m_leafTextureFilePath->setPalette(c_defaultPalette);
-}
-//----------------------------------------------------------------------------------------------------------------------
 bool PlantBlueprintDialog::checkFileExists(QString _fileName)
 {
 	QFileInfo file(_fileName);
 	return (file.exists());
+}
+//----------------------------------------------------------------------------------------------------------------------
+void PlantBlueprintDialog::setMaxLeavesStartDepth()
+{
+	int ld = m_ui->m_leavesStartDepth->value();
+	int md = m_ui->m_maxDepth->value();
+	m_ui->m_leavesStartDepth->setMaximum(md);
+	//reset start depth below max depth
+	if (ld > md)
+	{
+		m_ui->m_leavesStartDepth->setValue(md);
+	}
 }
 //----------------------------------------------------------------------------------------------------------------------

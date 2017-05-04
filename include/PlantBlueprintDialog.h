@@ -14,35 +14,15 @@
 /// @author Neerav Nagda
 /// @version 1.0
 /// @date 01/04/17
+/// @class PlantBlueprintDialog
+/// @brief This class manages the UI and UI functions for creating a new PlantBlueprint
 //----------------------------------------------------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------------------------------------------------
-/// @struct Validation
-/// @brief Contains enum variables
-/// @enum variables
-/// @brief Enumarated names for the validation array
-//----------------------------------------------------------------------------------------------------------------------
-struct PlantBlueprintValidation
-{
-		enum variables
-		{
-			BLUEPRINTNAME = 0,
-			GRAMMARFILE = 1,
-			WOODTEXTURE = 2,
-			LEAFTEXTURE = 3,
-			COUNT = 4
-		};
-};
-typedef PlantBlueprintValidation::variables ValidationVariables;
 
 		namespace Ui {
 		class PlantBlueprintDialog;
 		}
 
-//----------------------------------------------------------------------------------------------------------------------
-/// @class PlantBlueprintDialog
-/// @brief This class manages the UI and UI functions for creating a new PlantBlueprint
-//----------------------------------------------------------------------------------------------------------------------
+
 		class PlantBlueprintDialog : public QDialog
 		{
 				Q_OBJECT
@@ -68,7 +48,7 @@ typedef PlantBlueprintValidation::variables ValidationVariables;
 				//----------------------------------------------------------------------------------------------------------------------
 				bool createPlantBlueprint();
 
-			public slots:
+			private slots:
 				//----------------------------------------------------------------------------------------------------------------------
 				/// @brief Check if the blueprint already exists
 				//----------------------------------------------------------------------------------------------------------------------
@@ -82,24 +62,15 @@ typedef PlantBlueprintValidation::variables ValidationVariables;
 				//----------------------------------------------------------------------------------------------------------------------
 				void resetGrammarFileTextColour();
 				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief Check if the file exists
+				/// @brief Set the maximum value for leaves start depth
 				//----------------------------------------------------------------------------------------------------------------------
-				void checkWoodTextureFileExists();
-				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief Reset text colour to black
-				//----------------------------------------------------------------------------------------------------------------------
-				void resetWoodTextureFileTextColour();
-				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief Check if the file exists
-				//----------------------------------------------------------------------------------------------------------------------
-				void checkLeafTextureFileExists();
-				//----------------------------------------------------------------------------------------------------------------------
-				/// @brief Reset text colour to black
-				//----------------------------------------------------------------------------------------------------------------------
-				void resetLeafTextureFileTextColour();
-
+				void setMaxLeavesStartDepth();
 
 			private:
+				//----------------------------------------------------------------------------------------------------------------------
+				/// @brief enum for validation in the array
+				//----------------------------------------------------------------------------------------------------------------------
+				enum VALIDATION : unsigned {BLUEPRINTNAME = 0, GRAMMARFILE = 1, COUNT = 2};
 				//----------------------------------------------------------------------------------------------------------------------
 				/// @brief UI for this class
 				//----------------------------------------------------------------------------------------------------------------------
@@ -113,7 +84,7 @@ typedef PlantBlueprintValidation::variables ValidationVariables;
 				/// @brief Array of bools for validation statuses for UI elements
 				/// This is for all string validation
 				//----------------------------------------------------------------------------------------------------------------------
-				std::array<bool, ValidationVariables::COUNT> m_validationChecks;
+				std::array<bool, VALIDATION::COUNT> m_validationChecks;
 				//----------------------------------------------------------------------------------------------------------------------
 				/// @brief Check if a file exists
 				/// @param _fileName The file to check

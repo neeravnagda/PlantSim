@@ -30,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(m_ui->m_updateButton, SIGNAL(released()), this, SLOT(updatePlants()));
 	//Create a new plant
 	connect(m_ui->m_newPlantButton, SIGNAL(released()), this, SLOT(createNewPlant()));
+	//Delete a plant
+	connect(m_sceneManagerDialog, SIGNAL(deletePlantSignal(uint)), this, SLOT(deletePlant(uint)));
 	//Open the Plant Blueprint dialog
 	connect(m_ui->m_plantType, SIGNAL(currentIndexChanged(int)), this, SLOT(openPlantBlueprintDialogFromUI()));
 	connect(m_ui->s_newPlantBlueprint, SIGNAL(triggered(bool)), this, SLOT(openPlantBlueprintDialogFromMenubar()));
@@ -39,6 +41,9 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(m_plantBlueprintDialog->getUI().m_create, SIGNAL(released()), this, SLOT(createPlantBlueprint()));
 	//Open the scene manager
 	connect(m_ui->s_sceneManagerMenuButton, SIGNAL(triggered(bool)), this, SLOT(openSceneManager()));
+	connect(m_ui->m_sceneManagerButton, SIGNAL(released()), this, SLOT(openSceneManager()));
+	//Close the scene manager
+	connect(m_sceneManagerDialog->getUI().m_closeButton, SIGNAL(released()), this, SLOT(closeSceneManager()));
 	//Set the plant visibility
 	connect(m_sceneManagerDialog, SIGNAL(plantVisibility(uint,bool)), this, SLOT(setPlantVisibility(uint,bool)));
 
@@ -74,6 +79,11 @@ void MainWindow::createNewPlant()
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
+void MainWindow::deletePlant(unsigned _index)
+{
+	m_gl->deletePlant(_index);
+}
+//----------------------------------------------------------------------------------------------------------------------
 void MainWindow::openPlantBlueprintDialogFromUI()
 {
 	if (m_ui->m_plantType->currentText() == "create new")
@@ -95,6 +105,11 @@ void MainWindow::closePlantBlueprintDialog()
 void MainWindow::openSceneManager()
 {
 	m_sceneManagerDialog->show();
+}
+//----------------------------------------------------------------------------------------------------------------------
+void MainWindow::closeSceneManager()
+{
+	m_sceneManagerDialog->hide();
 }
 //----------------------------------------------------------------------------------------------------------------------
 void MainWindow::createPlantBlueprint()

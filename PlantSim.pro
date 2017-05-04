@@ -44,7 +44,6 @@ HEADERS+= include/NGLScene.h \
 	  include/WindowParams.h \
     include/Branch.h \
     include/ProductionRule.h \
-    include/RTreeTypes.h \
     include/Plant.h \
     include/PlantBlueprint.h \
     include/MainWindow.h \
