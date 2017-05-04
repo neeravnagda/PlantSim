@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>668</height>
+    <height>754</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -53,7 +53,7 @@
      </property>
     </widget>
    </item>
-   <item row="22" column="1">
+   <item row="26" column="1">
     <widget class="QPushButton" name="m_cancel">
      <property name="toolTip">
       <string>Cancel</string>
@@ -84,7 +84,7 @@
      </property>
     </widget>
    </item>
-   <item row="22" column="0">
+   <item row="26" column="0">
     <widget class="QPushButton" name="m_create">
      <property name="enabled">
       <bool>true</bool>
@@ -179,6 +179,13 @@
      </property>
     </widget>
    </item>
+   <item row="23" column="0" colspan="2">
+    <widget class="QLineEdit" name="m_woodTextureFilePath">
+     <property name="toolTip">
+      <string>Wood texture file path</string>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="0" colspan="2">
     <widget class="QLineEdit" name="m_blueprintName">
      <property name="toolTip">
@@ -199,10 +206,10 @@
      </property>
     </widget>
    </item>
-   <item row="19" column="0" colspan="2">
-    <widget class="QLineEdit" name="m_woodTextureFilePath">
+   <item row="25" column="0" colspan="2">
+    <widget class="QLineEdit" name="m_leafTextureFilePath">
      <property name="toolTip">
-      <string>Wood texture file path</string>
+      <string>Leaf texture file path</string>
      </property>
     </widget>
    </item>
@@ -229,21 +236,14 @@ Note this must end with &quot;.txt&quot;</string>
      </property>
     </widget>
    </item>
-   <item row="18" column="0">
+   <item row="22" column="0">
     <widget class="QLabel" name="s_woodTextureFileLabel">
      <property name="text">
       <string>Wood Texture File</string>
      </property>
     </widget>
    </item>
-   <item row="21" column="0" colspan="2">
-    <widget class="QLineEdit" name="m_leafTextureFilePath">
-     <property name="toolTip">
-      <string>Leaf texture file path</string>
-     </property>
-    </widget>
-   </item>
-   <item row="20" column="0" colspan="2">
+   <item row="24" column="0" colspan="2">
     <widget class="QLabel" name="s_leafTextureFileLabel">
      <property name="text">
       <string>Leaf Texture File</string>
@@ -270,6 +270,37 @@ Note this must end with &quot;.txt&quot;</string>
      </property>
      <property name="value">
       <number>5</number>
+     </property>
+    </widget>
+   </item>
+   <item row="19" column="0" colspan="2">
+    <widget class="QDoubleSpinBox" name="m_phototropismScaleFactor">
+     <property name="toolTip">
+      <string>Scale factor to grow towards the sun</string>
+     </property>
+     <property name="maximum">
+      <double>10.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="18" column="0">
+    <widget class="QLabel" name="s_phototropismScaleLabel">
+     <property name="text">
+      <string>Phototropism scale factor</string>
+     </property>
+    </widget>
+   </item>
+   <item row="20" column="0">
+    <widget class="QLabel" name="s_gravitropismScale">
+     <property name="text">
+      <string>Gravitropism scale factor</string>
+     </property>
+    </widget>
+   </item>
+   <item row="21" column="0" colspan="2">
+    <widget class="QDoubleSpinBox" name="m_gravitropismScaleFactor">
+     <property name="toolTip">
+      <string>Scale factor for branches to grow downwards due to gravity</string>
      </property>
     </widget>
    </item>

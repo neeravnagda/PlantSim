@@ -6,6 +6,7 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 #include "ui_PlantBlueprintDialog.h"
+#include "ui_SceneManagerDialog.h"
 #include "PlantBlueprint.h"
 //----------------------------------------------------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget *parent) :
@@ -21,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	//Create new dialogs
 	m_plantBlueprintDialog = new PlantBlueprintDialog(this);
+	m_sceneManagerDialog = new SceneManagerDialog(this);
 
 	//Quit the application
 	connect(m_ui->s_quit, SIGNAL(triggered(bool)), this, SLOT(quit()));
@@ -35,6 +37,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(m_plantBlueprintDialog->getUI().m_cancel, SIGNAL(released()), this, SLOT(closePlantBlueprintDialog()));
 	//Create a new Plant Blueprint
 	connect(m_plantBlueprintDialog->getUI().m_create, SIGNAL(released()), this, SLOT(createPlantBlueprint()));
+	//Open the scene manager
+	connect(m_ui->s_sceneManagerMenuButton, SIGNAL(triggered(bool)), this, SLOT(openSceneManager()));
+	//Set the plant visibility
+	connect(m_sceneManagerDialog, SIGNAL(plantVisibility(uint,bool)), this, SLOT(setPlantVisibility(uint,bool)));
 
 	m_ui->m_plantType->addItem("test");
 
@@ -62,8 +68,9 @@ void MainWindow::createNewPlant()
 	{
 		const float x = static_cast<float>(m_ui->m_positionX->value());
 		const float z = static_cast<float>(m_ui->m_positionZ->value());
-		const std::string type = m_ui->m_plantType->currentText().toStdString();
-		m_gl->createPlant(type,x,z);
+		const QString type = m_ui->m_plantType->currentText();
+		m_gl->createPlant(type.toStdString(),x,z);
+		m_sceneManagerDialog->addRow(type, x, 0, z);
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -83,6 +90,11 @@ void MainWindow::openPlantBlueprintDialogFromMenubar()
 void MainWindow::closePlantBlueprintDialog()
 {
 	m_plantBlueprintDialog->hide();
+}
+//----------------------------------------------------------------------------------------------------------------------
+void MainWindow::openSceneManager()
+{
+	m_sceneManagerDialog->show();
 }
 //----------------------------------------------------------------------------------------------------------------------
 void MainWindow::createPlantBlueprint()
@@ -106,5 +118,10 @@ void MainWindow::createPlantBlueprint()
 void MainWindow::updatePlants()
 {
 	m_gl->updatePlants();
+}
+//----------------------------------------------------------------------------------------------------------------------
+void MainWindow::setPlantVisibility(unsigned _index, bool _state)
+{
+	m_gl->setPlantVisibility(_index, _state);
 }
 //----------------------------------------------------------------------------------------------------------------------

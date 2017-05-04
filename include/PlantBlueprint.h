@@ -101,6 +101,16 @@ class PlantBlueprint
 		//----------------------------------------------------------------------------------------------------------------------
 		void setMaxDeviation(float _deviation){m_maxDeviation = _deviation;}
 		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Set function for m_phototropismScale
+		/// @param _scale New scale factor for the phototropism
+		//----------------------------------------------------------------------------------------------------------------------
+		void setPhototropismScaleFactor(float _scaleFactor){m_phototropismScaleFactor = _scaleFactor;}
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Set function for m_gravitropismScaleFactor
+		/// @param _scale New scale factor for the gravitropism
+		//----------------------------------------------------------------------------------------------------------------------
+		void setGravitropismScaleFactor(float _scaleFactor){m_gravitropismScaleFactor = _scaleFactor;}
+		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_axiom
 		/// @return Reference of the axiom for the L-system
 		//----------------------------------------------------------------------------------------------------------------------
@@ -146,6 +156,16 @@ class PlantBlueprint
 		//----------------------------------------------------------------------------------------------------------------------
 		const float& getMaxDeviation() const {return m_maxDeviation;}
 		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Get function for m_phototropismScaleFactor
+		/// @return The phototropism scale factor
+		//----------------------------------------------------------------------------------------------------------------------
+		const float& getPhototropismScaleFactor() const {return m_phototropismScaleFactor;}
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Get function for m_gravitropismScaleFactor
+		/// @return The gravitropism scale factor
+		//----------------------------------------------------------------------------------------------------------------------
+		const float& getGravitropismScaleFactor() const {return m_gravitropismScaleFactor;}
+		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for s_keys
 		/// @return Reference to the keys of the map, i.e. the names of the instances
 		/// This is used for the UI
@@ -157,6 +177,11 @@ class PlantBlueprint
 		/// This is needed for draw calls
 		//----------------------------------------------------------------------------------------------------------------------
 		static const std::string& getShaderName(){return s_shaderProgramName;}
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Get function for the sun position
+		/// @return Reference to the sun position
+		//----------------------------------------------------------------------------------------------------------------------
+		static const ngl::Vec3& getSunPosition(){return s_sunPosition;}
 
 	protected:
 		//----------------------------------------------------------------------------------------------------------------------
@@ -193,6 +218,11 @@ class PlantBlueprint
 		//----------------------------------------------------------------------------------------------------------------------
 		static std::unique_ptr<ngl::Obj> s_cylinder;
 		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief The sun position
+		/// This value is never changed at runtime, but is used for the plant simulation
+		//----------------------------------------------------------------------------------------------------------------------
+		static ngl::Vec3 s_sunPosition;
+		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief L-system axiom
 		//----------------------------------------------------------------------------------------------------------------------
 		std::string m_axiom;
@@ -228,6 +258,15 @@ class PlantBlueprint
 		/// @brief The maximum deviation of nodes for space colonisation
 		//----------------------------------------------------------------------------------------------------------------------
 		float m_maxDeviation;
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Scale factor for phototropism, i.e. how much it grows towards the sun
+		//----------------------------------------------------------------------------------------------------------------------
+		float m_phototropismScaleFactor;
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Scale factor for gravitropism, i.e. how much it falls due to gravity
+		/// This is scaled by the size of the branches, so a branch of size 0.5 will have a gravitropism of 0.5 * gravitropismScaleFactor
+		//----------------------------------------------------------------------------------------------------------------------
+		float m_gravitropismScaleFactor;
 };
 
 #endif // PLANTBLUEPRINT_H_

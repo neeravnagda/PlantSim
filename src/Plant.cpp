@@ -231,7 +231,8 @@ float Plant::calculateDecay(const unsigned& _depth) const
 //----------------------------------------------------------------------------------------------------------------------
 void Plant::spaceColonisation(Branch& _branch, ngl::Vec3& _direction)
 {
-	float maxLength = m_blueprint->getDrawLength() * calculateDecay(_branch.m_creationDepth);	//Max length of the branch bit
+	float decay = calculateDecay(_branch.m_creationDepth);
+	float maxLength = m_blueprint->getDrawLength() * decay;//Max length of the branch bit
 	ngl::Vec3 pos = _branch.m_positions.back();//Initialise position for this branch bit
 
 	point_t startPoint(pos.m_x, pos.m_y, pos.m_z);
@@ -263,6 +264,16 @@ void Plant::spaceColonisation(Branch& _branch, ngl::Vec3& _direction)
 		//Make sure the branch doesn't go below ground
 		if (pos.m_y <= 0.0f) pos.m_y *=-1;
 		_direction = pos - _branch.m_positions.back();
+
+		//Add a tropism toward the sun
+		ngl::Vec3 phototropism = PlantBlueprint::getSunPosition() - pos;//Calculate the direction to the sun
+		phototropism.normalize();
+		phototropism *= m_blueprint->getPhototropismScaleFactor();
+
+		//Add a tropism due to gravity and scale with the size of the branch
+		ngl::Vec3 gravitropism = ngl::Vec3::down() * m_blueprint->getGravitropismScaleFactor() * decay;
+
+		_direction += phototropism + gravitropism;
 		_direction.normalize();
 
 		//Add to the R-Tree

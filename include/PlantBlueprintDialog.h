@@ -111,6 +111,7 @@ typedef PlantBlueprintValidation::variables ValidationVariables;
 				QPalette c_defaultPalette;
 				//----------------------------------------------------------------------------------------------------------------------
 				/// @brief Array of bools for validation statuses for UI elements
+				/// This is for all string validation
 				//----------------------------------------------------------------------------------------------------------------------
 				std::array<bool, ValidationVariables::COUNT> m_validationChecks;
 				//----------------------------------------------------------------------------------------------------------------------

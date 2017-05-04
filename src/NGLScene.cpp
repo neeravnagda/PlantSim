@@ -38,6 +38,12 @@ void NGLScene::createPlant(std::string _type, float _x, float _z)
 	update();
 }
 //----------------------------------------------------------------------------------------------------------------------
+void NGLScene::setPlantVisibility(unsigned _index, bool _state)
+{
+	m_plants[_index].setVisibility(_state);
+	update();
+}
+//----------------------------------------------------------------------------------------------------------------------
 void NGLScene::resizeGL(int _w , int _h)
 {
 	m_camera.setShape(45, static_cast<float>(width())/height(), 0.1f, 100.0f);
@@ -75,6 +81,8 @@ void NGLScene::initializeGL()
 		pb->setMaxDeviation(0.1f);
 		pb->setNodesPerBranch(4);
 		pb->setRootRadius(0.03f);
+		pb->setPhototropismScaleFactor(1.0f);
+		pb->setGravitropismScaleFactor(0.3f);
 		createPlant("test", 0.0f, 0.0f);
 	}
 
@@ -121,7 +129,7 @@ void NGLScene::drawScene()
 	//Draw the plants
 	for (Plant &p : m_plants)
 	{
-		p.draw(m_mouseGlobalTX, m_camera.getViewMatrix(), m_camera.getProjectionMatrix());
+		if (p.getVisibility()) p.draw(m_mouseGlobalTX, m_camera.getViewMatrix(), m_camera.getProjectionMatrix());
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------

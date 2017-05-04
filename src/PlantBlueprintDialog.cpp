@@ -78,6 +78,8 @@ bool PlantBlueprintDialog::createPlantBlueprint()
 	pb->setDecay(static_cast<float>(m_ui->m_decay->value()));
 	pb->setMaxDeviation(static_cast<float>(m_ui->m_maxDeviation->value()));
 	pb->setNodesPerBranch(m_ui->m_numNodes->value());
+	pb->setPhototropismScaleFactor(static_cast<float>(m_ui->m_phototropismScaleFactor->value()));
+	pb->setGravitropismScaleFactor(static_cast<float>(m_ui->m_gravitropismScaleFactor->value()));
 
 	return true;
 }

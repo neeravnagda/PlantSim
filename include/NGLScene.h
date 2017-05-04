@@ -60,6 +60,12 @@ class NGLScene : public QOpenGLWidget
 		/// @param _z The z coordinate to place the object at
 		//----------------------------------------------------------------------------------------------------------------------
 		void createPlant(std::string _type, float _x, float _z);
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Set a plant visibility from the container
+		/// @param _index The index into the vector m_plants
+		/// @param _state The new visibility state
+		//----------------------------------------------------------------------------------------------------------------------
+		void setPlantVisibility(unsigned _index, bool _state);
 
 	private:
 		//----------------------------------------------------------------------------------------------------------------------

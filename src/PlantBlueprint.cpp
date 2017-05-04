@@ -9,6 +9,7 @@ std::unordered_set<std::string> PlantBlueprint::s_keys;
 rTree_t PlantBlueprint::s_rTree;
 std::string PlantBlueprint::s_shaderProgramName = "Phong";
 std::unique_ptr<ngl::Obj> PlantBlueprint::s_cylinder;
+ngl::Vec3 PlantBlueprint::s_sunPosition = ngl::Vec3(0.0f, 100.0f, 0.0f);
 //----------------------------------------------------------------------------------------------------------------------
 PlantBlueprint* PlantBlueprint::instance(const std::string _instanceID)
 {
@@ -47,7 +48,7 @@ void PlantBlueprint::destroyAll()
 void PlantBlueprint::init()
 {
 	//Create the geometry
-	s_cylinder.reset(new ngl::Obj("models/Cylinder.obj", "textures/treeTex.jpg"));
+	s_cylinder.reset(new ngl::Obj("models/cylinder_low.obj", "textures/treeTex.jpg"));
 	s_cylinder->createVAO();
 
 	//Load the shaders
