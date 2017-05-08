@@ -12,7 +12,6 @@
 //Define static members
 std::random_device Plant::s_randomDevice;
 std::mt19937 Plant::s_numberGenerator(Plant::s_randomDevice());
-boost::uuids::random_generator Plant::s_IDGenerator;
 //----------------------------------------------------------------------------------------------------------------------
 Plant::Plant(const std::string& _blueprint, const ngl::Vec3& _position)
 {
@@ -87,10 +86,10 @@ void Plant::draw(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, c
 	for (Branch &b : m_branches)
 	{
 		decay = calculateDecay(b.m_creationDepth);
-		for (unsigned i=1; i<b.m_positions.size(); ++i)
+		for (unsigned i=1; i<b.m_nodePositions.size(); ++i)
 		{
 			//Calculate the direction and length of the segment
-			ngl::Vec3 dir = b.m_positions[i] - b.m_positions[i-1];
+			ngl::Vec3 dir = b.m_nodePositions[i] - b.m_nodePositions[i-1];
 			float length = dir.length();
 			dir.normalize();
 
@@ -114,7 +113,7 @@ void Plant::draw(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, c
 			}
 
 			//Update the position
-			ngl::Vec3 position = b.m_positions[i-1] + dir*length/2;
+			ngl::Vec3 position = b.m_nodePositions[i-1] + dir*length/2;
 			m_transform =  scaleMatrix * rotationMatrix;
 			m_transform.m_30 = position.m_x;
 			m_transform.m_31 = position.m_y;
@@ -154,7 +153,7 @@ void Plant::addBranches(const unsigned& _number, unsigned& _position)
 {
 	for (unsigned i=0; i<_number; ++i, ++_position)
 	{
-		m_branches.emplace(m_branches.begin()+_position, s_IDGenerator(), m_depth);
+		m_branches.emplace(m_branches.begin()+_position, m_depth);
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -183,7 +182,7 @@ void Plant::stringToBranches()
 		//Otherwise create a new branch with the string
 		else
 		{
-			m_branches.emplace_back(s_IDGenerator(), m_depth, branchString);
+			m_branches.emplace_back(m_depth, branchString);
 		}
 		branchStartPos = branchEndPos+1;
 	}
@@ -236,15 +235,44 @@ float Plant::calculateDecay(const unsigned& _depth) const
 	else return 1.0f / static_cast<float>(pow(m_blueprint->getDecayConstant(), _depth));
 }
 //----------------------------------------------------------------------------------------------------------------------
+void Plant::scatterLeaves(const ngl::Vec3 &_startPos, const ngl::Vec3 &_endPos, const float _radius, const ngl::Vec3& _direction, Branch& _branch)
+{
+	unsigned count = m_blueprint->getLeavesPerBranch() / m_blueprint->getNodesPerBranch();
+	ngl::Vec3 axis;
+	axis.cross(_direction, ngl::Vec3::up());
+	float angle = acos(_direction.dot(ngl::Vec3::up()));
+	ngl::Mat4 rotationMatrix1 = axisAngleRotationMatrix(angle, axis);
+	ngl::Mat4 rotationMatrix2 = axisAngleRotationMatrix(-angle, axis);
+
+	for (unsigned i=0; i<count; ++i)
+	{
+		//Lerp parameter for position along the branch
+		float height = generateRandomFloat();
+		ngl::Vec3 posAlongBranch = (_startPos * height) + (_endPos * (1 - height));
+		float rotationAroundBranch = generateRandomFloat();
+		ngl::Vec4 unorientedPos = rotationMatrix1 * ngl::Vec4(posAlongBranch);
+		unorientedPos.m_x += _radius * cos(rotationAroundBranch);
+		unorientedPos.m_z += _radius * sin(rotationAroundBranch);
+
+		ngl::Vec4 reorientedPos = rotationMatrix2 * unorientedPos;
+
+		ngl::Vec3 leafRotation(generateRandomFloat()*30,generateRandomFloat()*30,generateRandomFloat()*30);
+
+		_branch.m_leafPositions.emplace_back(reorientedPos.toVec3());
+		_branch.m_leafRotations.emplace_back(leafRotation);
+	}
+}
+//----------------------------------------------------------------------------------------------------------------------
 void Plant::spaceColonisation(Branch& _branch, ngl::Vec3& _direction)
 {
 	float decay = calculateDecay(_branch.m_creationDepth);
 	float maxLength = m_blueprint->getDrawLength() * decay;//Max length of the branch bit
-	ngl::Vec3 pos = _branch.m_positions.back();//Initialise position for this branch bit
+	ngl::Vec3 pos = _branch.m_nodePositions.back();//Initialise position for this branch bit
 
 	//Create some segments
 	for (unsigned i=1; i<m_blueprint->getNodesPerBranch(); ++i)
 	{
+		ngl::Vec3 startPos = pos;	//Temp variable for scatterLeavesFunction
 		//Generate a random length, radius and angle to create a random point inside a cone
 		float h = generateRandomFloat();
 		float r = generateRandomFloat() * h * m_blueprint->getMaxDeviation();
@@ -268,9 +296,9 @@ void Plant::spaceColonisation(Branch& _branch, ngl::Vec3& _direction)
 		pos += newPos.toVec3();
 		//Make sure the branch doesn't go below ground
 		if (pos.m_y <= 0.0f) pos.m_y *=-1;
-		_direction = pos - _branch.m_positions.back();
+		_direction = pos - _branch.m_nodePositions.back();
 
-		//Add a tropism toward the sun
+		//Add tropisms
 		if ((m_blueprint->getPhototropismScaleFactor() > 0) || (m_blueprint->getGravitropismScaleFactor() > 0))
 		{
 			ngl::Vec3 phototropism = PlantBlueprint::getSunPosition() - pos;//Calculate the direction to the sun
@@ -285,7 +313,13 @@ void Plant::spaceColonisation(Branch& _branch, ngl::Vec3& _direction)
 		_direction.normalize();
 
 		//Add the position to the end of the array
-		_branch.m_positions.emplace_back(pos);		
+		_branch.m_nodePositions.emplace_back(pos);
+
+		//Calculate leaves
+		if (_branch.m_creationDepth >= m_blueprint->getLeavesStartDepth())
+		{
+			scatterLeaves(startPos, pos, decay * m_blueprint->getRootRadius(), _direction, _branch);
+		}
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -310,16 +344,16 @@ void Plant::evaluateBranches()
 
 		//Add the last position to the position stack
 		//This is to avoid resimulating the branch
-		if (!b.m_positions.empty())
+		if (!b.m_nodePositions.empty())
 		{
-			ngl::Vec3 direction = b.m_positions.back() - b.m_positions.front();
+			ngl::Vec3 direction = b.m_nodePositions.back() - b.m_nodePositions.front();
 			directionStack.push(direction);
-			positionStack.push(b.m_positions.back());
+			positionStack.push(b.m_nodePositions.back());
 		}
 		//Perform the space colonisation algorithm
 		else
 		{
-			b.m_positions.emplace_back(positionStack.top());//Initialise the start position of the branch
+			b.m_nodePositions.emplace_back(positionStack.top());//Initialise the start position of the branch
 			ngl::Vec3 direction = directionStack.top();//Create a temporary variable for the direction of the branch nodes
 
 			// evaluate the string to find the new direction
@@ -387,8 +421,8 @@ void Plant::evaluateBranches()
 			}//End for [char]
 
 			// update the stacks
-			positionStack.push(b.m_positions.back());
-			directionStack.push(b.m_positions.back() - b.m_positions.front());
+			positionStack.push(b.m_nodePositions.back());
+			directionStack.push(b.m_nodePositions.back() - b.m_nodePositions.front());
 
 		}//End else condition
 		lastBranchDepth = b.m_creationDepth;

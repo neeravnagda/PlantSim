@@ -4,8 +4,6 @@
 #include <random>
 #include <string>
 #include <vector>
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
 #include <ngl/Mat4.h>
 #include <ngl/Vec3.h>
 #include "Branch.h"
@@ -98,10 +96,6 @@ class Plant
 		//----------------------------------------------------------------------------------------------------------------------
 		std::vector<Branch> m_branches;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief ID generator for branches
-		//----------------------------------------------------------------------------------------------------------------------
-		static boost::uuids::random_generator s_IDGenerator;
-		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Transformation for draw calls
 		//----------------------------------------------------------------------------------------------------------------------
 		ngl::Mat4 m_transform;
@@ -156,6 +150,15 @@ class Plant
 		/// This is used to shorten branches, and must be multiplied to a length
 		//----------------------------------------------------------------------------------------------------------------------
 		float calculateDecay(const unsigned& _depth) const;
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Randomly scatter leaves along a branch
+		/// @param _startPos The start position of the branch
+		/// @param _endPos The end position of the branch
+		/// @param _radius The radius of the branch
+		/// @param _direction The direction of the branch
+		/// @param _branch The branch to add to
+		//----------------------------------------------------------------------------------------------------------------------
+		void scatterLeaves(const ngl::Vec3& _startPos, const ngl::Vec3& _endPos, const float _radius, const ngl::Vec3& _direction, Branch& _branch);
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Calculate the branch positions using space colonisation
 		/// @param _branch A reference to the branch to calculate

@@ -86,8 +86,8 @@ void NGLScene::initializeGL()
 		pb->setDrawLength(0.8f);
 		pb->setMaxDepth(5);
 		pb->setMaxDeviation(0.1f);
-		pb->setLeavesPerBranch(30);
-		pb->setLeavesStartDepth(0);
+		pb->setLeavesPerBranch(18);
+		pb->setLeavesStartDepth(2);
 		pb->setNodesPerBranch(6);
 		pb->setRootRadius(0.03f);
 		pb->setPhototropismScaleFactor(0.00f);

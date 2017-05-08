@@ -112,8 +112,20 @@ void PlantBlueprintDialog::validateAxiom()
 	//Set the text colour to green if acceptable
 	if (m_ui->m_axiom->hasAcceptableInput())
 	{
-		palette.setColor(QPalette::Text, Qt::green);
-		m_validationChecks[VALIDATION::AXIOM] = true;
+		bool isOneAlpha = false;
+		for (auto &c : m_ui->m_axiom->text())
+		{
+			if (c.isUpper())
+			{
+				isOneAlpha = true;
+				break;
+			}
+		}
+		if (isOneAlpha)
+		{
+			palette.setColor(QPalette::Text, Qt::green);
+			m_validationChecks[VALIDATION::AXIOM] = true;
+		}
 	}
 	else
 	{
