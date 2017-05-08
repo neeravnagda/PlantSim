@@ -79,6 +79,7 @@ void NGLScene::initializeGL()
 	//Initialise test plant - need to delete this later
 	{
 		PlantBlueprint *pb = PlantBlueprint::instance("test");
+		pb->setAxiom("FA");
 		pb->readGrammarFromFile("rules.txt");
 		pb->setDecay(1.4f);
 		pb->setDrawAngle(45);

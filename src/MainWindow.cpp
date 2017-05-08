@@ -68,6 +68,12 @@ void MainWindow::quit()
 //----------------------------------------------------------------------------------------------------------------------
 void MainWindow::createNewPlant()
 {
+	//If the selection is for create new and the dialog is currently closed, show the dialog
+	if ((m_ui->m_plantType->currentText() == "create new") && (m_plantBlueprintDialog->isHidden()))
+	{
+		m_plantBlueprintDialog->show();
+	}
+
 	//Check if the selection is not blank
 	if (m_ui->m_plantType->currentIndex() > 0)
 	{

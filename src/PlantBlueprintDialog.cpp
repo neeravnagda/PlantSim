@@ -1,7 +1,7 @@
+#include <unordered_set>
 #include <QFileInfo>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
-#include <unordered_set>
 #include "PlantBlueprint.h"
 #include "PlantBlueprintDialog.h"
 #include "ui_PlantBlueprintDialog.h"
@@ -34,8 +34,12 @@ PlantBlueprintDialog::PlantBlueprintDialog(QWidget *parent) :
 	m_ui->m_grammarFilePath->setValidator(txtFileValidator);
 
 	//Add a validator for the L-system axiom
-	QString validCharacters = "([A-Z]*[" + QRegularExpression::escape("[+-/\\\\&^]") + "]*)*";
-	QString axiomPattern = "(" + validCharacters + "|\\[(?=" + validCharacters + "\\])" + ")+";
+	//Manual nested branches are used as it is difficult to implement with regular expressions
+	QString validCharacters = "([A-Z]*[" + QRegularExpression::escape("+-/\\\\&^") + "]*)*";
+	QString branch = "(\\[(" + validCharacters + ")+\\])*";
+	QString nest2 = "(\\[(" + validCharacters + branch + ")+\\])*";
+	QString nest3 = "(\\[(" + validCharacters + nest2 + ")+\\])*";
+	QString axiomPattern = "(" + validCharacters + nest3 + ")+";
 	QRegularExpression axiomRegExp(axiomPattern);
 	QRegularExpressionValidator *axiomValidator = new QRegularExpressionValidator(axiomRegExp, this);
 	m_ui->m_axiom->setValidator(axiomValidator);
@@ -62,8 +66,9 @@ bool PlantBlueprintDialog::createPlantBlueprint()
 		if (b == false) {return false;}//Exit and do not create a new Plant Blueprint
 	}
 
-	//Create a new blueprint
+	//Create a new blueprint and set all the members
 	PlantBlueprint *pb = PlantBlueprint::instance(m_ui->m_blueprintName->text().toStdString());
+	pb->setAxiom(m_ui->m_axiom->text().toStdString());
 	pb->readGrammarFromFile(m_ui->m_grammarFilePath->text().toStdString());
 	pb->setMaxDepth(static_cast<unsigned>(m_ui->m_maxDepth->value()));
 	pb->setDrawLength(static_cast<float>(m_ui->m_drawLength->value()));
@@ -103,7 +108,26 @@ void PlantBlueprintDialog::checkBlueprintExists()
 //----------------------------------------------------------------------------------------------------------------------
 void PlantBlueprintDialog::validateAxiom()
 {
+	QPalette palette = c_defaultPalette;
+	//Set the text colour to green if acceptable
+	if (m_ui->m_axiom->hasAcceptableInput())
+	{
+		palette.setColor(QPalette::Text, Qt::green);
+		m_validationChecks[VALIDATION::AXIOM] = true;
+	}
+	else
+	{
+		m_validationChecks[VALIDATION::AXIOM] = false;
+	}
 
+	//Set the text colour to black if empty string
+	if (m_ui->m_axiom->text().isEmpty())
+	{
+		palette.setColor(QPalette::Text, Qt::black);
+		m_validationChecks[VALIDATION::AXIOM] = false;
+	}
+
+	m_ui->m_axiom->setPalette(palette);
 }
 //----------------------------------------------------------------------------------------------------------------------
 void PlantBlueprintDialog::checkGrammarFileExists()

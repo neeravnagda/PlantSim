@@ -1,9 +1,9 @@
+#include <iostream>
 #include <stack>
 #include <QString>
 #include <QTableWidgetItem>
 #include "SceneManagerDialog.h"
 #include "ui_SceneManagerDialog.h"
-#include <iostream>
 
 SceneManagerDialog::SceneManagerDialog(QWidget *parent) :
 	QDialog(parent),

@@ -67,30 +67,22 @@ void PlantBlueprint::drawCylinder()
 	s_cylinder->draw();
 }
 //----------------------------------------------------------------------------------------------------------------------
-//Set the first line of the file as the axiom
-//All successive lines are the production rules
+void PlantBlueprint::setAxiom(const std::string _axiom)
+{
+	//Convert the axiom to a branch if necessary
+	if (_axiom.compare(0,1,"[",1)!=0)
+	{
+		m_axiom = "[" + _axiom + "]";
+	}
+	//Otherwise set the axiom as the input
+	else
+		m_axiom = _axiom;
+}
+//----------------------------------------------------------------------------------------------------------------------
 void PlantBlueprint::readGrammarFromFile(const std::string _filePath)
 {
 	std::ifstream fileIn(_filePath);//Open the file
 	std::string line;//Temp string for each line
-
-	//Add the first line as the axiom
-	{
-		std::getline(fileIn,line);
-
-		//Remove any whitespaces, '=' and ',' to avoid errors
-		line.erase(std::remove(line.begin(),line.end(),' '),line.end());
-		line.erase(std::remove(line.begin(),line.end(),'='),line.end());
-		line.erase(std::remove(line.begin(),line.end(),','),line.end());
-
-		//Convert to a branch if not specified in text file
-		if (line.compare(0,1,"[",1)!=0)
-		{
-			line.insert(0,"[");
-			line.append("]");
-		}
-		m_axiom = line;
-	}
 
 	//Add the rules, one line at a time
 	while (std::getline(fileIn,line))
