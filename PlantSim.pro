@@ -52,11 +52,11 @@ HEADERS+= include/NGLScene.h \
 
 # add the readme and glsl shader files
 OTHER_FILES+= README.md \
-                          rules.txt \
-                          shaders/BlinnPhong.fragment.glsl \
-                          shaders/BlinnPhong.vertex.glsl
+		shaders/BlinnPhong.fragment.glsl \
+		shaders/BlinnPhong.vertex.glsl \
+		rules.txt
 
-# add the ui form
+# add the ui forms
 FORMS += ui/MainWindow.ui \
     ui/PlantBlueprintDialog.ui \
     ui/SceneManagerDialog.ui

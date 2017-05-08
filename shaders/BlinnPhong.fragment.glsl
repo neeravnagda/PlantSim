@@ -57,9 +57,8 @@ uniform MaterialInfo Material = MaterialInfo(
 
 
 /// @brief calculate the light contribution of one light
-vec3 calculateLightContribution()
+vec3 calculateLightContribution(in vec3 _diffuseColour)
 {
-	vec3 diffuseColour = texture(tex, uvCoord).xyz;
 	float lambertTerm = dot(fragNormal, sunDirection);
 	if (lambertTerm > 0)
 	{
@@ -70,7 +69,7 @@ vec3 calculateLightContribution()
 
 		return vec3(
 					Sun.La * Material.Ka +//Ambient contribution
-					Sun.Ld * diffuseColour * lambertTerm +//Diffuse contribution
+					Sun.Ld * Material.Kd * _diffuseColour * lambertTerm +//Diffuse contribution
 					Sun.Ls * Material.Ks * pow(NdotH, Material.Shininess)//Specular contribution
 					);
 	}
@@ -79,7 +78,12 @@ vec3 calculateLightContribution()
 
 void main(void)
 {
-	vec3 totalColour = calculateLightContribution();
+	vec4 diffuseColour = texture(tex, uvCoord);
+	if (diffuseColour.w == 0.0f)
+	{
+		discard;
+	}
+	vec3 totalColour = calculateLightContribution(diffuseColour.xyz);
 
 	fragColour = vec4(totalColour,1.0f);
 }

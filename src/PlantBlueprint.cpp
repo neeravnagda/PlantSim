@@ -1,6 +1,8 @@
-#include <iostream>
 #include <algorithm>
 #include <fstream>
+#include <iostream>
+#include <ngl/Texture.h>
+#include <ngl/VAOPrimitives.h>
 #include "PlantBlueprint.h"
 //----------------------------------------------------------------------------------------------------------------------
 // Set the static members
@@ -8,6 +10,8 @@ std::unordered_map<std::string, PlantBlueprint*> PlantBlueprint::s_instances;
 std::unordered_set<std::string> PlantBlueprint::s_keys;
 std::string PlantBlueprint::s_shaderProgramName = "Phong";
 std::unique_ptr<ngl::Obj> PlantBlueprint::s_cylinder;
+std::string PlantBlueprint::s_leafGeometryName = "leafQuad";
+GLuint PlantBlueprint::s_leafGeometryTexture;
 ngl::Vec3 PlantBlueprint::s_sunPosition = ngl::Vec3(0.0f, 100.0f, 0.0f);
 //----------------------------------------------------------------------------------------------------------------------
 PlantBlueprint* PlantBlueprint::instance(const std::string _instanceID)
@@ -50,6 +54,9 @@ void PlantBlueprint::init()
 	s_cylinder.reset(new ngl::Obj("models/cylinder_low.obj", "textures/treeTex.jpg"));
 	s_cylinder->createVAO();
 
+	ngl::VAOPrimitives *prim = ngl::VAOPrimitives::instance();
+	prim->createTrianglePlane(s_leafGeometryName,1,1,1,1,ngl::Vec3::up());
+
 	//Load the shaders
 	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
 	shader->createShaderProgram(s_shaderProgramName);
@@ -58,6 +65,10 @@ void PlantBlueprint::init()
 	shader->loadShader(s_shaderProgramName,vertexShader, fragmentShader);
 	//Use the shader
 	(*shader)[s_shaderProgramName]->use();
+
+	//Set the leaf texture
+	//ngl::Texture leafTex("textures/leafTex.png");
+	//s_leafGeometryTexture = leafTex.setTextureGL();
 }
 //----------------------------------------------------------------------------------------------------------------------
 void PlantBlueprint::drawCylinder()
@@ -65,6 +76,18 @@ void PlantBlueprint::drawCylinder()
 	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
 	(*shader)[s_shaderProgramName]->use();
 	s_cylinder->draw();
+}
+//----------------------------------------------------------------------------------------------------------------------
+void PlantBlueprint::drawLeaf()
+{
+	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
+	(*shader)[s_shaderProgramName]->use();
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, s_leafGeometryTexture);
+
+	ngl::VAOPrimitives *prim = ngl::VAOPrimitives::instance();
+	prim->draw(s_leafGeometryName);
 }
 //----------------------------------------------------------------------------------------------------------------------
 void PlantBlueprint::setAxiom(const std::string _axiom)
