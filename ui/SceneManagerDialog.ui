@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>321</width>
     <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Scene Manager</string>
   </property>
-  <layout class="QGridLayout" name="s_gridLayout">
+  <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <widget class="QTableWidget" name="m_tableWidget">
      <column>
@@ -33,16 +33,6 @@
      </column>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QPushButton" name="m_deleteButton">
-     <property name="statusTip">
-      <string>This is undoable</string>
-     </property>
-     <property name="text">
-      <string>Delete Selected</string>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="0">
     <widget class="QPushButton" name="m_toggleVisibilityButton">
      <property name="toolTip">
@@ -50,6 +40,16 @@
      </property>
      <property name="text">
       <string>Show/Hide Selected</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QPushButton" name="m_deleteButton">
+     <property name="statusTip">
+      <string>This is undoable</string>
+     </property>
+     <property name="text">
+      <string>Delete Selected</string>
      </property>
     </widget>
    </item>

@@ -23,13 +23,11 @@ class SceneManagerDialog : public QDialog
 		void deletePlantSignal(unsigned _index);
 
 	private slots:
-		void setCurrentRow(int _r, int _c, int _pr, int _pc);
 		void togglePlantVisibility();
 		void removePlant();
 
 	private:
 		Ui::SceneManagerDialog *m_ui;
-		int m_currentRow;
 };
 
 #endif // SCENEMANAGERDIALOG_H

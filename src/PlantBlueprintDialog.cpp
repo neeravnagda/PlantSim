@@ -27,15 +27,23 @@ PlantBlueprintDialog::PlantBlueprintDialog(QWidget *parent) :
 	QRegularExpressionValidator *pbNameValidator = new QRegularExpressionValidator(pbNameExp, this);
 	m_ui->m_blueprintName->setValidator(pbNameValidator);
 
-	//Add a validator to the QLineEdit for L-system grammar text file
+	//Add a validator for L-system grammar text file
 	QString txtFileExp = fileRegExp + "(txt)";
 	QRegularExpression txtFileRegExp(txtFileExp);
 	QRegularExpressionValidator *txtFileValidator = new QRegularExpressionValidator(txtFileRegExp, this);
 	m_ui->m_grammarFilePath->setValidator(txtFileValidator);
 
+	//Add a validator for the L-system axiom
+	QString validCharacters = "([A-Z]*[" + QRegularExpression::escape("[+-/\\\\&^]") + "]*)*";
+	QString axiomPattern = "(" + validCharacters + "|\\[(?=" + validCharacters + "\\])" + ")+";
+	QRegularExpression axiomRegExp(axiomPattern);
+	QRegularExpressionValidator *axiomValidator = new QRegularExpressionValidator(axiomRegExp, this);
+	m_ui->m_axiom->setValidator(axiomValidator);
+
 	//Connect signals and slots
 	connect(m_ui->m_blueprintName, SIGNAL(editingFinished()), this, SLOT(checkBlueprintExists()));
 	connect(m_ui->m_blueprintName, SIGNAL(textChanged(QString)), this, SLOT(checkBlueprintExists()));
+	connect(m_ui->m_axiom, SIGNAL(textChanged(QString)), this, SLOT(validateAxiom()));
 	connect(m_ui->m_grammarFilePath, SIGNAL(editingFinished()), this, SLOT(checkGrammarFileExists()));
 	connect(m_ui->m_grammarFilePath, SIGNAL(textChanged(QString)), this, SLOT(resetGrammarFileTextColour()));
 	connect(m_ui->m_maxDepth, SIGNAL(valueChanged(int)), this, SLOT(setMaxLeavesStartDepth()));
@@ -48,7 +56,6 @@ PlantBlueprintDialog::~PlantBlueprintDialog()
 //----------------------------------------------------------------------------------------------------------------------
 bool PlantBlueprintDialog::createPlantBlueprint()
 {
-
 	//Return if any validation failed
 	for (bool &b : m_validationChecks)
 	{
@@ -92,6 +99,11 @@ void PlantBlueprintDialog::checkBlueprintExists()
 		m_validationChecks[VALIDATION::BLUEPRINTNAME] = false;
 	}
 	m_ui->m_blueprintName->setPalette(palette);
+}
+//----------------------------------------------------------------------------------------------------------------------
+void PlantBlueprintDialog::validateAxiom()
+{
+
 }
 //----------------------------------------------------------------------------------------------------------------------
 void PlantBlueprintDialog::checkGrammarFileExists()

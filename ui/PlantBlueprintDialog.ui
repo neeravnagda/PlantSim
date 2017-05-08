@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>675</height>
+    <height>756</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,6 +15,29 @@
   </property>
   <layout class="QGridLayout" name="s_gridLayout">
    <item row="23" column="0" colspan="2">
+    <widget class="QSpinBox" name="m_numNodes">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of nodes in a branch. Set to minimum for a rigid L-system.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="minimum">
+      <number>2</number>
+     </property>
+     <property name="maximum">
+      <number>10</number>
+     </property>
+     <property name="value">
+      <number>5</number>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="2">
+    <widget class="QLabel" name="s_maxDepthLabel">
+     <property name="text">
+      <string>Maximum L-system Depth</string>
+     </property>
+    </widget>
+   </item>
+   <item row="25" column="0" colspan="2">
     <widget class="QDoubleSpinBox" name="m_phototropismScaleFactor">
      <property name="toolTip">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scale factor to grow towards the sun. Set to 0 for no influence by the sun.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -27,72 +50,7 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0" colspan="2">
-    <widget class="QLabel" name="s_maxDepthLabel">
-     <property name="text">
-      <string>Maximum L-system Depth</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0" colspan="2">
-    <widget class="QSpinBox" name="m_maxDepth">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum fractal depth.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="minimum">
-      <number>1</number>
-     </property>
-     <property name="maximum">
-      <number>10</number>
-     </property>
-     <property name="value">
-      <number>5</number>
-     </property>
-    </widget>
-   </item>
-   <item row="26" column="0">
-    <widget class="QPushButton" name="m_create">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="toolTip">
-      <string>Create this shader</string>
-     </property>
-     <property name="text">
-      <string>Create</string>
-     </property>
-    </widget>
-   </item>
-   <item row="22" column="0">
-    <widget class="QLabel" name="s_phototropismScaleLabel">
-     <property name="text">
-      <string>Phototropism scale factor</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0" colspan="2">
-    <widget class="QLineEdit" name="m_grammarFilePath">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Path to grammar file.&lt;/p&gt;&lt;p&gt;Note this must end with &amp;quot;.txt&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="inputMethodHints">
-      <set>Qt::ImhNone</set>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="echoMode">
-      <enum>QLineEdit::Normal</enum>
-     </property>
-     <property name="placeholderText">
-      <string>GrammarFile.txt</string>
-     </property>
-     <property name="fileExists" stdset="0">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="11" column="0" colspan="2">
+   <item row="13" column="0" colspan="2">
     <widget class="QDoubleSpinBox" name="m_rootRadius">
      <property name="toolTip">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Root radius.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -108,31 +66,81 @@
      </property>
     </widget>
    </item>
-   <item row="20" column="0" colspan="2">
-    <widget class="QLabel" name="s_numNodesLabel">
-     <property name="text">
-      <string>Number of nodes per branch</string>
+   <item row="11" column="0" colspan="2">
+    <widget class="QDoubleSpinBox" name="m_drawAngle">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Draw angle in degrees.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="maximum">
+      <double>360.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>45.000000000000000</double>
      </property>
     </widget>
    </item>
-   <item row="8" column="0" colspan="2">
+   <item row="27" column="0" colspan="2">
+    <widget class="QDoubleSpinBox" name="m_gravitropismScaleFactor">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scale factor for branches to grow downwards due to gravity. Set to 0 for no influence by gravity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="0" colspan="2">
+    <widget class="QLabel" name="s_decayRateLabel">
+     <property name="text">
+      <string>Decay Rate</string>
+     </property>
+    </widget>
+   </item>
+   <item row="26" column="0">
+    <widget class="QLabel" name="s_gravitropismScale">
+     <property name="text">
+      <string>Gravitropism scale factor</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0" colspan="2">
     <widget class="QLabel" name="s_drawAngleLabel">
      <property name="text">
       <string>Draw Angle</string>
      </property>
     </widget>
    </item>
-   <item row="26" column="1">
-    <widget class="QPushButton" name="m_cancel">
-     <property name="toolTip">
-      <string>Cancel</string>
-     </property>
+   <item row="16" column="0" colspan="2">
+    <widget class="QLabel" name="s_leafCountLabel">
      <property name="text">
-      <string>Cancel</string>
+      <string>Number of leaves per branch</string>
      </property>
     </widget>
    </item>
-   <item row="19" column="0" colspan="2">
+   <item row="18" column="0" colspan="2">
+    <widget class="QLabel" name="s_leavesStartDepthLabel">
+     <property name="text">
+      <string>Start Depth for leaves</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0" colspan="2">
+    <widget class="QSpinBox" name="m_maxDepth">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum fractal depth.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>10</number>
+     </property>
+     <property name="value">
+      <number>5</number>
+     </property>
+    </widget>
+   </item>
+   <item row="21" column="0" colspan="2">
     <widget class="QDoubleSpinBox" name="m_maxDeviation">
      <property name="toolTip">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum deviation of a branch. This increase is exponential.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -148,13 +156,23 @@
      </property>
     </widget>
    </item>
-   <item row="25" column="0" colspan="2">
-    <widget class="QDoubleSpinBox" name="m_gravitropismScaleFactor">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scale factor for branches to grow downwards due to gravity. Set to 0 for no influence by gravity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   <item row="12" column="0" colspan="2">
+    <widget class="QLabel" name="s_rootRadiusLabel">
+     <property name="text">
+      <string>Root Radius</string>
      </property>
-     <property name="singleStep">
-      <double>0.100000000000000</double>
+    </widget>
+   </item>
+   <item row="28" column="0">
+    <widget class="QPushButton" name="m_create">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="toolTip">
+      <string>Create this shader</string>
+     </property>
+     <property name="text">
+      <string>Create</string>
      </property>
     </widget>
    </item>
@@ -167,21 +185,83 @@
       <string/>
      </property>
      <property name="placeholderText">
-      <string>BlueprintName</string>
+      <string>Blueprint name that doesn't already exist</string>
      </property>
     </widget>
    </item>
-   <item row="14" column="0" colspan="2">
-    <widget class="QLabel" name="s_leafCountLabel">
+   <item row="4" column="0" colspan="2">
+    <widget class="QLabel" name="s_grammarFileLabel">
      <property name="text">
-      <string>Number of leaves per branch</string>
+      <string>L-system grammar file</string>
      </property>
     </widget>
    </item>
-   <item row="12" column="0" colspan="2">
-    <widget class="QLabel" name="s_decayRateLabel">
+   <item row="28" column="1">
+    <widget class="QPushButton" name="m_cancel">
+     <property name="toolTip">
+      <string>Cancel</string>
+     </property>
      <property name="text">
-      <string>Decay Rate</string>
+      <string>Cancel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0" colspan="2">
+    <widget class="QLineEdit" name="m_grammarFilePath">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Path to grammar file.&lt;/p&gt;&lt;p&gt;Note this must end with &amp;quot;.txt&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="inputMethodHints">
+      <set>Qt::ImhNone</set>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="echoMode">
+      <enum>QLineEdit::Normal</enum>
+     </property>
+     <property name="placeholderText">
+      <string>Relative or absolute path to a .txt file</string>
+     </property>
+     <property name="fileExists" stdset="0">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="24" column="0">
+    <widget class="QLabel" name="s_phototropismScaleLabel">
+     <property name="text">
+      <string>Phototropism scale factor</string>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="0" colspan="2">
+    <widget class="QDoubleSpinBox" name="m_decay">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decay rate. Higher values = faster decay.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="minimum">
+      <double>1.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>5.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QLabel" name="s_axiomLabel">
+     <property name="text">
+      <string>L-system axiom</string>
+     </property>
+    </widget>
+   </item>
+   <item row="22" column="0" colspan="2">
+    <widget class="QLabel" name="s_numNodesLabel">
+     <property name="text">
+      <string>Number of nodes per branch</string>
      </property>
     </widget>
    </item>
@@ -193,33 +273,6 @@
     </widget>
    </item>
    <item row="9" column="0" colspan="2">
-    <widget class="QDoubleSpinBox" name="m_drawAngle">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Draw angle in degrees.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="maximum">
-      <double>360.000000000000000</double>
-     </property>
-     <property name="value">
-      <double>45.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0" colspan="2">
-    <widget class="QLabel" name="s_drawLengthLabel">
-     <property name="text">
-      <string>Draw Length</string>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="0" colspan="2">
-    <widget class="QLabel" name="s_rootRadiusLabel">
-     <property name="text">
-      <string>Root Radius</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="0" colspan="2">
     <widget class="QDoubleSpinBox" name="m_drawLength">
      <property name="toolTip">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Initial draw length.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -238,80 +291,44 @@
      </property>
     </widget>
    </item>
-   <item row="24" column="0">
-    <widget class="QLabel" name="s_gravitropismScale">
+   <item row="8" column="0" colspan="2">
+    <widget class="QLabel" name="s_drawLengthLabel">
      <property name="text">
-      <string>Gravitropism scale factor</string>
+      <string>Draw Length</string>
      </property>
     </widget>
    </item>
-   <item row="13" column="0" colspan="2">
-    <widget class="QDoubleSpinBox" name="m_decay">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decay rate. Higher values = faster decay.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="minimum">
-      <double>1.000000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>5.000000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>0.100000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="21" column="0" colspan="2">
-    <widget class="QSpinBox" name="m_numNodes">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of nodes in a branch. Set to minimum for a rigid L-system.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="minimum">
-      <number>2</number>
-     </property>
-     <property name="maximum">
-      <number>10</number>
-     </property>
-     <property name="value">
-      <number>5</number>
-     </property>
-    </widget>
-   </item>
-   <item row="15" column="0" colspan="2">
-    <widget class="QSpinBox" name="m_leafCount">
-     <property name="toolTip">
-      <string>Number of leaves per branch.</string>
-     </property>
-    </widget>
-   </item>
-   <item row="18" column="0" colspan="2">
-    <widget class="QLabel" name="s_maxdeviatonLabel">
-     <property name="text">
-      <string>Maximum deviation of a branch</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="2">
-    <widget class="QLabel" name="s_grammarFileLabel">
-     <property name="text">
-      <string>L-system grammar file</string>
-     </property>
-    </widget>
-   </item>
-   <item row="16" column="0" colspan="2">
-    <widget class="QLabel" name="s_leavesStartDepthLabel">
-     <property name="text">
-      <string>Start Depth for leaves</string>
-     </property>
-    </widget>
-   </item>
-   <item row="17" column="0" colspan="2">
+   <item row="19" column="0" colspan="2">
     <widget class="QSpinBox" name="m_leavesStartDepth">
      <property name="toolTip">
       <string>The L-system depth when leaves start to appear. Set to 0 for no leaves</string>
      </property>
      <property name="maximum">
       <number>5</number>
+     </property>
+    </widget>
+   </item>
+   <item row="17" column="0" colspan="2">
+    <widget class="QSpinBox" name="m_leafCount">
+     <property name="toolTip">
+      <string>Number of leaves per branch.</string>
+     </property>
+    </widget>
+   </item>
+   <item row="20" column="0" colspan="2">
+    <widget class="QLabel" name="s_maxdeviatonLabel">
+     <property name="text">
+      <string>Maximum deviation of a branch</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QLineEdit" name="m_axiom">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;L-system axiom. Use any of the following characters:&lt;/p&gt;&lt;p&gt;A-Z [] /\ +- &amp;amp;^&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="placeholderText">
+      <string>A valid L-system axiom</string>
      </property>
     </widget>
    </item>
