@@ -67,8 +67,8 @@ void PlantBlueprint::init()
 	(*shader)[s_shaderProgramName]->use();
 
 	//Set the leaf texture
-	//ngl::Texture leafTex("textures/leafTex.png");
-	//s_leafGeometryTexture = leafTex.setTextureGL();
+	ngl::Texture leafTex("textures/treeTex.jpg");
+	s_leafGeometryTexture = leafTex.setTextureGL();
 }
 //----------------------------------------------------------------------------------------------------------------------
 void PlantBlueprint::drawCylinder()

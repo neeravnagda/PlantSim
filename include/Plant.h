@@ -158,7 +158,7 @@ class Plant
 		/// @param _direction The direction of the branch
 		/// @param _branch The branch to add to
 		//----------------------------------------------------------------------------------------------------------------------
-		void scatterLeaves(const ngl::Vec3& _startPos, const ngl::Vec3& _endPos, const float _radius, const ngl::Vec3& _direction, Branch& _branch);
+		void scatterLeaves(Branch& _branch, const ngl::Vec3& _startPos, const ngl::Vec3& _endPos, const float _radius, const ngl::Vec3& _direction);
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Calculate the branch positions using space colonisation
 		/// @param _branch A reference to the branch to calculate
