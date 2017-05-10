@@ -78,6 +78,7 @@ bool PlantBlueprintDialog::createPlantBlueprint()
 	pb->setMaxDeviation(static_cast<float>(m_ui->m_maxDeviation->value()));
 	pb->setLeavesPerBranch(static_cast<unsigned>(m_ui->m_leafCount->value()));
 	pb->setLeavesStartDepth(static_cast<unsigned>(m_ui->m_leavesStartDepth->value()));
+	pb->setLeafScale(static_cast<float>(m_ui->m_leafScale->value()));
 	pb->setNodesPerBranch(m_ui->m_numNodes->value());
 	pb->setPhototropismScaleFactor(static_cast<float>(m_ui->m_phototropismScaleFactor->value()));
 	pb->setGravitropismScaleFactor(static_cast<float>(m_ui->m_gravitropismScaleFactor->value()));

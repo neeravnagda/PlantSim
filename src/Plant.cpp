@@ -80,7 +80,7 @@ void Plant::draw(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, c
 {
 	//Set some initial parameters
 	float decay = 1.0f;
-	ngl::Vec3 initialDir = ngl::Vec3(0.0f,1.0f,0.0f);
+	ngl::Vec3 initialDirection = ngl::Vec3(0.0f,1.0f,0.0f);
 
 	//Draw each branch
 	for (Branch &b : m_branches)
@@ -100,12 +100,12 @@ void Plant::draw(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, c
 			scaleMatrix.scale(m_blueprint->getRootRadius()*decay, length, m_blueprint->getRootRadius()*decay);
 
 			//Calculate the axis and angle for the rotation matrix
-			float angle = acos(initialDir.dot(dir));
+			float angle = acos(initialDirection.dot(dir));
 			ngl::Mat4 rotationMatrix;
 			if (angle > 0)
 			{
 				ngl::Vec3 axis;
-				axis.cross(initialDir, dir);
+				axis.cross(initialDirection, dir);
 				axis.normalize();
 				rotationMatrix = axisAngleRotationMatrix(angle, axis);
 			}
@@ -122,21 +122,22 @@ void Plant::draw(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, c
 			PlantBlueprint::drawCylinder();
 		}
 
+		glDisable(GL_CULL_FACE);
 		//Draw the leaves
+		ngl::Vec3 leafInitialDirection = ngl::Vec3(1.0f, 0.0f, 0.0f);
 		for (unsigned i=0; i<b.m_leafPositions.size(); ++i)
 		{
 			//Calculate the scale matrix
 			ngl::Mat4 scaleMatrix;
-			float leafScale = m_blueprint->getRootRadius()*decay;
-			scaleMatrix.scale(leafScale, leafScale, leafScale);
+			scaleMatrix.scale(m_blueprint->getLeafScale(), m_blueprint->getLeafScale(), m_blueprint->getLeafScale());
 
 			//Calculate the rotation matrix
-			float angle = acos(initialDir.dot(b.m_leafOrientations[i]));
+			float angle = acos(leafInitialDirection.dot(b.m_leafOrientations[i]));
 			ngl::Mat4 rotationMatrix;
 			if (angle > 0)
 			{
 				ngl::Vec3 axis;
-				axis.cross(initialDir, b.m_leafOrientations[i]);
+				axis.cross(leafInitialDirection, b.m_leafOrientations[i]);
 				axis.normalize();
 				rotationMatrix = axisAngleRotationMatrix(angle, axis);
 			}
@@ -151,6 +152,7 @@ void Plant::draw(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, c
 			loadMatricesToShader(_mouseGlobalTX, _viewMatrix, _projectionMatrix);
 			PlantBlueprint::drawLeaf();
 		}
+		glEnable(GL_CULL_FACE);
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -281,17 +283,22 @@ void Plant::scatterLeaves(Branch& _branch, const ngl::Vec3 &_startPos, const ngl
 		float theta = generateRandomFloat() * ngl::TWO_PI;
 		ngl::Vec3 unorientedPosition(_radius * cos(theta), height, _radius * sin(theta));
 		ngl::Vec3 unorientedNormal(unorientedPosition.m_x, 0.0f, unorientedPosition.m_z);
+		unorientedNormal.normalize();
 
 		//Rotate the point and normal
 		ngl::Vec4 position = rotationMatrix * ngl::Vec4(unorientedPosition);
+
 		ngl::Vec4 normal = rotationMatrix * ngl::Vec4(unorientedNormal);
-		//Add the original position
-		position += ngl::Vec4(_startPos);
+		normal.normalize();
+
+		//Add the original position and the normal
+		position += ngl::Vec4(_startPos) + normal * m_blueprint->getLeafScale() / 2;
 
 		//Add a random rotation to the normal - this is a maximum of +- 15 degrees in each axis
 		normal.m_x += (generateRandomFloat() - 0.5f) * ngl::PI2 / 3;
 		normal.m_y += (generateRandomFloat() - 0.5f) * ngl::PI2 / 3;
 		normal.m_z += (generateRandomFloat() - 0.5f) * ngl::PI2 / 3;
+
 		normal.normalize();
 
 		//Store the position and orientation in the vectors in the branch

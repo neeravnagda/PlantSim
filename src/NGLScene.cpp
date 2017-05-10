@@ -86,8 +86,9 @@ void NGLScene::initializeGL()
 		pb->setDrawLength(0.8f);
 		pb->setMaxDepth(5);
 		pb->setMaxDeviation(0.1f);
-		pb->setLeavesPerBranch(18);
-		pb->setLeavesStartDepth(0);
+		pb->setLeavesPerBranch(30);
+		pb->setLeavesStartDepth(2);
+		pb->setLeafScale(0.03f);
 		pb->setNodesPerBranch(6);
 		pb->setRootRadius(0.03f);
 		pb->setPhototropismScaleFactor(0.00f);
@@ -109,6 +110,10 @@ void NGLScene::initializeGL()
 
 	//Create the ground plane geometry
 	ngl::VAOPrimitives::instance()->createTrianglePlane("groundPlane", 1, 1, 1, 1, ngl::Vec3::up());
+
+	//Initialise the texture for the ground
+	ngl::Texture groundTexture("textures/GroundTexture.jpg");
+	m_groundTexture = groundTexture.setTextureGL();
 }
 //----------------------------------------------------------------------------------------------------------------------
 void NGLScene::drawScene()
@@ -133,8 +138,14 @@ void NGLScene::drawScene()
 	shader->setUniform("MV", MV);
 	shader->setUniform("MVP", MVP);
 	shader->setUniform("N", N);
-	//Draw the ground
+
+	//Bind the texture for the ground plane
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_groundTexture);
+
+	//Draw the ground plane
 	ngl::VAOPrimitives::instance()->draw("groundPlane");
+
 	//Draw the plants
 	for (Plant &p : m_plants)
 	{

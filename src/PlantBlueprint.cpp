@@ -67,7 +67,7 @@ void PlantBlueprint::init()
 	(*shader)[s_shaderProgramName]->use();
 
 	//Set the leaf texture
-	ngl::Texture leafTex("textures/treeTex.jpg");
+	ngl::Texture leafTex("textures/Leaves0203.png");
 	s_leafGeometryTexture = leafTex.setTextureGL();
 }
 //----------------------------------------------------------------------------------------------------------------------
