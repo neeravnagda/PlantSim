@@ -51,7 +51,7 @@ void PlantBlueprint::destroyAll()
 void PlantBlueprint::init()
 {
 	//Create the geometry
-	s_cylinder.reset(new ngl::Obj("models/cylinder_low.obj", "textures/treeTex.jpg"));
+	s_cylinder.reset(new ngl::Obj("models/cylinder_low.obj", "textures/TreeTexture.jpg"));
 	s_cylinder->createVAO();
 
 	ngl::VAOPrimitives *prim = ngl::VAOPrimitives::instance();
