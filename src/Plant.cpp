@@ -156,7 +156,7 @@ void Plant::draw(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, c
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
-void Plant::update()
+void Plant::updateSimulation()
 {
 	stringRewrite();
 	evaluateBranches();
@@ -168,15 +168,14 @@ float Plant::generateRandomFloat() const
 	return distribute(s_numberGenerator);
 }
 //----------------------------------------------------------------------------------------------------------------------
-unsigned Plant::countBranches(const std::string& _string) const
+unsigned Plant::countCharInString(const std::string& _string, const char& _c) const
 {
-	//Count the number of '[' in a string
-	unsigned branchCount = 0;
+	unsigned count = 0;
 	for (char c: _string)
 	{
-		if (c == '[') ++branchCount;
+		if (c == _c) ++count;
 	}
-	return branchCount;
+	return count;
 }
 //----------------------------------------------------------------------------------------------------------------------
 void Plant::addBranches(const unsigned& _number, unsigned& _position)
@@ -189,7 +188,7 @@ void Plant::addBranches(const unsigned& _number, unsigned& _position)
 //----------------------------------------------------------------------------------------------------------------------
 void Plant::stringToBranches()
 {
-	unsigned numBranches = countBranches(m_string);
+	unsigned numBranches = countCharInString(m_string, '[');
 
 	//Initialise the start and end positions of branches in the string
 	std::size_t branchStartPos = 0;
@@ -201,6 +200,7 @@ void Plant::stringToBranches()
 		branchStartPos = m_string.find_first_not_of("[]", branchStartPos);
 		//The branch ends at the next bracket - open or closed
 		branchEndPos = m_string.find_first_of("[]", branchStartPos+1);
+
 		//Find a substring
 		std::string branchString = m_string.substr(branchStartPos, branchEndPos - branchStartPos);
 
@@ -225,6 +225,9 @@ void Plant::stringRewrite()
 	{
 		++m_depth;//Increment the depth of the expansion
 
+		//Count the number of draw calls, will rerun this function if the count is the same
+		unsigned fCount = countCharInString(m_string, 'F');
+
 		std::string newString;
 		bool isReplaced = false;//Check if a production rule was executed
 
@@ -242,18 +245,25 @@ void Plant::stringRewrite()
 						i += r.m_predecessor.length() - 1;//Iterate further through the original string if predecessor length > 1 char
 						isReplaced = true;
 						//Add new branches to the container
-						addBranches(countBranches(r.m_successor), branchCount);
+						addBranches(countCharInString(r.m_successor, '['), branchCount);
 					}
 					break;//Avoid checking other rules
 				}
 			}
 			if (isReplaced == false) { newString += m_string[i]; }//No replacement was made, so add the original char
-			branchCount = countBranches(newString);
+			branchCount = countCharInString(newString, '[');
 		}
 		m_string = newString;//Assign the temp string to the member variable
 
 		//Update the string in each branch
 		stringToBranches();
+
+		//Check if the drawing will be the same, i.e. if this function needs to be rerun
+		if (countCharInString(m_string, 'F') == fCount)
+		{
+			--m_depth;
+			stringRewrite();
+		}
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------

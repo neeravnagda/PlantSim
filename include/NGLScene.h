@@ -12,15 +12,13 @@
 #include "WindowParams.h"
 //----------------------------------------------------------------------------------------------------------------------
 /// @file NGLScene.h
-/// @brief this class inherits from the Qt OpenGLWindow and allows us to use NGL to draw OpenGL
+/// @brief This class is a widget in the MainWindow and draws the plants
 /// @author Jonathan Macey
+/// @author Neerav Nagda
 /// @version 1.0
-/// @date 10/9/13
-/// Revision History :
-/// This is an initial version used for the new NGL6 / Qt 5 demos
+/// @date 10/05/17
 /// @class NGLScene
-/// @brief our main glwindow widget for NGL applications all drawing elements are
-/// put in this file
+/// @brief OpenGL widget to handle drawing of plants
 //----------------------------------------------------------------------------------------------------------------------
 
 class NGLScene : public QOpenGLWidget

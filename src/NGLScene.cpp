@@ -25,7 +25,7 @@ void NGLScene::updatePlants()
 	//Update all the plants
 	for (Plant &p : m_plants)
 	{
-		p.update();
+		p.updateSimulation();
 	}
 	//Force a window update
 	update();

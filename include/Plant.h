@@ -43,7 +43,7 @@ class Plant
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Update function to evaluate the Plant simulation
 		//----------------------------------------------------------------------------------------------------------------------
-		void update();
+		void updateSimulation();
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for the L-system string
 		/// @return The L-system string
@@ -123,11 +123,12 @@ class Plant
 		//----------------------------------------------------------------------------------------------------------------------
 		float generateRandomFloat() const;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Count the number of branches in a string
-		/// @param _string The string to count branches from
-		/// @return The number of branches in the string
+		/// @brief Count the number of occurrences of a char in a string
+		/// @param _string The string to check from
+		/// @param _char The character to check for
+		/// @return The number of occurrences of the char
 		//----------------------------------------------------------------------------------------------------------------------
-		unsigned countBranches(const std::string& _string) const;
+		unsigned countCharInString(const std::string& _string, const char& _c) const;
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Add branches to the container
 		/// @param _number The number of branches to add

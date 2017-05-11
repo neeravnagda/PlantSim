@@ -171,5 +171,11 @@ void PlantBlueprint::readGrammarFromFile(const std::string _filePath)
 		//Construct the rule in the container
 		m_productionRules.emplace_back(predecessorValue,successorValue,probabilityValue);
 	}
+
+	std::cout<<"Rules:\n";
+	for (ProductionRule r : m_productionRules)
+	{
+		std::cout<<r.m_predecessor<<" = "<<r.m_successor<< ", "<<r.m_probability<<"\n";
+	}
 }
 //----------------------------------------------------------------------------------------------------------------------
