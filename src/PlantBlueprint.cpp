@@ -148,7 +148,6 @@ void PlantBlueprint::readGrammarFromFile(const std::string _filePath)
 			predecessorValue = match.captured("predecessor").toStdString();
 			successorValue = match.captured("successor").toStdString();
 			probabilityValue = match.captured("probability").toFloat();
-			std::cout<<"from regex: "<<predecessorValue<<" == "<<successorValue<<", "<<probabilityValue<<"\n";
 		}
 		//Check for rule without probability
 		else
@@ -159,7 +158,6 @@ void PlantBlueprint::readGrammarFromFile(const std::string _filePath)
 				predecessorValue = match.captured("predecessor").toStdString();
 				successorValue = match.captured("successor").toStdString();
 				probabilityValue = 1.0f;
-				std::cout<<"from regex2: "<<predecessorValue<<" == "<<successorValue<<", "<<probabilityValue<<"\n";
 			}
 			//The rule was invalid so don't add this line
 			else
@@ -170,12 +168,6 @@ void PlantBlueprint::readGrammarFromFile(const std::string _filePath)
 
 		//Construct the rule in the container
 		m_productionRules.emplace_back(predecessorValue,successorValue,probabilityValue);
-	}
-
-	std::cout<<"Rules:\n";
-	for (ProductionRule r : m_productionRules)
-	{
-		std::cout<<r.m_predecessor<<" = "<<r.m_successor<< ", "<<r.m_probability<<"\n";
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------

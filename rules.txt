@@ -1,4 +1,3 @@
-A=BC,1
+A=BC
 B=[+FA][-FA]
 C=[+FA][-FA]
-D

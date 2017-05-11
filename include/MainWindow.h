@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H_
 #define MAINWINDOW_H_
 
+#include <QKeyEvent>
 #include <QMainWindow>
 #include "NGLScene.h"
 #include "PlantBlueprintDialog.h"
@@ -104,6 +105,11 @@ class MainWindow : public QMainWindow
 		/// @brief Dialog box to manage Plants in the scene
 		//----------------------------------------------------------------------------------------------------------------------
 		SceneManagerDialog *m_sceneManagerDialog;
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Handle key presses
+		/// @param _event The key to query
+		//----------------------------------------------------------------------------------------------------------------------
+		void keyPressEvent(QKeyEvent *_event);
 };
 
 #endif // MAINWINDOW_H_

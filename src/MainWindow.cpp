@@ -146,3 +146,12 @@ void MainWindow::setPlantVisibility(unsigned _index, bool _state)
 	m_gl->setPlantVisibility(_index, _state);
 }
 //----------------------------------------------------------------------------------------------------------------------
+void MainWindow::keyPressEvent(QKeyEvent *_event)
+{
+	switch (_event->key())
+	{
+		case Qt::Key_Escape: QApplication::exit(EXIT_SUCCESS); break;
+		default: break;
+	}
+}
+//----------------------------------------------------------------------------------------------------------------------
