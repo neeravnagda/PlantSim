@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 #include <ngl/Texture.h>
 #include <ngl/VAOPrimitives.h>
 #include "PlantBlueprint.h"
@@ -102,70 +104,68 @@ void PlantBlueprint::setAxiom(const std::string _axiom)
 		m_axiom = _axiom;
 }
 //----------------------------------------------------------------------------------------------------------------------
+void PlantBlueprint::cleanupString(std::string &_string)
+{
+	//Remove '=' and ','
+	_string.erase(std::remove(_string.begin(),_string.end(), '='), _string.end());
+	_string.erase(std::remove(_string.begin(),_string.end(), ','), _string.end());
+}
+//----------------------------------------------------------------------------------------------------------------------
 void PlantBlueprint::readGrammarFromFile(const std::string _filePath)
 {
 	std::ifstream fileIn(_filePath);//Open the file
 	std::string line;//Temp string for each line
 
+	//Set regular expressions for valid characters/numbers
+	QString validCharacters = "([A-Z]|[" + QRegularExpression::escape("+-/\\\\&^") + "]|(\\[)|(\\]))+";
+	QString validNumeric = "(([0-9]+)((\\.)([0-9]+))?)";
+
+	//Set regular expressions using the format "predecessor=successor,probability" or "predecessor=successor"
+	QString ruleWithProbabilityString = "^(?<predecessor>" + validCharacters + ")\\=(?<successor>" + validCharacters + ")\\,(?<probability>" + validNumeric + ")$";
+	QString ruleWithoutProbabilityString = "^(?<predecessor>" + validCharacters + ")\\=(?<successor>" + validCharacters + ")$";
+
+	//Create the regular expressions
+	QRegularExpression ruleWithProbability(ruleWithProbabilityString);
+	QRegularExpression ruleWithoutProbability(ruleWithoutProbabilityString);
+
 	//Add the rules, one line at a time
 	while (std::getline(fileIn,line))
 	{
 		//Remove whitespaces
-		//auto lineIterator = std::remove(line.begin(),line.end(),' ');
 		line.erase(std::remove(line.begin(),line.end(),' '),line.end());
 
-		//Create variables to add to the container
+		//Create variables for adding to the container
 		std::string predecessorValue;
 		std::string successorValue;
 		float probabilityValue = 1.0f;
 
-		//Everything from start of line to '=' is the predecessor
-		std::size_t predecessorPosition = line.find('=');
-		if (predecessorPosition != std::string::npos)
+		//Use expression matching to split the string
+		QString qLine = QString::fromStdString(line);
+		//Check for rule with probability
+		QRegularExpressionMatch match = ruleWithProbability.match(qLine);
+		if (match.hasMatch())
 		{
-			predecessorValue = line.substr(0,predecessorPosition);
-
-			//Remove any duplicate '=' or ',' values from the string
-			predecessorValue.erase(std::remove(predecessorValue.begin(),predecessorValue.end(),'='),
-														 predecessorValue.end());
-			predecessorValue.erase(std::remove(predecessorValue.begin(),predecessorValue.end(),','),
-														 predecessorValue.end());
+			predecessorValue = match.captured("predecessor").toStdString();
+			successorValue = match.captured("successor").toStdString();
+			probabilityValue = match.captured("probability").toFloat();
+			std::cout<<"from regex: "<<predecessorValue<<" == "<<successorValue<<", "<<probabilityValue<<"\n";
 		}
-		else continue;
-
-		//Everything from '=' to ',' is the successor
-		++predecessorPosition;//Exclude the "=" symbol
-		std::size_t successorPosition = line.find(',');
-		if (successorPosition != std::string::npos)
-		{
-			successorValue = line.substr(predecessorPosition, successorPosition - predecessorPosition);
-		}
+		//Check for rule without probability
 		else
 		{
-			successorValue = line.substr(predecessorPosition, line.length() - predecessorPosition);
-		}
-
-		//Remove any duplicate '=' or ',' values from the string
-		successorValue.erase(std::remove(successorValue.begin(),successorValue.end(),'='),
-												 successorValue.end());
-		successorValue.erase(std::remove(successorValue.begin(),successorValue.end(),','),
-												 successorValue.end());
-
-		//Check for error if successor value is empty
-		if (successorValue.empty())
-			continue;
-
-		if (successorPosition != std::string::npos)
-		{
-			++successorPosition;
-			std::string probabilityText = line.substr(successorPosition, line.length() - successorPosition);
-			probabilityValue = std::stof(probabilityText);
-
-			//Check if probability is out of range
-			if (probabilityValue > 1.0f)
+			match = ruleWithoutProbability.match(qLine);
+			if (match.hasMatch())
+			{
+				predecessorValue = match.captured("predecessor").toStdString();
+				successorValue = match.captured("successor").toStdString();
 				probabilityValue = 1.0f;
-			else if (probabilityValue < 0.0f)
-				probabilityValue = 0.0f;
+				std::cout<<"from regex2: "<<predecessorValue<<" == "<<successorValue<<", "<<probabilityValue<<"\n";
+			}
+			//The rule was invalid so don't add this line
+			else
+			{
+				continue;
+			}
 		}
 
 		//Construct the rule in the container

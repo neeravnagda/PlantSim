@@ -316,6 +316,11 @@ class PlantBlueprint
 		/// This is scaled by the size of the branches, so a branch of size 0.5 will have a gravitropism of 0.5 * gravitropismScaleFactor
 		//----------------------------------------------------------------------------------------------------------------------
 		float m_gravitropismScaleFactor;
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Clean a string to remove any invalid characters or empty brackets
+		/// @param _string The string to clean
+		//----------------------------------------------------------------------------------------------------------------------
+		void cleanupString(std::string& _string);
 };
 
 #endif // PLANTBLUEPRINT_H_
