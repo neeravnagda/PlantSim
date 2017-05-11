@@ -28,13 +28,14 @@ PlantBlueprintDialog::PlantBlueprintDialog(QWidget *parent) :
 	m_ui->m_blueprintName->setValidator(pbNameValidator);
 
 	//Add a validator for L-system grammar text file
-	QString txtFileExp = fileRegExp + "(txt)";
+	QString txtFileExp = fileRegExp + "(txt)";	//Must end in .txt
 	QRegularExpression txtFileRegExp(txtFileExp);
 	QRegularExpressionValidator *txtFileValidator = new QRegularExpressionValidator(txtFileRegExp, this);
 	m_ui->m_grammarFilePath->setValidator(txtFileValidator);
 
 	//Add a validator for the L-system axiom
-	//Manual nested branches are used as it is difficult to implement with regular expressions
+	//Manual nested branches are used as it is difficult to implement with regular expressions. This uses a maximum of 3 nested branches
+	//This checks for empty brackets and bracket completion
 	QString validCharacters = "([A-Z]*[" + QRegularExpression::escape("+-/\\\\&^") + "]*)*";
 	QString branch = "(\\[(" + validCharacters + ")+\\])*";
 	QString nest2 = "(\\[(" + validCharacters + branch + ")+\\])*";
@@ -44,12 +45,15 @@ PlantBlueprintDialog::PlantBlueprintDialog(QWidget *parent) :
 	QRegularExpressionValidator *axiomValidator = new QRegularExpressionValidator(axiomRegExp, this);
 	m_ui->m_axiom->setValidator(axiomValidator);
 
-	//Connect signals and slots
+	//Check if the blueprint exists
 	connect(m_ui->m_blueprintName, SIGNAL(editingFinished()), this, SLOT(checkBlueprintExists()));
 	connect(m_ui->m_blueprintName, SIGNAL(textChanged(QString)), this, SLOT(checkBlueprintExists()));
+	//Check if the axiom is valid
 	connect(m_ui->m_axiom, SIGNAL(textChanged(QString)), this, SLOT(validateAxiom()));
+	//Check if the grammar file is valid
 	connect(m_ui->m_grammarFilePath, SIGNAL(editingFinished()), this, SLOT(checkGrammarFileExists()));
 	connect(m_ui->m_grammarFilePath, SIGNAL(textChanged(QString)), this, SLOT(resetGrammarFileTextColour()));
+	//Change the upper limits for the leaves start depth
 	connect(m_ui->m_maxDepth, SIGNAL(valueChanged(int)), this, SLOT(setMaxLeavesStartDepth()));
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -60,7 +64,7 @@ PlantBlueprintDialog::~PlantBlueprintDialog()
 //----------------------------------------------------------------------------------------------------------------------
 bool PlantBlueprintDialog::createPlantBlueprint()
 {
-	//Return if any validation failed
+	//Check if any validation failed
 	for (bool &b : m_validationChecks)
 	{
 		if (b == false) {return false;}//Exit and do not create a new Plant Blueprint
@@ -90,29 +94,39 @@ void PlantBlueprintDialog::checkBlueprintExists()
 {
 	QPalette palette = c_defaultPalette;
 	auto check = PlantBlueprint::getKeys().find(m_ui->m_blueprintName->text().toStdString());
+
+	//Set text to default (black) if empty
 	if (m_ui->m_blueprintName->text().length() == 0)
 	{
-		m_ui->m_blueprintName->setPalette(palette);//Set text to black if empty
+		m_ui->m_blueprintName->setPalette(palette);
 	}
+
+	//Set text to green if OK
 	else if (check == PlantBlueprint::getKeys().end())
 	{
-		palette.setColor(QPalette::Text, Qt::green);//Set text to green if OK
+		palette.setColor(QPalette::Text, Qt::green);
 		m_validationChecks[VALIDATION::BLUEPRINTNAME] = true;
 	}
+
+	//Set text to red if the blueprint name already exists
 	else
 	{
-		palette.setColor(QPalette::Text, Qt::red);//Set text to red if already exists
+		palette.setColor(QPalette::Text, Qt::red);
 		m_validationChecks[VALIDATION::BLUEPRINTNAME] = false;
 	}
+
+	//Apply the palette
 	m_ui->m_blueprintName->setPalette(palette);
 }
 //----------------------------------------------------------------------------------------------------------------------
 void PlantBlueprintDialog::validateAxiom()
 {
 	QPalette palette = c_defaultPalette;
-	//Set the text colour to green if acceptable
+
+	//Check if the regular expression is valid
 	if (m_ui->m_axiom->hasAcceptableInput())
 	{
+		//Check for at least one upper case char to make sure the brackets aren't blank
 		bool isOneAlpha = false;
 		for (auto &c : m_ui->m_axiom->text())
 		{
@@ -122,12 +136,14 @@ void PlantBlueprintDialog::validateAxiom()
 				break;
 			}
 		}
+		//Set the text colour to green
 		if (isOneAlpha)
 		{
 			palette.setColor(QPalette::Text, Qt::green);
 			m_validationChecks[VALIDATION::AXIOM] = true;
 		}
 	}
+	//If this validation for empty brackets failed, set the validation flag to false
 	else
 	{
 		m_validationChecks[VALIDATION::AXIOM] = false;
@@ -140,6 +156,7 @@ void PlantBlueprintDialog::validateAxiom()
 		m_validationChecks[VALIDATION::AXIOM] = false;
 	}
 
+	//Apply the palette
 	m_ui->m_axiom->setPalette(palette);
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -147,16 +164,21 @@ void PlantBlueprintDialog::checkGrammarFileExists()
 {
 	QPalette palette = c_defaultPalette;
 
+	//Set text to green if OK
 	if (checkFileExists(m_ui->m_grammarFilePath->text()))
 	{
-		palette.setColor(QPalette::Text,Qt::green);//Set text to green if OK
+		palette.setColor(QPalette::Text,Qt::green);
 		m_validationChecks[VALIDATION::GRAMMARFILE] = true;
 	}
+
+	//Set text to red if invalid
 	else
 	{
-		palette.setColor(QPalette::Text,Qt::red);//Set text to red if invalid
+		palette.setColor(QPalette::Text,Qt::red);
 		m_validationChecks[VALIDATION::GRAMMARFILE] = false;
 	}
+
+	//Apply the palette
 	m_ui->m_grammarFilePath->setPalette(palette);
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -167,16 +189,21 @@ void PlantBlueprintDialog::resetGrammarFileTextColour()
 //----------------------------------------------------------------------------------------------------------------------
 bool PlantBlueprintDialog::checkFileExists(QString _fileName)
 {
+	//If a file can be opened, it exists
 	QFileInfo file(_fileName);
 	return (file.exists());
 }
 //----------------------------------------------------------------------------------------------------------------------
 void PlantBlueprintDialog::setMaxLeavesStartDepth()
 {
+	//Get the values from the UI
 	int ld = m_ui->m_leavesStartDepth->value();
 	int md = m_ui->m_maxDepth->value();
+
+	//Set the upper limit
 	m_ui->m_leavesStartDepth->setMaximum(md);
-	//reset start depth below max depth
+
+	//Reset start depth to the max depth if it exceeds the upper limit
 	if (ld > md)
 	{
 		m_ui->m_leavesStartDepth->setValue(md);

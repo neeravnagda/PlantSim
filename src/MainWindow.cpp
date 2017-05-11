@@ -4,10 +4,10 @@
 #include <QApplication>
 #include <QString>
 #include "MainWindow.h"
+#include "PlantBlueprint.h"
 #include "ui_MainWindow.h"
 #include "ui_PlantBlueprintDialog.h"
 #include "ui_SceneManagerDialog.h"
-#include "PlantBlueprint.h"
 //----------------------------------------------------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
@@ -47,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	//Set the plant visibility
 	connect(m_sceneManagerDialog, SIGNAL(plantVisibility(uint,bool)), this, SLOT(setPlantVisibility(uint,bool)));
 
+	//Add all preset values
 	m_ui->m_plantType->addItem("test");
 
 	//Add all the names of the instances of PlantBlueprint
@@ -77,6 +78,7 @@ void MainWindow::createNewPlant()
 	//Check if the selection is not blank
 	if (m_ui->m_plantType->currentIndex() > 0)
 	{
+		//Create a new plant with the parameters
 		const float x = static_cast<float>(m_ui->m_positionX->value());
 		const float z = static_cast<float>(m_ui->m_positionZ->value());
 		const QString type = m_ui->m_plantType->currentText();
@@ -127,7 +129,7 @@ void MainWindow::createPlantBlueprint()
 		//Update the blueprint names
 		for (std::string s : PlantBlueprint::getKeys())
 		{
-			//Check if the item does not exist
+			//Check if the item does not exist before adding it
 			if (m_ui->m_plantType->findText(QString::fromStdString(s)) == -1)
 			{
 				m_ui->m_plantType->addItem(QString::fromStdString(s));
@@ -138,6 +140,7 @@ void MainWindow::createPlantBlueprint()
 //----------------------------------------------------------------------------------------------------------------------
 void MainWindow::updatePlants()
 {
+	//Update the plant simulations
 	m_gl->updatePlants();
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -150,7 +153,7 @@ void MainWindow::keyPressEvent(QKeyEvent *_event)
 {
 	switch (_event->key())
 	{
-		case Qt::Key_Escape: QApplication::exit(EXIT_SUCCESS); break;
+		case Qt::Key_Escape: quit(); break;
 		default: break;
 	}
 }

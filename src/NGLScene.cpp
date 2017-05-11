@@ -16,13 +16,12 @@ NGLScene::NGLScene(QWidget *_parent) : QOpenGLWidget(_parent)
 //----------------------------------------------------------------------------------------------------------------------
 NGLScene::~NGLScene()
 {
-	PlantBlueprint::destroyAll();//Clear all Plant Blueprints
 	std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
 }
 //----------------------------------------------------------------------------------------------------------------------
 void NGLScene::updatePlants()
 {
-	//Update all the plants
+	//Update all plant simulations
 	for (Plant &p : m_plants)
 	{
 		p.updateSimulation();
@@ -52,6 +51,7 @@ void NGLScene::deletePlant(unsigned _index)
 //----------------------------------------------------------------------------------------------------------------------
 void NGLScene::resizeGL(int _w , int _h)
 {
+	//Set the camera and window parameters
 	m_camera.setShape(45, static_cast<float>(width())/height(), 0.1f, 100.0f);
 	m_win.width  = static_cast<int>( _w * devicePixelRatio() );
 	m_win.height = static_cast<int>( _h * devicePixelRatio() );
@@ -76,7 +76,7 @@ void NGLScene::initializeGL()
 	//Initialise the PlantBlueprint. This initialises the shader and the geometry needed for drawing
 	PlantBlueprint::init();
 
-	//Initialise test plant - need to delete this later
+	//Initialise test plant - need to delete this later and set to some presets
 	{
 		PlantBlueprint *pb = PlantBlueprint::instance("test");
 		pb->setAxiom("FA");
@@ -93,7 +93,6 @@ void NGLScene::initializeGL()
 		pb->setRootRadius(0.03f);
 		pb->setPhototropismScaleFactor(0.00f);
 		pb->setGravitropismScaleFactor(0.0f);
-		createPlant("test", 0.0f, 0.0f);
 	}
 
 	//Initialise the camera
@@ -134,6 +133,8 @@ void NGLScene::drawScene()
 	ngl::Mat4 MVP = M * m_camera.getProjectionMatrix();
 	ngl::Mat3 N = MV;
 	N.inverse();
+
+	//Send the matrices to the shader
 	shader->setUniform("M", M);
 	shader->setUniform("MV", MV);
 	shader->setUniform("MVP", MVP);
@@ -146,7 +147,7 @@ void NGLScene::drawScene()
 	//Draw the ground plane
 	ngl::VAOPrimitives::instance()->draw("groundPlane");
 
-	//Draw the plants
+	//Draw the plants if visible
 	for (Plant &p : m_plants)
 	{
 		if (p.getVisibility()) p.draw(m_mouseGlobalTX, m_camera.getViewMatrix(), m_camera.getProjectionMatrix());
@@ -158,6 +159,6 @@ void NGLScene::paintGL()
 	// clear the screen and depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glViewport(0,0,m_win.width,m_win.height);
-	drawScene();
+	drawScene();	//Draw the ground plane then call each Plant draw call
 }
 //----------------------------------------------------------------------------------------------------------------------

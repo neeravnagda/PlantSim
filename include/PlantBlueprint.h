@@ -36,13 +36,8 @@ class PlantBlueprint
 		//----------------------------------------------------------------------------------------------------------------------
 		static PlantBlueprint* instance(const std::string _instanceID);
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Destroys an instance
-		/// @param _instanceID The key of the instance to delete
-		//----------------------------------------------------------------------------------------------------------------------
-		static void destroy(const std::string _instanceID);
-		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Destroys all instances
-		/// This should be called on program exit
+		/// This is automatically called on program exit
 		//----------------------------------------------------------------------------------------------------------------------
 		static void destroyAll();
 		//----------------------------------------------------------------------------------------------------------------------
@@ -316,11 +311,6 @@ class PlantBlueprint
 		/// This is scaled by the size of the branches, so a branch of size 0.5 will have a gravitropism of 0.5 * gravitropismScaleFactor
 		//----------------------------------------------------------------------------------------------------------------------
 		float m_gravitropismScaleFactor;
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Clean a string to remove any invalid characters or empty brackets
-		/// @param _string The string to clean
-		//----------------------------------------------------------------------------------------------------------------------
-		void cleanupString(std::string& _string);
 };
 
 #endif // PLANTBLUEPRINT_H_

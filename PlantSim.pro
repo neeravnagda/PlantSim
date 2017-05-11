@@ -1,21 +1,21 @@
 #Set some core settings
-# specify the executable name
+# Specify the executable name
 TARGET=PlantSim
-# were are going to default to a console app
+# Default to a console app
 CONFIG += console
-# core Qt Libs to use add more here if needed.
+# Include necessary stuff
 QT+=gui opengl core widgets
 
 #Configure folders and file paths
-# where our exe is going to live (root of project)
+# Executable path
 DESTDIR=./
-# where to put the .o files
+# .o files directory
 OBJECTS_DIR=obj
-# where to put moc auto generated files
+# moc files directory
 MOC_DIR=moc
-# where to put ui header files
+# ui header files directory
 UI_DIR=ui
-# and add the include dir into the search path for Qt and make
+# include directories for search paths
 INCLUDEPATH +=include \
 			    ui
 
@@ -50,7 +50,7 @@ HEADERS+= include/NGLScene.h \
     include/PlantBlueprintDialog.h \
     include/SceneManagerDialog.h
 
-# add the readme and glsl shader files
+# add the readme, glsl shader files and rules
 OTHER_FILES+= README.md \
 		shaders/BlinnPhong.fragment.glsl \
 		shaders/BlinnPhong.vertex.glsl \

@@ -5,7 +5,7 @@ layout (location = 0) in vec3 inVert;
 layout (location = 1) in vec2 inUV;
 /// @brief The normal passed in
 layout (location = 2) in vec3 inNormal;
-
+//----------------------------------------------------------------------------------------------------------------------
 uniform 	vec3 viewerPos;
 /// @brief model matrix
 uniform mat4 M;
@@ -17,7 +17,7 @@ uniform mat4 MVP;
 uniform mat3 N;
 /// @brief the sun position
 uniform vec3 sunPosition = vec3(0.0f, 100.0f, 0.0f);
-
+//----------------------------------------------------------------------------------------------------------------------
 /// @brief the UV coordinates
 out vec2 uvCoord;
 /// @brief fragment position
@@ -30,7 +30,7 @@ out vec3 eyeDirection;
 out vec3 sunDirection;
 /// @brief half vector
 out vec3 halfVector;
-
+//----------------------------------------------------------------------------------------------------------------------
 void main(void)
 {
 	uvCoord = inUV;

@@ -11,8 +11,8 @@
 /// @file MainWindow.h
 /// @brief This class is the main window, containing the NGLScene widget and UI functions
 /// @author Neerav Nagda
-/// @version 0.4
-/// @date 01/04/17
+/// @version 1.0
+/// @date 11/05/17
 /// @class MainWindow
 /// @brief This class is the main window, containing widgets and UI functions
 //----------------------------------------------------------------------------------------------------------------------
@@ -68,6 +68,7 @@ class MainWindow : public QMainWindow
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Delete a Plant object
 		/// @param _index The index into the container of Plants
+		/// This calls the delete plant function in NGLScene
 		//----------------------------------------------------------------------------------------------------------------------
 		void deletePlant(unsigned _index);
 		//----------------------------------------------------------------------------------------------------------------------

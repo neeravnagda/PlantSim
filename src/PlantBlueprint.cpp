@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <QRegularExpression>
@@ -19,43 +20,42 @@ ngl::Vec3 PlantBlueprint::s_sunPosition = ngl::Vec3(0.0f, 100.0f, 0.0f);
 PlantBlueprint* PlantBlueprint::instance(const std::string _instanceID)
 {
 	const auto it = s_instances.find(_instanceID);
+
 	//return the instance if it was found
 	if (it != s_instances.end())
 	{
 		return static_cast<PlantBlueprint*>(it->second);
 	}
-	//If it wasn't found, create a new instance
+
+	//If it wasn't found, create a new instance and return it
 	PlantBlueprint* blueprint = new PlantBlueprint;
 	s_instances[_instanceID] = blueprint;
 	s_keys.emplace(_instanceID);
 	return blueprint;
 }
 //----------------------------------------------------------------------------------------------------------------------
-void PlantBlueprint::destroy(const std::string _instanceID)
-{
-	auto it = s_instances.find(_instanceID);
-	if (it != s_instances.end())
-	{
-		delete (*it).second;
-		s_instances.erase(it);
-	}
-}
-//----------------------------------------------------------------------------------------------------------------------
 void PlantBlueprint::destroyAll()
 {
+	std::cout<<"clearing plant blueprints\n";
+	//Delete the pointers
 	for (auto i : s_instances)
 	{
 		delete i.second;
 	}
+	//Clear the map
 	s_instances.clear();
 }
 //----------------------------------------------------------------------------------------------------------------------
 void PlantBlueprint::init()
 {
-	//Create the geometry
+	//Define at exit handler
+	std::atexit(destroyAll);
+
+	//Create the cylinder mesh
 	s_cylinder.reset(new ngl::Obj("models/cylinder_low.obj", "textures/TreeTexture.jpg"));
 	s_cylinder->createVAO();
 
+	//Create the leaf geometry
 	ngl::VAOPrimitives *prim = ngl::VAOPrimitives::instance();
 	prim->createTrianglePlane(s_leafGeometryName,1,1,1,1,ngl::Vec3::up());
 
@@ -85,6 +85,7 @@ void PlantBlueprint::drawLeaf()
 	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
 	(*shader)[s_shaderProgramName]->use();
 
+	//Bind the texture before drawing
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, s_leafGeometryTexture);
 
@@ -102,13 +103,6 @@ void PlantBlueprint::setAxiom(const std::string _axiom)
 	//Otherwise set the axiom as the input
 	else
 		m_axiom = _axiom;
-}
-//----------------------------------------------------------------------------------------------------------------------
-void PlantBlueprint::cleanupString(std::string &_string)
-{
-	//Remove '=' and ','
-	_string.erase(std::remove(_string.begin(),_string.end(), '='), _string.end());
-	_string.erase(std::remove(_string.begin(),_string.end(), ','), _string.end());
 }
 //----------------------------------------------------------------------------------------------------------------------
 void PlantBlueprint::readGrammarFromFile(const std::string _filePath)

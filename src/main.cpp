@@ -4,6 +4,10 @@
 
 int main(int argc, char **argv)
 {
+	//----------------------------------------------------------------------------------------------------------------------
+	// Set the surface format
+	//----------------------------------------------------------------------------------------------------------------------
+
 	QSurfaceFormat format;
 	// set the number of samples for multisampling
 	// will need to enable glEnable(GL_MULTISAMPLE); once we have a context
@@ -20,7 +24,10 @@ int main(int argc, char **argv)
 
 	QSurfaceFormat::setDefaultFormat(format);
 
-	//Create an application and window
+	//----------------------------------------------------------------------------------------------------------------------
+	// Create the application and window
+	//----------------------------------------------------------------------------------------------------------------------
+
 	QApplication app(argc, argv);
 	MainWindow w;
 

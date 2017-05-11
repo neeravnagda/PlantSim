@@ -36,7 +36,7 @@ void Plant::loadMatricesToShader(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat
 	ngl::Mat4 MVP = M * _projectionMatrix;
 	ngl::Mat3 N = MV;
 	N.inverse();
-	//Set the uniforms
+	//Set the uniforms in the shader
 	shader->setUniform("M", M);
 	shader->setUniform("MV", MV);
 	shader->setUniform("MVP", MVP);
@@ -85,6 +85,7 @@ void Plant::draw(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, c
 	//Draw each branch
 	for (Branch &b : m_branches)
 	{
+		//Pre-compute the decay for the branch
 		decay = calculateDecay(b.m_creationDepth);
 
 		//Draw the branch nodes
@@ -122,7 +123,7 @@ void Plant::draw(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, c
 			PlantBlueprint::drawCylinder();
 		}
 
-		glDisable(GL_CULL_FACE);
+		glDisable(GL_CULL_FACE);	//Disable face culling for the leaves
 		//Draw the leaves
 		ngl::Vec3 leafInitialDirection = ngl::Vec3(1.0f, 0.0f, 0.0f);
 		for (unsigned i=0; i<b.m_leafPositions.size(); ++i)
@@ -134,7 +135,7 @@ void Plant::draw(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, c
 			//Calculate the rotation matrix
 			float angle = acos(leafInitialDirection.dot(b.m_leafOrientations[i]));
 			ngl::Mat4 rotationMatrix;
-			if (angle > 0)
+			if (angle > 0)	//The rotation matrix is undefined if the angle is 0
 			{
 				ngl::Vec3 axis;
 				axis.cross(leafInitialDirection, b.m_leafOrientations[i]);
@@ -152,7 +153,7 @@ void Plant::draw(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, c
 			loadMatricesToShader(_mouseGlobalTX, _viewMatrix, _projectionMatrix);
 			PlantBlueprint::drawLeaf();
 		}
-		glEnable(GL_CULL_FACE);
+		glEnable(GL_CULL_FACE);	//Re-enable face culling for the branches
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -214,7 +215,7 @@ void Plant::stringToBranches()
 		{
 			m_branches.emplace_back(m_depth, branchString);
 		}
-		branchStartPos = branchEndPos+1;
+		branchStartPos = branchEndPos+1;	//Increment the start position to check the next branch
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -228,7 +229,7 @@ void Plant::stringRewrite()
 		//Count the number of draw calls, will rerun this function if the count is the same
 		unsigned fCount = countCharInString(m_string, 'F');
 
-		std::string newString;
+		std::string newString;	//Temporary new string to add to
 		bool isReplaced = false;//Check if a production rule was executed
 
 		for (unsigned i=0, branchCount=0; i<m_string.length(); ++i)//Loop through each char in the string
@@ -286,6 +287,7 @@ void Plant::scatterLeaves(Branch& _branch, const ngl::Vec3 &_startPos, const ngl
 	float angle = acos(_direction.dot(ngl::Vec3::up()));
 	ngl::Mat4 rotationMatrix = axisAngleRotationMatrix(angle, axis);
 
+	//Compute each leaf
 	for (unsigned i=0; i<count; ++i)
 	{
 		//Calculate a random point and its normal on the surface of a cylinder pointing up
@@ -305,11 +307,11 @@ void Plant::scatterLeaves(Branch& _branch, const ngl::Vec3 &_startPos, const ngl
 		position += ngl::Vec4(_startPos) + normal * m_blueprint->getLeafScale() / 2;
 
 		//Add a random rotation to the normal - this is a maximum of +- 15 degrees in each axis
-		normal.m_x += (generateRandomFloat() - 0.5f) * ngl::PI2 / 3;
-		normal.m_y += (generateRandomFloat() - 0.5f) * ngl::PI2 / 3;
-		normal.m_z += (generateRandomFloat() - 0.5f) * ngl::PI2 / 3;
+		normal.m_x += (generateRandomFloat() - 0.5f) * ngl::PI / 6;
+		normal.m_y += (generateRandomFloat() - 0.5f) * ngl::PI / 6;
+		normal.m_z += (generateRandomFloat() - 0.5f) * ngl::PI / 6;
 
-		normal.normalize();
+		normal.normalize();	//Need to renormalise to account for the added random
 
 		//Store the position and orientation in the vectors in the branch
 		_branch.m_leafPositions.emplace_back(position.toVec3());
@@ -319,7 +321,7 @@ void Plant::scatterLeaves(Branch& _branch, const ngl::Vec3 &_startPos, const ngl
 //----------------------------------------------------------------------------------------------------------------------
 void Plant::spaceColonisation(Branch& _branch, ngl::Vec3& _direction)
 {
-	float decay = calculateDecay(_branch.m_creationDepth);
+	float decay = calculateDecay(_branch.m_creationDepth);	//Precompute the decay of the branch
 	float maxLength = m_blueprint->getDrawLength() * decay;//Max length of the branch bit
 	ngl::Vec3 pos = _branch.m_nodePositions.back();//Initialise position for this branch bit
 
@@ -333,7 +335,7 @@ void Plant::spaceColonisation(Branch& _branch, ngl::Vec3& _direction)
 		float alpha = generateRandomFloat() * ngl::TWO_PI;
 		h *= maxLength / m_blueprint->getNodesPerBranch();
 
-		//Convert the cylindrical coordinates to cartesian
+		//Convert the cylindrical coordinates to cartesian coordinates
 		ngl::Vec3 randPoint;
 		randPoint.m_x = r * cos(alpha);
 		randPoint.m_y = h;
@@ -353,18 +355,21 @@ void Plant::spaceColonisation(Branch& _branch, ngl::Vec3& _direction)
 		_direction = newPos.toVec3() - pos;
 		float nodeLength = _direction.length();
 
-		//Add tropisms
-		if ((m_blueprint->getPhototropismScaleFactor() > 0) || (m_blueprint->getGravitropismScaleFactor() > 0))
+		//Add phototrophism if applicable
+		if (m_blueprint->getPhototropismScaleFactor() > 0)
 		{
 			ngl::Vec3 phototropism = PlantBlueprint::getSunPosition() - pos;//Calculate the direction to the sun
 			phototropism.normalize();
 			phototropism *= m_blueprint->getPhototropismScaleFactor();
-
-			//Add a tropism due to gravity and scale with the size of the branch
-			ngl::Vec3 gravitropism = ngl::Vec3::down() * m_blueprint->getGravitropismScaleFactor() * decay;
-
-			_direction += phototropism + gravitropism;
+			_direction += phototropism;
 		}
+		//Add gravitropism if applicable
+		if (m_blueprint->getGravitropismScaleFactor() > 0)
+		{
+			ngl::Vec3 gravitropism = ngl::Vec3::down() * m_blueprint->getGravitropismScaleFactor() * decay;
+			_direction += gravitropism;
+		}
+		//Calculate the new position
 		_direction.normalize();
 		pos += _direction * nodeLength;
 
