@@ -17,6 +17,8 @@ uniform mat4 MVP;
 uniform mat3 N;
 /// @brief the sun position
 uniform vec3 sunPosition = vec3(0.0f, 100.0f, 0.0f);
+/// @brief the texture tile factor
+uniform float texScale = 1.0f;
 //----------------------------------------------------------------------------------------------------------------------
 /// @brief the UV coordinates
 out vec2 uvCoord;
@@ -33,7 +35,7 @@ out vec3 halfVector;
 //----------------------------------------------------------------------------------------------------------------------
 void main(void)
 {
-	uvCoord = inUV;
+	uvCoord = inUV * texScale;
 
 	vec4 worldPosition = M * vec4(inVert, 1.0f);
 	eyeDirection = normalize(viewerPos - worldPosition.xyz);

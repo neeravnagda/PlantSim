@@ -1,5 +1,4 @@
 #include <cmath>
-#include <iostream>
 #include <stack>
 #include <ngl/Mat3.h>
 #include <ngl/Vec4.h>
@@ -33,7 +32,7 @@ void Plant::loadMatricesToShader(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat
 	//Create the matrices
 	ngl::Mat4 M = m_transform * _mouseGlobalTX;
 	ngl::Mat4 MV = M * _viewMatrix;
-	ngl::Mat4 MVP = M * _projectionMatrix;
+	ngl::Mat4 MVP = MV * _projectionMatrix;
 	ngl::Mat3 N = MV;
 	N.inverse();
 	//Set the uniforms in the shader
@@ -41,6 +40,8 @@ void Plant::loadMatricesToShader(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat
 	shader->setUniform("MV", MV);
 	shader->setUniform("MVP", MVP);
 	shader->setUniform("N", N);
+	//The texture does not need to tile
+	shader->setUniform("texScale", 1.0f);
 }
 //----------------------------------------------------------------------------------------------------------------------
 //Rotation matrix found from https://en.wikipedia.org/wiki/Rotation_matrix
@@ -159,8 +160,13 @@ void Plant::draw(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, c
 //----------------------------------------------------------------------------------------------------------------------
 void Plant::updateSimulation()
 {
-	stringRewrite();
-	evaluateBranches();
+	//Only update if the current depth is less than the max
+	if (m_depth < m_blueprint->getMaxDepth())
+	{
+		++m_depth;//Increment the depth of the expansion
+		stringRewrite();
+		evaluateBranches();
+	}
 }
 //----------------------------------------------------------------------------------------------------------------------
 float Plant::generateRandomFloat() const
@@ -221,50 +227,43 @@ void Plant::stringToBranches()
 //----------------------------------------------------------------------------------------------------------------------
 void Plant::stringRewrite()
 {
-	//Only rewrite the string if the current depth is less than the max
-	if (m_depth < m_blueprint->getMaxDepth())
+	//Count the number of draw calls, will rerun this function if the count is the same
+	unsigned fCount = countCharInString(m_string, 'F');
+
+	std::string newString;	//Temporary new string to add to
+	bool isReplaced = false;//Check if a production rule was executed
+
+	for (unsigned i=0, branchCount=0; i<m_string.length(); ++i)//Loop through each char in the string
 	{
-		++m_depth;//Increment the depth of the expansion
-
-		//Count the number of draw calls, will rerun this function if the count is the same
-		unsigned fCount = countCharInString(m_string, 'F');
-
-		std::string newString;	//Temporary new string to add to
-		bool isReplaced = false;//Check if a production rule was executed
-
-		for (unsigned i=0, branchCount=0; i<m_string.length(); ++i)//Loop through each char in the string
+		isReplaced = false;
+		for (ProductionRule r : m_blueprint->getProductionRules())//Loop through the production rules
 		{
-			isReplaced = false;
-			for (ProductionRule r : m_blueprint->getProductionRules())//Loop through the production rules
+			if(r.m_predecessor == m_string.substr(i,r.m_predecessor.length()))//Check if a substring matches the rule predecessor
 			{
-				if(r.m_predecessor == m_string.substr(i,r.m_predecessor.length()))//Check if a substring matches the rule predecessor
+				//Only calculate a random number if the probability is not 1
+				if( (r.m_probability == 1.0f) || (r.m_probability > generateRandomFloat()) )
 				{
-					//Only calculate a random number if the probability is not 1
-					if( (r.m_probability == 1.0f) || (r.m_probability > generateRandomFloat()) )
-					{
-						newString += r.m_successor;//Add the replaced rule
-						i += r.m_predecessor.length() - 1;//Iterate further through the original string if predecessor length > 1 char
-						isReplaced = true;
-						//Add new branches to the container
-						addBranches(countCharInString(r.m_successor, '['), branchCount);
-					}
-					break;//Avoid checking other rules
+					newString += r.m_successor;//Add the replaced rule
+					i += r.m_predecessor.length() - 1;//Iterate further through the original string if predecessor length > 1 char
+					isReplaced = true;
+					//Add new branches to the container
+					addBranches(countCharInString(r.m_successor, '['), branchCount);
 				}
+				break;//Avoid checking other rules
 			}
-			if (isReplaced == false) { newString += m_string[i]; }//No replacement was made, so add the original char
-			branchCount = countCharInString(newString, '[');
 		}
-		m_string = newString;//Assign the temp string to the member variable
+		if (isReplaced == false) { newString += m_string[i]; }//No replacement was made, so add the original char
+		branchCount = countCharInString(newString, '[');
+	}
+	m_string = newString;//Assign the temp string to the member variable
 
-		//Update the string in each branch
-		stringToBranches();
+	//Update the string in each branch
+	stringToBranches();
 
-		//Check if the drawing will be the same, i.e. if this function needs to be rerun
-		if (countCharInString(m_string, 'F') == fCount)
-		{
-			--m_depth;
-			stringRewrite();
-		}
+	//Check if the drawing will be the same, i.e. if this function needs to be rerun
+	if (countCharInString(m_string, 'F') == fCount)
+	{
+		stringRewrite();
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------

@@ -57,7 +57,7 @@ uniform MaterialInfo Material = MaterialInfo(
 			vec3(0.1f, 0.1f, 0.1f),//Ambient
 			vec3(0.6f, 0.6f, 0.6f),//Diffuse
 			vec3(1.0f, 1.0f, 1.0f),//Specular
-			10.0f//Specular shininess
+			100.0f//Specular shininess
 			);
 //----------------------------------------------------------------------------------------------------------------------
 /// @brief calculate the light contribution of one light
@@ -73,11 +73,11 @@ vec3 calculateLightContribution(in vec3 _diffuseColour)
 		//Normal dot Half-vector
 		float NdotH = max(dot(fragNormal, halfVector),0.0f);
 
-		return vec3(
-					Sun.La * Material.Ka +//Ambient contribution
-					Sun.Ld * Material.Kd * _diffuseColour * lambertTerm +//Diffuse contribution
-					Sun.Ls * Material.Ks * pow(NdotH, Material.Shininess)//Specular contribution
-					);
+		vec3 ambient = Sun.La * Material.Ka;
+		vec3 diffuse = Sun.Ld * Material.Kd * _diffuseColour * lambertTerm;
+		vec3 specular = Sun.Ls * Material.Ks * _diffuseColour * pow(NdotH, Material.Shininess);
+
+		return ambient + diffuse + specular;
 	}
 	else return vec3(0,0,0);
 }
@@ -85,6 +85,7 @@ vec3 calculateLightContribution(in vec3 _diffuseColour)
 void main(void)
 {
 	vec4 diffuseColour = texture(tex, uvCoord);
+
 	if (diffuseColour.w == 0.0f)
 	{
 		discard;

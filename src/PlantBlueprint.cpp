@@ -1,7 +1,6 @@
 #include <algorithm>
 #include <cstdlib>
 #include <fstream>
-#include <iostream>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <ngl/Texture.h>
@@ -36,7 +35,6 @@ PlantBlueprint* PlantBlueprint::instance(const std::string _instanceID)
 //----------------------------------------------------------------------------------------------------------------------
 void PlantBlueprint::destroyAll()
 {
-	std::cout<<"clearing plant blueprints\n";
 	//Delete the pointers
 	for (auto i : s_instances)
 	{
@@ -52,7 +50,7 @@ void PlantBlueprint::init()
 	std::atexit(destroyAll);
 
 	//Create the cylinder mesh
-	s_cylinder.reset(new ngl::Obj("models/cylinder_low.obj", "textures/TreeTexture.jpg"));
+	s_cylinder.reset(new ngl::Obj("models/Cylinder.obj", "textures/TreeTexture.jpg"));
 	s_cylinder->createVAO();
 
 	//Create the leaf geometry

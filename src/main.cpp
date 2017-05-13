@@ -1,4 +1,3 @@
-#include <QtGui/QGuiApplication>
 #include <QApplication>
 #include "MainWindow.h"
 
@@ -17,9 +16,9 @@ int main(int argc, char **argv)
 	format.setMajorVersion(3);
 	format.setMinorVersion(3);
 
-	// now we are going to set to CoreProfile OpenGL so we can't use and old Immediate mode GL
+	// Set to core profile
 	format.setProfile(QSurfaceFormat::CoreProfile);
-	// now set the depth buffer to 24 bits
+	// Set the depth buffer to 24 bits
 	format.setDepthBufferSize(24);
 
 	QSurfaceFormat::setDefaultFormat(format);

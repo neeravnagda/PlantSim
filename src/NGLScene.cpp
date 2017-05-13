@@ -1,4 +1,3 @@
-#include <iostream>
 #include <QMouseEvent>
 #include <QGuiApplication>
 #include <ngl/NGLInit.h>
@@ -14,10 +13,7 @@ NGLScene::NGLScene(QWidget *_parent) : QOpenGLWidget(_parent)
 	this->resize(_parent->size());
 }
 //----------------------------------------------------------------------------------------------------------------------
-NGLScene::~NGLScene()
-{
-	std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
-}
+NGLScene::~NGLScene(){}
 //----------------------------------------------------------------------------------------------------------------------
 void NGLScene::updatePlants()
 {
@@ -52,7 +48,7 @@ void NGLScene::deletePlant(unsigned _index)
 void NGLScene::resizeGL(int _w , int _h)
 {
 	//Set the camera and window parameters
-	m_camera.setShape(45, static_cast<float>(width())/height(), 0.1f, 100.0f);
+	m_camera.setShape(45, static_cast<float>(width())/height(), 0.001f, 60.0f);
 	m_win.width  = static_cast<int>( _w * devicePixelRatio() );
 	m_win.height = static_cast<int>( _h * devicePixelRatio() );
 }
@@ -63,7 +59,7 @@ void NGLScene::initializeGL()
 	// be done once we have a valid GL context but before we call any GL commands. If we dont do
 	// this everything will crash
 	ngl::NGLInit::instance();
-	glClearColor(0.4f, 0.4f, 0.4f, 1.0f);			   // Grey Background
+	glClearColor(0.57f, 0.77f, 0.92f, 1.0f);			   // Light blue background
 	// enable depth testing for drawing
 	glEnable(GL_DEPTH_TEST);
 	// enable multisampling for smoother drawing
@@ -96,10 +92,10 @@ void NGLScene::initializeGL()
 	}
 
 	//Initialise the camera
-	m_camera.set(ngl::Vec3(2.0f, 2.0f, 10.0f),//from
+	m_camera.set(ngl::Vec3(0.0f, 0.6f, 1.6f),//from
 							 ngl::Vec3::zero(),//to
 							 ngl::Vec3::up());//up
-	m_camera.setShape(45, static_cast<float>(width())/height(), 0.1f, 100.0f);
+	m_camera.setShape(45, static_cast<float>(width())/height(), 0.001f, 60.0f);
 
 	//Send the viewer position to the shader
 	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
@@ -108,11 +104,14 @@ void NGLScene::initializeGL()
 	glViewport(0,0,width(),height());
 
 	//Create the ground plane geometry
-	ngl::VAOPrimitives::instance()->createTrianglePlane("groundPlane", 1, 1, 1, 1, ngl::Vec3::up());
+	ngl::VAOPrimitives::instance()->createTrianglePlane("groundPlane", 100, 100, 1, 1, ngl::Vec3::up());
 
 	//Initialise the texture for the ground
 	ngl::Texture groundTexture("textures/GroundTexture.jpg");
 	m_groundTexture = groundTexture.setTextureGL();
+	//Make the texture tileable
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 //----------------------------------------------------------------------------------------------------------------------
 void NGLScene::drawScene()
@@ -130,7 +129,7 @@ void NGLScene::drawScene()
 	ngl::Mat4 M;
 	M *= m_mouseGlobalTX;
 	ngl::Mat4 MV = M * m_camera.getViewMatrix();
-	ngl::Mat4 MVP = M * m_camera.getProjectionMatrix();
+	ngl::Mat4 MVP = MV * m_camera.getProjectionMatrix();
 	ngl::Mat3 N = MV;
 	N.inverse();
 
@@ -139,6 +138,9 @@ void NGLScene::drawScene()
 	shader->setUniform("MV", MV);
 	shader->setUniform("MVP", MVP);
 	shader->setUniform("N", N);
+
+	//Set the texture scale as it needs to tile
+	shader->setUniform("texScale", 100.0f);
 
 	//Bind the texture for the ground plane
 	glActiveTexture(GL_TEXTURE0);

@@ -20,7 +20,7 @@ PlantBlueprintDialog::PlantBlueprintDialog(QWidget *parent) :
 	// (/\\w+)? is an optional "/path"
 	// ((../)|(\\w+/))* is an optional number of "../" or "path/"
 	// (\\w+\\.) is "file." and is required
-	const QString fileRegExp = "(/\\w+)?((../)|(\\w+/))*(\\w+\\.)";
+	const QString fileRegExp = "(/\\w+)?((../)|(\\w+/))*(\\w+)";
 
 	//Add a validator to the plant blueprint name
 	QRegularExpression pbNameExp("\\w+");//Must be at least one char
@@ -28,7 +28,7 @@ PlantBlueprintDialog::PlantBlueprintDialog(QWidget *parent) :
 	m_ui->m_blueprintName->setValidator(pbNameValidator);
 
 	//Add a validator for L-system grammar text file
-	QString txtFileExp = fileRegExp + "(txt)";	//Must end in .txt
+	QString txtFileExp = fileRegExp + "\\.(txt)";	//Must end in .txt
 	QRegularExpression txtFileRegExp(txtFileExp);
 	QRegularExpressionValidator *txtFileValidator = new QRegularExpressionValidator(txtFileRegExp, this);
 	m_ui->m_grammarFilePath->setValidator(txtFileValidator);
