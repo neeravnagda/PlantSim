@@ -328,11 +328,25 @@ void Plant::spaceColonisation(Branch& _branch, ngl::Vec3& _direction)
 	for (unsigned i=1; i<m_blueprint->getNodesPerBranch(); ++i)
 	{
 		ngl::Vec3 startPos = pos;	//Temp variable for scatterLeavesFunction
+
+		//Predefine variables
+		float h, r, alpha;
+
 		//Generate a random length, radius and angle to create a random point inside a cone
-		float h = generateRandomFloat();
-		float r = generateRandomFloat() * h * m_blueprint->getMaxDeviation();
-		float alpha = generateRandomFloat() * ngl::TWO_PI;
+		if (m_blueprint->getNodesPerBranch() > 2)
+		{
+		h = generateRandomFloat();
+		r = generateRandomFloat() * h * m_blueprint->getMaxDeviation();
+		alpha = generateRandomFloat() * ngl::TWO_PI;
 		h *= maxLength / m_blueprint->getNodesPerBranch();
+		}
+		//Don't generata random values as this is a rigid L-system
+		else
+		{
+			h = maxLength;
+			r = 0.0f;
+			alpha = 0.0f;
+		}
 
 		//Convert the cylindrical coordinates to cartesian coordinates
 		ngl::Vec3 randPoint;
@@ -359,7 +373,7 @@ void Plant::spaceColonisation(Branch& _branch, ngl::Vec3& _direction)
 		{
 			ngl::Vec3 phototropism = PlantBlueprint::getSunPosition() - pos;//Calculate the direction to the sun
 			phototropism.normalize();
-			phototropism *= m_blueprint->getPhototropismScaleFactor();
+			phototropism *= m_blueprint->getPhototropismScaleFactor() * decay;
 			_direction += phototropism;
 		}
 		//Add gravitropism if applicable

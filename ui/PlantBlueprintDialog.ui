@@ -53,6 +53,13 @@
      </property>
     </widget>
    </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QLabel" name="s_blueprintNameLabel">
+     <property name="text">
+      <string>Blueprint name</string>
+     </property>
+    </widget>
+   </item>
    <item row="5" column="0" colspan="2">
     <widget class="QScrollArea" name="scrollArea">
      <property name="frameShape">
@@ -302,7 +309,7 @@
           <item row="1" column="0" colspan="2">
            <widget class="QSpinBox" name="m_leafCount">
             <property name="toolTip">
-             <string>Number of leaves per branch.</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of leaves per branch. Set to zero for no leaves.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="value">
              <number>30</number>
@@ -312,7 +319,7 @@
           <item row="4" column="0" colspan="2">
            <widget class="QSpinBox" name="m_leavesStartDepth">
             <property name="toolTip">
-             <string>The L-system depth when leaves start to appear. Set to 0 for no leaves</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The L-system depth when leaves start to appear.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="maximum">
              <number>5</number>
@@ -373,7 +380,7 @@
           <item row="1" column="0" colspan="2">
            <widget class="QDoubleSpinBox" name="m_maxDeviation">
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum deviation of a branch. This increase is exponential.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum deviation of a branch. Increasing this value has an exponential effect. Set to 0 for a rigid L-system&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="minimum">
              <double>0.010000000000000</double>
@@ -403,7 +410,7 @@
           <item row="3" column="0" colspan="2">
            <widget class="QSpinBox" name="m_numNodes">
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of nodes in a branch. Set to minimum for a rigid L-system.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of nodes in a branch. Set to 2 for a rigid L-system.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="minimum">
              <number>2</number>
@@ -458,13 +465,6 @@
        </item>
       </layout>
      </widget>
-    </widget>
-   </item>
-   <item row="0" column="0" colspan="2">
-    <widget class="QLabel" name="s_blueprintNameLabel">
-     <property name="text">
-      <string>Blueprint name</string>
-     </property>
     </widget>
    </item>
   </layout>

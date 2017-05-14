@@ -54,7 +54,7 @@ HEADERS+= include/NGLScene.h \
 OTHER_FILES+= README.md \
 		shaders/BlinnPhong.fragment.glsl \
 		shaders/BlinnPhong.vertex.glsl \
-		rules.txt
+    presets/*
 
 # add the ui forms
 FORMS += ui/MainWindow.ui \

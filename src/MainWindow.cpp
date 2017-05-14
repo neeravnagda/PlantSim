@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(m_sceneManagerDialog, SIGNAL(plantVisibility(uint,bool)), this, SLOT(setPlantVisibility(uint,bool)));
 
 	//Add all preset values
-	m_ui->m_plantType->addItem("test");
+	//m_ui->m_plantType->addItem("test");
 
 	//Add all the names of the instances of PlantBlueprint
 	for (std::string s : PlantBlueprint::getKeys())

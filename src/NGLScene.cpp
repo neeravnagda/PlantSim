@@ -11,9 +11,70 @@ NGLScene::NGLScene(QWidget *_parent) : QOpenGLWidget(_parent)
 	// re-size the widget to that of the parent (in this case the GLFrame passed in on construction)
 	setFocus();
 	this->resize(_parent->size());
+	initialisePresets();
 }
 //----------------------------------------------------------------------------------------------------------------------
 NGLScene::~NGLScene(){}
+//----------------------------------------------------------------------------------------------------------------------
+void NGLScene::initialisePresets()
+{
+	//Rigid L-system. This has no space colonisation or tropisms
+	{
+		PlantBlueprint *pb = PlantBlueprint::instance("RigidLSystem");
+		pb->setAxiom("FFA");
+		pb->readGrammarFromFile("presets/RigidLSystem.txt");
+		pb->setDecay(1.5f);
+		pb->setDrawAngle(45);
+		pb->setDrawLength(0.7f);
+		pb->setMaxDepth(5);
+		pb->setMaxDeviation(0.0f);
+		pb->setLeavesPerBranch(30);
+		pb->setLeavesStartDepth(2);
+		pb->setLeafScale(0.05f);
+		pb->setNodesPerBranch(2);
+		pb->setRootRadius(0.1f);
+		pb->setPhototropismScaleFactor(0.00f);
+		pb->setGravitropismScaleFactor(0.0f);
+	}
+
+	//Tangled growth
+	{
+		PlantBlueprint *pb = PlantBlueprint::instance("TangledBranches");
+		pb->setAxiom("FA");
+		pb->readGrammarFromFile("presets/TangledBranches.txt");
+		pb->setDecay(1.4f);
+		pb->setDrawAngle(30);
+		pb->setDrawLength(0.8f);
+		pb->setMaxDepth(4);
+		pb->setMaxDeviation(0.1f);
+		pb->setLeavesPerBranch(0);
+		pb->setLeavesStartDepth(0);
+		pb->setLeafScale(0.03f);
+		pb->setNodesPerBranch(8);
+		pb->setRootRadius(0.05f);
+		pb->setPhototropismScaleFactor(0.0f);
+		pb->setGravitropismScaleFactor(0.0f);
+	}
+
+	//Generic tree
+	{
+		PlantBlueprint *pb = PlantBlueprint::instance("GenericTree");
+		pb->setAxiom("FFA");
+		pb->readGrammarFromFile("presets/GenericTree.txt");
+		pb->setDecay(1.4f);
+		pb->setDrawAngle(45);
+		pb->setDrawLength(1.2f);
+		pb->setMaxDepth(5);
+		pb->setMaxDeviation(0.1f);
+		pb->setLeavesPerBranch(30);
+		pb->setLeavesStartDepth(3);
+		pb->setLeafScale(0.03f);
+		pb->setNodesPerBranch(6);
+		pb->setRootRadius(0.04f);
+		pb->setPhototropismScaleFactor(0.005f);
+		pb->setGravitropismScaleFactor(0.0f);
+	}
+}
 //----------------------------------------------------------------------------------------------------------------------
 void NGLScene::updatePlants()
 {
@@ -71,25 +132,6 @@ void NGLScene::initializeGL()
 
 	//Initialise the PlantBlueprint. This initialises the shader and the geometry needed for drawing
 	PlantBlueprint::init();
-
-	//Initialise test plant - need to delete this later and set to some presets
-	{
-		PlantBlueprint *pb = PlantBlueprint::instance("test");
-		pb->setAxiom("FA");
-		pb->readGrammarFromFile("rules.txt");
-		pb->setDecay(1.4f);
-		pb->setDrawAngle(45);
-		pb->setDrawLength(0.8f);
-		pb->setMaxDepth(5);
-		pb->setMaxDeviation(0.1f);
-		pb->setLeavesPerBranch(30);
-		pb->setLeavesStartDepth(2);
-		pb->setLeafScale(0.03f);
-		pb->setNodesPerBranch(6);
-		pb->setRootRadius(0.03f);
-		pb->setPhototropismScaleFactor(0.00f);
-		pb->setGravitropismScaleFactor(0.0f);
-	}
 
 	//Initialise the camera
 	m_camera.set(ngl::Vec3(0.0f, 0.6f, 1.6f),//from
