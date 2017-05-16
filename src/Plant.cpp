@@ -335,16 +335,17 @@ void Plant::spaceColonisation(Branch& _branch, ngl::Vec3& _direction)
 		//Generate a random length, radius and angle to create a random point inside a cone
 		if (m_blueprint->getNodesPerBranch() > 2)
 		{
-		h = generateRandomFloat();
-		r = generateRandomFloat() * h * m_blueprint->getMaxDeviation();
-		alpha = generateRandomFloat() * ngl::TWO_PI;
-		h *= maxLength / m_blueprint->getNodesPerBranch();
+			h = generateRandomFloat();
+			r = generateRandomFloat() * h * m_blueprint->getMaxDeviation();
+			alpha = generateRandomFloat() * ngl::TWO_PI;
+			h *= maxLength / m_blueprint->getNodesPerBranch();
 		}
-		//Don't generata random values as this is a rigid L-system
+		//Don't generata random values for height as this is a rigid L-system
 		else
 		{
 			h = maxLength;
-			r = 0.0f;
+			//If the max deviation > 0, compute a random deviation, otherwise set to 0
+			r = (m_blueprint->getMaxDeviation() > 0) ? generateRandomFloat() * h * m_blueprint->getMaxDeviation() : 0.0f;
 			alpha = 0.0f;
 		}
 

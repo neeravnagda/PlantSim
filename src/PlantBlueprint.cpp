@@ -109,12 +109,12 @@ void PlantBlueprint::readGrammarFromFile(const std::string _filePath)
 	std::string line;//Temp string for each line
 
 	//Set regular expressions for valid characters/numbers
-	QString validCharacters = "([A-Z]|[" + QRegularExpression::escape("+-/\\\\&^") + "]|(\\[)|(\\]))+";
-	QString validNumeric = "(([0-9]+)((\\.)([0-9]+))?)";
+	const QString validCharacters = "([A-Z]|[" + QRegularExpression::escape("+-/\\\\&^") + "]|(\\[)|(\\]))+";
+	const QString validNumeric = "(([0-9]+)((\\.)([0-9]+))?)";
 
 	//Set regular expressions using the format "predecessor=successor,probability" or "predecessor=successor"
-	QString ruleWithProbabilityString = "^(?<predecessor>" + validCharacters + ")\\=(?<successor>" + validCharacters + ")\\,(?<probability>" + validNumeric + ")$";
-	QString ruleWithoutProbabilityString = "^(?<predecessor>" + validCharacters + ")\\=(?<successor>" + validCharacters + ")$";
+	const QString ruleWithProbabilityString = "^(?<predecessor>" + validCharacters + ")\\=(?<successor>" + validCharacters + ")\\,(?<probability>" + validNumeric + ")$";
+	const QString ruleWithoutProbabilityString = "^(?<predecessor>" + validCharacters + ")\\=(?<successor>" + validCharacters + ")$";
 
 	//Create the regular expressions
 	QRegularExpression ruleWithProbability(ruleWithProbabilityString);

@@ -14,7 +14,7 @@
 /// @file PlantBlueprint.h
 /// @brief This class contains data required for Plant objects
 /// @author Neerav Nagda
-/// @version 0.5
+/// @version 1.0
 /// @date 01/04/17
 /// @class PlantBlueprint
 /// @brief This class contains data required for Plant objects

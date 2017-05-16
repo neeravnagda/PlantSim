@@ -28,7 +28,7 @@ PlantBlueprintDialog::PlantBlueprintDialog(QWidget *parent) :
 	m_ui->m_blueprintName->setValidator(pbNameValidator);
 
 	//Add a validator for L-system grammar text file
-	QString txtFileExp = fileRegExp + "\\.(txt)";	//Must end in .txt
+	const QString txtFileExp = fileRegExp + "\\.(txt)";	//Must end in .txt
 	QRegularExpression txtFileRegExp(txtFileExp);
 	QRegularExpressionValidator *txtFileValidator = new QRegularExpressionValidator(txtFileRegExp, this);
 	m_ui->m_grammarFilePath->setValidator(txtFileValidator);
@@ -36,11 +36,11 @@ PlantBlueprintDialog::PlantBlueprintDialog(QWidget *parent) :
 	//Add a validator for the L-system axiom
 	//Manual nested branches are used as it is difficult to implement with regular expressions. This uses a maximum of 3 nested branches
 	//This checks for empty brackets and bracket completion
-	QString validCharacters = "([A-Z]*[" + QRegularExpression::escape("+-/\\\\&^") + "]*)*";
-	QString branch = "(\\[(" + validCharacters + ")+\\])*";
-	QString nest2 = "(\\[(" + validCharacters + branch + ")+\\])*";
-	QString nest3 = "(\\[(" + validCharacters + nest2 + ")+\\])*";
-	QString axiomPattern = "(" + validCharacters + nest3 + ")+";
+	const QString validCharacters = "([A-Z]*[" + QRegularExpression::escape("+-/\\\\&^") + "]*)*";
+	const QString branch = "(\\[(" + validCharacters + ")+\\])*";
+	const QString nest2 = "(\\[(" + validCharacters + branch + ")+\\])*";
+	const QString nest3 = "(\\[(" + validCharacters + nest2 + ")+\\])*";
+	const QString axiomPattern = "(" + validCharacters + nest3 + ")+";
 	QRegularExpression axiomRegExp(axiomPattern);
 	QRegularExpressionValidator *axiomValidator = new QRegularExpressionValidator(axiomRegExp, this);
 	m_ui->m_axiom->setValidator(axiomValidator);
@@ -197,8 +197,8 @@ bool PlantBlueprintDialog::checkFileExists(QString _fileName)
 void PlantBlueprintDialog::setMaxLeavesStartDepth()
 {
 	//Get the values from the UI
-	int ld = m_ui->m_leavesStartDepth->value();
-	int md = m_ui->m_maxDepth->value();
+	const int ld = m_ui->m_leavesStartDepth->value();
+	const int md = m_ui->m_maxDepth->value();
 
 	//Set the upper limit
 	m_ui->m_leavesStartDepth->setMaximum(md);
