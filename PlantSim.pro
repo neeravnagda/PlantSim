@@ -50,7 +50,7 @@ HEADERS+= include/NGLScene.h \
     include/PlantBlueprintDialog.h \
     include/SceneManagerDialog.h
 
-# add the readme, glsl shader files and rules
+# add the readme, glsl shader files and presets
 OTHER_FILES+= README.md \
 		shaders/BlinnPhong.fragment.glsl \
 		shaders/BlinnPhong.vertex.glsl \

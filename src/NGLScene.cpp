@@ -20,9 +20,9 @@ void NGLScene::initialisePresets()
 {
 	//Rigid L-system. This has no space colonisation or tropisms
 	{
-		PlantBlueprint *pb = PlantBlueprint::instance("RigidLSystem");
+		PlantBlueprint *pb = PlantBlueprint::instance("LSystemClone");
 		pb->setAxiom("FFA");
-		pb->readGrammarFromFile("presets/RigidLSystem.txt");
+		pb->readGrammarFromFile("presets/LSystemClone.txt");
 		pb->setDecay(1.5f);
 		pb->setDrawAngle(45);
 		pb->setDrawLength(0.7f);
