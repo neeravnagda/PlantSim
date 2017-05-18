@@ -240,15 +240,11 @@ void Plant::stringRewrite()
 		{
 			if(r.m_predecessor == m_string.substr(i,r.m_predecessor.length()))//Check if a substring matches the rule predecessor
 			{
-				//Only calculate a random number if the probability is not 1
-				if( (r.m_probability == 1.0f) || (r.m_probability > generateRandomFloat()) )
-				{
-					newString += r.m_successor;//Add the replaced rule
-					i += r.m_predecessor.length() - 1;//Iterate further through the original string if predecessor length > 1 char
-					isReplaced = true;
-					//Add new branches to the container
-					addBranches(countCharInString(r.m_successor, '['), branchCount);
-				}
+				newString += r.m_successor;//Add the replaced rule
+				i += r.m_predecessor.length() - 1;//Iterate further through the original string if predecessor length > 1 char
+				isReplaced = true;
+				//Add new branches to the container
+				addBranches(countCharInString(r.m_successor, '['), branchCount);
 				break;//Avoid checking other rules
 			}
 		}

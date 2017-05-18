@@ -23,16 +23,11 @@ typedef struct ProductionRule
 		//----------------------------------------------------------------------------------------------------------------------
 		std::string m_successor;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief The probability of replacing the predecessor with the successor
-		//----------------------------------------------------------------------------------------------------------------------
-		float m_probability;
-		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Constructor
 		//----------------------------------------------------------------------------------------------------------------------
-		ProductionRule(std::string _predecessor, std::string _successor, float _probability) :
+		ProductionRule(std::string _predecessor, std::string _successor) :
 			m_predecessor(_predecessor),
-			m_successor(_successor),
-			m_probability(_probability){}
+			m_successor(_successor){}
 } ProductionRule;
 
 #endif // PRODUCTIONRULE_H_

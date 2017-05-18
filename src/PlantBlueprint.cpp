@@ -110,15 +110,12 @@ void PlantBlueprint::readGrammarFromFile(const std::string _filePath)
 
 	//Set regular expressions for valid characters/numbers
 	const QString validCharacters = "([A-Z]|[" + QRegularExpression::escape("+-/\\\\&^") + "]|(\\[)|(\\]))+";
-	const QString validNumeric = "(([0-9]+)((\\.)([0-9]+))?)";
 
 	//Set regular expressions using the format "predecessor=successor,probability" or "predecessor=successor"
-	const QString ruleWithProbabilityString = "^(?<predecessor>" + validCharacters + ")\\=(?<successor>" + validCharacters + ")\\,(?<probability>" + validNumeric + ")$";
-	const QString ruleWithoutProbabilityString = "^(?<predecessor>" + validCharacters + ")\\=(?<successor>" + validCharacters + ")$";
+	const QString ruleString = "^(?<predecessor>" + validCharacters + ")\\=(?<successor>" + validCharacters + ")$";
 
 	//Create the regular expressions
-	QRegularExpression ruleWithProbability(ruleWithProbabilityString);
-	QRegularExpression ruleWithoutProbability(ruleWithoutProbabilityString);
+	QRegularExpression rule(ruleString);
 
 	//Add the rules, one line at a time
 	while (std::getline(fileIn,line))
@@ -129,37 +126,18 @@ void PlantBlueprint::readGrammarFromFile(const std::string _filePath)
 		//Create variables for adding to the container
 		std::string predecessorValue;
 		std::string successorValue;
-		float probabilityValue = 1.0f;
 
 		//Use expression matching to split the string
 		QString qLine = QString::fromStdString(line);
 		//Check for rule with probability
-		QRegularExpressionMatch match = ruleWithProbability.match(qLine);
+		QRegularExpressionMatch match = rule.match(qLine);
 		if (match.hasMatch())
 		{
 			predecessorValue = match.captured("predecessor").toStdString();
 			successorValue = match.captured("successor").toStdString();
-			probabilityValue = match.captured("probability").toFloat();
 		}
-		//Check for rule without probability
-		else
-		{
-			match = ruleWithoutProbability.match(qLine);
-			if (match.hasMatch())
-			{
-				predecessorValue = match.captured("predecessor").toStdString();
-				successorValue = match.captured("successor").toStdString();
-				probabilityValue = 1.0f;
-			}
-			//The rule was invalid so don't add this line
-			else
-			{
-				continue;
-			}
-		}
-
 		//Construct the rule in the container
-		m_productionRules.emplace_back(predecessorValue,successorValue,probabilityValue);
+		m_productionRules.emplace_back(predecessorValue,successorValue);
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
