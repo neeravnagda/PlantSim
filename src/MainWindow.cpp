@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 	//Initialise the UI and OpenGL widget (NGLScene)
 	m_ui->setupUi(this);
-	m_gl = new NGLScene(this);
+	m_gl = new PlantScene(this);
 
 	//Position the OpenGL widget
 	m_ui->s_mainWindowGridLayout->addWidget(m_gl,0,0,3,1);

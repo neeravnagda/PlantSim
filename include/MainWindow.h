@@ -3,7 +3,7 @@
 
 #include <QKeyEvent>
 #include <QMainWindow>
-#include "NGLScene.h"
+#include "PlantScene.h"
 #include "PlantBlueprintDialog.h"
 #include "SceneManagerDialog.h"
 
@@ -97,7 +97,7 @@ class MainWindow : public QMainWindow
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief OpenGL widget
 		//----------------------------------------------------------------------------------------------------------------------
-		NGLScene *m_gl;
+		PlantScene *m_gl;
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Dialog box to create a new Plant Blueprint Instance
 		//----------------------------------------------------------------------------------------------------------------------

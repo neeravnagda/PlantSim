@@ -1,5 +1,5 @@
-#ifndef NGLSCENE_H_
-#define NGLSCENE_H_
+#ifndef PLANTSCENE_H_
+#define PLANTSCENE_H_
 
 #include <array>
 #include <string>
@@ -10,27 +10,27 @@
 #include <QOpenGLWidget>
 #include "Plant.h"
 //----------------------------------------------------------------------------------------------------------------------
-/// @file NGLScene.h
+/// @file PlantScene.h
 /// @brief This class is a widget in the MainWindow and draws the plants
 /// @author Neerav Nagda
 /// @version 1.0
 /// @date 10/05/17
-/// @class NGLScene
+/// @class PlantScene
 /// @brief OpenGL widget to handle drawing of plants
 //----------------------------------------------------------------------------------------------------------------------
 
-class NGLScene : public QOpenGLWidget
+class PlantScene : public QOpenGLWidget
 {
 	public:
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief constructor
 		/// @param _parent The parent window to the class
 		//----------------------------------------------------------------------------------------------------------------------
-		NGLScene(QWidget *_parent);
+		PlantScene(QWidget *_parent);
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief destructor
 		//----------------------------------------------------------------------------------------------------------------------
-		~NGLScene();
+		~PlantScene();
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief the initialize class is called once when the window is created and we have a valid GL context
 		/// use this to setup any default GL stuff
@@ -131,4 +131,4 @@ class NGLScene : public QOpenGLWidget
 		void wheelEvent( QWheelEvent *_event) override;
 };
 
-#endif
+#endif // PLANTSCENE_H_

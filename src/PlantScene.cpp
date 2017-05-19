@@ -3,10 +3,10 @@
 #include <ngl/NGLInit.h>
 #include <ngl/ShaderLib.h>
 #include <ngl/VAOPrimitives.h>
-#include "NGLScene.h"
+#include "PlantScene.h"
 #include "PlantBlueprint.h"
 //----------------------------------------------------------------------------------------------------------------------
-NGLScene::NGLScene(QWidget *_parent) : QOpenGLWidget(_parent)
+PlantScene::PlantScene(QWidget *_parent) : QOpenGLWidget(_parent)
 {
 	// re-size the widget to that of the parent (in this case the GLFrame passed in on construction)
 	setFocus();
@@ -14,9 +14,9 @@ NGLScene::NGLScene(QWidget *_parent) : QOpenGLWidget(_parent)
 	initialisePresets();
 }
 //----------------------------------------------------------------------------------------------------------------------
-NGLScene::~NGLScene(){}
+PlantScene::~PlantScene(){}
 //----------------------------------------------------------------------------------------------------------------------
-void NGLScene::initialisePresets()
+void PlantScene::initialisePresets()
 {
 	//Rigid L-system. This has no space colonisation or tropisms
 	{
@@ -76,7 +76,7 @@ void NGLScene::initialisePresets()
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
-void NGLScene::updatePlants()
+void PlantScene::updatePlants()
 {
 	//Update all plant simulations
 	for (Plant &p : m_plants)
@@ -87,32 +87,32 @@ void NGLScene::updatePlants()
 	update();
 }
 //----------------------------------------------------------------------------------------------------------------------
-void NGLScene::createPlant(std::string _type, float _x, float _z)
+void PlantScene::createPlant(std::string _type, float _x, float _z)
 {
 	ngl::Vec3 pos(_x,0.0f,_z);
 	m_plants.emplace_back(_type, pos);
 	update();
 }
 //----------------------------------------------------------------------------------------------------------------------
-void NGLScene::setPlantVisibility(unsigned _index, bool _state)
+void PlantScene::setPlantVisibility(unsigned _index, bool _state)
 {
 	m_plants[_index].setVisibility(_state);
 	update();
 }
 //----------------------------------------------------------------------------------------------------------------------
-void NGLScene::deletePlant(unsigned _index)
+void PlantScene::deletePlant(unsigned _index)
 {
 	m_plants.erase(m_plants.begin() + _index);
 	update();
 }
 //----------------------------------------------------------------------------------------------------------------------
-void NGLScene::resizeGL(int _w , int _h)
+void PlantScene::resizeGL(int _w , int _h)
 {
 	//Set the camera and window parameters
 	m_camera.setShape(45, static_cast<float>(width())/height(), 0.001f, 60.0f);
 }
 //----------------------------------------------------------------------------------------------------------------------
-void NGLScene::initializeGL()
+void PlantScene::initializeGL()
 {
 	QWidget::setFocusPolicy(Qt::StrongFocus);//Set keyboard focus
 	ngl::NGLInit::instance();//Initialise the ngl library
@@ -130,8 +130,8 @@ void NGLScene::initializeGL()
 	PlantBlueprint::init();
 
 	//Initialise the camera
-	m_camera.set(ngl::Vec3(0.0f, 0.6f, 1.6f),//from
-							 ngl::Vec3::zero(),//to
+	m_camera.set(ngl::Vec3(0.0f, 0.5f, 3.0f),//from
+							 ngl::Vec3(0.0f, 0.5f, 0.0f),//to
 							 ngl::Vec3::up());//up
 	m_camera.setShape(45, static_cast<float>(width())/height(), 0.001f, 60.0f);
 
@@ -152,7 +152,7 @@ void NGLScene::initializeGL()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 //----------------------------------------------------------------------------------------------------------------------
-void NGLScene::drawScene()
+void PlantScene::drawScene()
 {
 	//Calculate the matrices for the ground plane
 	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
@@ -185,7 +185,7 @@ void NGLScene::drawScene()
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
-void NGLScene::paintGL()
+void PlantScene::paintGL()
 {
 	// clear the screen and depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -193,7 +193,7 @@ void NGLScene::paintGL()
 	drawScene();	//Draw the ground plane then call each Plant draw call
 }
 //----------------------------------------------------------------------------------------------------------------------
-void NGLScene::keyPressEvent(QKeyEvent *_event)
+void PlantScene::keyPressEvent(QKeyEvent *_event)
 {
 	switch (_event->key()) {
 		//WASD movement
@@ -257,8 +257,8 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
 		//Reset the camera
 		case Qt::Key_Space:
 		{
-			m_camera.set(ngl::Vec3(0.0f, 0.6f, 1.6f),//from
-									 ngl::Vec3::zero(),//to
+			m_camera.set(ngl::Vec3(0.0f, 0.5f, 3.0f),//from
+									 ngl::Vec3(0.0f, 0.5f, 0.0f),//to
 									 ngl::Vec3::up());//up
 			break;
 		}
@@ -267,7 +267,7 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
 	update();
 }
 //----------------------------------------------------------------------------------------------------------------------
-void NGLScene::mouseMoveEvent( QMouseEvent* _event )
+void PlantScene::mouseMoveEvent( QMouseEvent* _event )
 {
 	//Rotate the camera
 	if ( m_rotate && _event->buttons() == Qt::LeftButton )
@@ -297,7 +297,7 @@ void NGLScene::mouseMoveEvent( QMouseEvent* _event )
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
-void NGLScene::mousePressEvent( QMouseEvent* _event )
+void PlantScene::mousePressEvent( QMouseEvent* _event )
 {
 	//Set the rotation flag to true
 	if ( _event->button() == Qt::LeftButton )
@@ -308,7 +308,7 @@ void NGLScene::mousePressEvent( QMouseEvent* _event )
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
-void NGLScene::mouseReleaseEvent( QMouseEvent* _event )
+void PlantScene::mouseReleaseEvent( QMouseEvent* _event )
 {
 	//Set the rotation flag to false
 	if ( _event->button() == Qt::LeftButton )
@@ -317,7 +317,7 @@ void NGLScene::mouseReleaseEvent( QMouseEvent* _event )
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
-void NGLScene::wheelEvent( QWheelEvent* _event )
+void PlantScene::wheelEvent( QWheelEvent* _event )
 {
 	//Calculate a direction vector
 	ngl::Vec4 moveDirection = m_camera.getEye() - m_camera.getLook();

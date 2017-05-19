@@ -31,22 +31,23 @@ CONFIG-=app_bundle
 
 # add .cpp files
 SOURCES+= src/main.cpp \
-	  src/NGLScene.cpp \
     src/Plant.cpp \
     src/PlantBlueprint.cpp \
     src/MainWindow.cpp \
     src/PlantBlueprintDialog.cpp \
-    src/SceneManagerDialog.cpp
+    src/SceneManagerDialog.cpp \
+    src/PlantScene.cpp
 
 # add .h files
-HEADERS+= include/NGLScene.h \
+HEADERS+= \
     include/Branch.h \
     include/ProductionRule.h \
     include/Plant.h \
     include/PlantBlueprint.h \
     include/MainWindow.h \
     include/PlantBlueprintDialog.h \
-    include/SceneManagerDialog.h
+    include/SceneManagerDialog.h \
+    include/PlantScene.h
 
 # add the readme, glsl shader files and presets
 OTHER_FILES+= README.md \
