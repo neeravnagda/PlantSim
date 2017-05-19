@@ -35,16 +35,20 @@ out vec3 halfVector;
 //----------------------------------------------------------------------------------------------------------------------
 void main(void)
 {
+	//Scale the UV coordinates if the object needs to tile the texture
 	uvCoord = inUV * texScale;
 
+	//Calculate the eye direction
 	vec4 worldPosition = M * vec4(inVert, 1.0f);
 	eyeDirection = normalize(viewerPos - worldPosition.xyz);
 
 	//Calculate the vertex position
 	gl_Position = MVP * vec4(inVert, 1.0f);
+
 	//Calculate the fragment position
 	vec4 eyePos = MV * vec4(inVert,1.0f);
 	fragPos = eyePos.xyz / eyePos.w;
+
 	//Calculate the fragment normal
 	fragNormal = normalize(N * inNormal);
 

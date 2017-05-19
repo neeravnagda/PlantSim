@@ -18,13 +18,13 @@ in vec3 halfVector;
 /// @brief the texture
 //----------------------------------------------------------------------------------------------------------------------
 uniform sampler2D tex;
+vec4 diffuseColour = texture(tex, uvCoord);
 //----------------------------------------------------------------------------------------------------------------------
 /// @struct LightInfo
 /// @brief a structure to hold light parameters
 //----------------------------------------------------------------------------------------------------------------------
 struct LightInfo
 {
-	bool isActive;
 	vec3 Position;//World position of the light
 	vec3 La;//Ambient light intensity
 	vec3 Ld;//Diffuse light intensity
@@ -34,7 +34,6 @@ struct LightInfo
 /// @brief the sunlight
 //----------------------------------------------------------------------------------------------------------------------
 uniform LightInfo Sun = LightInfo(
-			true,
 			vec3(0.0f, 100.0f, 0.0f),
 			vec3(0.5f),
 			vec3(1.0f),
@@ -63,34 +62,32 @@ uniform MaterialInfo Material = MaterialInfo(
 /// @brief calculate the light contribution of one light
 /// @param _diffuseColour The diffuse colour from the texture
 //----------------------------------------------------------------------------------------------------------------------
-vec3 calculateLightContribution(in vec3 _diffuseColour)
+vec3 calculateLightContribution()
 {
 	float lambertTerm = dot(fragNormal, sunDirection);
-	if (lambertTerm > 0)
+	if (lambertTerm > 0)//This is the amount of diffuse contribution
 	{
 		//Light vector
 		vec3 s = Sun.Position - fragPos;
 		//Normal dot Half-vector
 		float NdotH = max(dot(fragNormal, halfVector),0.0f);
-
+		//Calculate the ambient diffuse and specular components
 		vec3 ambient = Sun.La * Material.Ka;
-		vec3 diffuse = Sun.Ld * Material.Kd * _diffuseColour * lambertTerm;
-		vec3 specular = Sun.Ls * Material.Ks * _diffuseColour * pow(NdotH, Material.Shininess);
+		vec3 diffuse = Sun.Ld * Material.Kd * diffuseColour.rgb * lambertTerm;
+		vec3 specular = Sun.Ls * Material.Ks * diffuseColour.rgb * pow(NdotH, Material.Shininess);
 
-		return ambient + diffuse + specular;
+		return ambient + diffuse + specular;//The final colour
 	}
-	else return vec3(0,0,0);
+	else return vec3(0,0,0);//No diffuse contribution so set to black
 }
 //----------------------------------------------------------------------------------------------------------------------
 void main(void)
 {
-	vec4 diffuseColour = texture(tex, uvCoord);
-
-	if (diffuseColour.w == 0.0f)
+	if (diffuseColour.w == 0.0f)//Discard fragments with zero alpha
 	{
 		discard;
 	}
-	vec3 totalColour = calculateLightContribution(diffuseColour.xyz);
+	vec3 totalColour = calculateLightContribution();
 
 	fragColour = vec4(totalColour,1.0f);
 }
