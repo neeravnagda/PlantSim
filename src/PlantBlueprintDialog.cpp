@@ -83,7 +83,7 @@ bool PlantBlueprintDialog::createPlantBlueprint()
 	pb->setLeavesPerBranch(static_cast<unsigned>(m_ui->m_leafCount->value()));
 	pb->setLeavesStartDepth(static_cast<unsigned>(m_ui->m_leavesStartDepth->value()));
 	pb->setLeafScale(static_cast<float>(m_ui->m_leafScale->value()));
-	pb->setNodesPerBranch(m_ui->m_numNodes->value());
+	pb->setControlPointsPerBranch(static_cast<unsigned>(m_ui->m_numControlPoints->value()));
 	pb->setPhototropismScaleFactor(static_cast<float>(m_ui->m_phototropismScaleFactor->value()));
 	pb->setGravitropismScaleFactor(static_cast<float>(m_ui->m_gravitropismScaleFactor->value()));
 
@@ -93,7 +93,7 @@ bool PlantBlueprintDialog::createPlantBlueprint()
 void PlantBlueprintDialog::checkBlueprintExists()
 {
 	QPalette palette = c_defaultPalette;
-	auto check = PlantBlueprint::getKeys().find(m_ui->m_blueprintName->text().toStdString());
+	auto check = PlantBlueprint::keys().find(m_ui->m_blueprintName->text().toStdString());
 
 	//Set text to default (black) if empty
 	if (m_ui->m_blueprintName->text().length() == 0)
@@ -102,7 +102,7 @@ void PlantBlueprintDialog::checkBlueprintExists()
 	}
 
 	//Set text to green if OK
-	else if (check == PlantBlueprint::getKeys().end())
+	else if (check == PlantBlueprint::keys().end())
 	{
 		palette.setColor(QPalette::Text, Qt::green);
 		m_validationChecks[VALIDATION::BLUEPRINTNAME] = true;

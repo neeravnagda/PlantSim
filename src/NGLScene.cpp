@@ -31,7 +31,7 @@ void NGLScene::initialisePresets()
 		pb->setLeavesPerBranch(30);
 		pb->setLeavesStartDepth(2);
 		pb->setLeafScale(0.05f);
-		pb->setNodesPerBranch(2);
+		pb->setControlPointsPerBranch(2);
 		pb->setRootRadius(0.1f);
 		pb->setPhototropismScaleFactor(0.00f);
 		pb->setGravitropismScaleFactor(0.0f);
@@ -50,7 +50,7 @@ void NGLScene::initialisePresets()
 		pb->setLeavesPerBranch(0);
 		pb->setLeavesStartDepth(0);
 		pb->setLeafScale(0.03f);
-		pb->setNodesPerBranch(8);
+		pb->setControlPointsPerBranch(8);
 		pb->setRootRadius(0.05f);
 		pb->setPhototropismScaleFactor(0.0f);
 		pb->setGravitropismScaleFactor(0.0f);
@@ -69,7 +69,7 @@ void NGLScene::initialisePresets()
 		pb->setLeavesPerBranch(30);
 		pb->setLeavesStartDepth(3);
 		pb->setLeafScale(0.03f);
-		pb->setNodesPerBranch(6);
+		pb->setControlPointsPerBranch(6);
 		pb->setRootRadius(0.04f);
 		pb->setPhototropismScaleFactor(0.005f);
 		pb->setGravitropismScaleFactor(0.0f);
@@ -194,7 +194,7 @@ void NGLScene::drawScene()
 	//Draw the plants if visible
 	for (Plant &p : m_plants)
 	{
-		if (p.getVisibility()) p.draw(m_mouseGlobalTX, m_camera.getViewMatrix(), m_camera.getProjectionMatrix());
+		if (p.visibility()) p.draw(m_mouseGlobalTX, m_camera.getViewMatrix(), m_camera.getProjectionMatrix());
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------

@@ -104,10 +104,10 @@ class PlantBlueprint
 		//----------------------------------------------------------------------------------------------------------------------
 		void setLeafScale(float _scale){m_leafScale = _scale;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Set function for m_leavesPerBranch
-		/// @param _numLeaves New number of leaves per branch
+		/// @brief Set function for m_controlPointsPerBranch
+		/// @param _numControlPoints New number of leaves per branch
 		//----------------------------------------------------------------------------------------------------------------------
-		void setNodesPerBranch(unsigned _numNodes){m_nodesPerBranch = _numNodes;}
+		void setControlPointsPerBranch(unsigned _numControlPoints){m_controlPointsPerBranch = _numControlPoints;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Set function for m_maxDeviation
 		/// @param _deviation New max deviation for space colonisation
@@ -127,89 +127,89 @@ class PlantBlueprint
 		/// @brief Get function for m_axiom
 		/// @return Reference of the axiom for the L-system
 		//----------------------------------------------------------------------------------------------------------------------
-		const std::string& getAxiom() const {return m_axiom;}
+		const std::string& axiom() const {return m_axiom;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_maxDepth
 		/// @return Reference of the max depth of the L-system
 		//----------------------------------------------------------------------------------------------------------------------
-		const unsigned& getMaxDepth() const {return m_maxDepth;}
+		const unsigned& maxDepth() const {return m_maxDepth;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_productionRules
 		/// @return Reference to the container of Production Rules
 		//----------------------------------------------------------------------------------------------------------------------
-		const std::vector<ProductionRule>& getProductionRules() const {return m_productionRules;}
+		const std::vector<ProductionRule>& productionRules() const {return m_productionRules;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_drawLength
 		/// @return Reference to the draw length
 		//----------------------------------------------------------------------------------------------------------------------
-		const float& getDrawLength() const {return m_drawLength;}
+		const float& drawLength() const {return m_drawLength;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_drawAngle
 		/// @return Reference to the draw angle
 		//----------------------------------------------------------------------------------------------------------------------
-		const float& getDrawAngle() const {return m_drawAngle;}
+		const float& drawAngle() const {return m_drawAngle;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_rootRadius
 		/// @return Reference to the initial radius
 		//----------------------------------------------------------------------------------------------------------------------
-		const float& getRootRadius() const {return m_rootRadius;}
+		const float& rootRadius() const {return m_rootRadius;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_decayConstant
 		/// @return The decay constant
 		//----------------------------------------------------------------------------------------------------------------------
-		const float& getDecayConstant() const {return m_decayConstant;}
+		const float& decayConstant() const {return m_decayConstant;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_leavesPerBranch
 		/// @return The number of leaves per branch
 		//----------------------------------------------------------------------------------------------------------------------
-		const unsigned& getLeavesPerBranch() const {return m_leavesPerBranch;}
+		const unsigned& leavesPerBranch() const {return m_leavesPerBranch;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_leavesStartDepth
 		/// @return The depth when leaves start to appear
 		//----------------------------------------------------------------------------------------------------------------------
-		const unsigned& getLeavesStartDepth() const {return m_leavesStartDepth;}
+		const unsigned& leavesStartDepth() const {return m_leavesStartDepth;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_leafScale
 		/// @return The scale of the leaves
 		//----------------------------------------------------------------------------------------------------------------------
-		const float& getLeafScale() const {return m_leafScale;}
+		const float& leafScale() const {return m_leafScale;}
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief Get function for m_leavesPerBranch
-		/// @return The number of leaves per branch
+		/// @brief Get function for m_controlPointsPerBranch
+		/// @return The number of control points per branch
 		//----------------------------------------------------------------------------------------------------------------------
-		const unsigned& getNodesPerBranch() const {return m_nodesPerBranch;}
+		const unsigned& controlPointsPerBranch() const {return m_controlPointsPerBranch;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_maxDeviation
 		/// @return The maximum deviation for space colonisation
 		//----------------------------------------------------------------------------------------------------------------------
-		const float& getMaxDeviation() const {return m_maxDeviation;}
+		const float& maxDeviation() const {return m_maxDeviation;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_phototropismScaleFactor
 		/// @return The phototropism scale factor
 		//----------------------------------------------------------------------------------------------------------------------
-		const float& getPhototropismScaleFactor() const {return m_phototropismScaleFactor;}
+		const float& phototropismScaleFactor() const {return m_phototropismScaleFactor;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for m_gravitropismScaleFactor
 		/// @return The gravitropism scale factor
 		//----------------------------------------------------------------------------------------------------------------------
-		const float& getGravitropismScaleFactor() const {return m_gravitropismScaleFactor;}
+		const float& gravitropismScaleFactor() const {return m_gravitropismScaleFactor;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for s_keys
 		/// @return Reference to the keys of the map, i.e. the names of the instances
 		/// This is used for the UI
 		//----------------------------------------------------------------------------------------------------------------------
-		static const std::unordered_set<std::string>& getKeys(){return s_keys;}
+		static const std::unordered_set<std::string>& keys(){return s_keys;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for the shader name
 		/// @return Reference to the shader name
 		/// This is needed for draw calls
 		//----------------------------------------------------------------------------------------------------------------------
-		static const std::string& getShaderName(){return s_shaderProgramName;}
+		static const std::string& shaderName(){return s_shaderProgramName;}
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Get function for the sun position
 		/// @return Reference to the sun position
 		//----------------------------------------------------------------------------------------------------------------------
-		static const ngl::Vec3& getSunPosition(){return s_sunPosition;}
+		static const ngl::Vec3& sunPosition(){return s_sunPosition;}
 
 	protected:
 		//----------------------------------------------------------------------------------------------------------------------
@@ -295,9 +295,9 @@ class PlantBlueprint
 		//----------------------------------------------------------------------------------------------------------------------
 		float m_leafScale;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief The number of leaves in a branch
+		/// @brief The number of control points in a branch
 		//----------------------------------------------------------------------------------------------------------------------
-		unsigned m_nodesPerBranch;
+		unsigned m_controlPointsPerBranch;
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief The maximum deviation of nodes for space colonisation
 		//----------------------------------------------------------------------------------------------------------------------

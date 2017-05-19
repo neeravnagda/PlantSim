@@ -44,7 +44,7 @@ class SceneManagerDialog : public QDialog
 		/// @brief Get function for the UI
 		/// @return The UI
 		//----------------------------------------------------------------------------------------------------------------------
-		const Ui::SceneManagerDialog& getUI() {return *m_ui;}
+		const Ui::SceneManagerDialog& Ui() {return *m_ui;}
 
 	signals:
 		//----------------------------------------------------------------------------------------------------------------------

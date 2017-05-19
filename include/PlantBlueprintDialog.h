@@ -41,7 +41,7 @@
 				/// @brief Get function for the UI
 				/// @return Reference to the UI in this class
 				//----------------------------------------------------------------------------------------------------------------------
-				const Ui::PlantBlueprintDialog& getUI() {return *m_ui;}
+				const Ui::PlantBlueprintDialog& Ui() {return *m_ui;}
 				//----------------------------------------------------------------------------------------------------------------------
 				/// @brief Create a new instance of the Plant Blueprint
 				/// @return Status if a new Plant Blueprint was created

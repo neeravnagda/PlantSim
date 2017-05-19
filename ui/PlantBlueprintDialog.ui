@@ -81,7 +81,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-476</y>
         <width>581</width>
         <height>962</height>
        </rect>
@@ -401,14 +401,14 @@
            </widget>
           </item>
           <item row="2" column="0" colspan="2">
-           <widget class="QLabel" name="s_numNodesLabel">
+           <widget class="QLabel" name="s_numControlPointsLabel">
             <property name="text">
-             <string>Number of nodes per branch</string>
+             <string>Number of control points per branch</string>
             </property>
            </widget>
           </item>
           <item row="3" column="0" colspan="2">
-           <widget class="QSpinBox" name="m_numNodes">
+           <widget class="QSpinBox" name="m_numControlPoints">
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of nodes in a branch. Set to 2 for a rigid L-system.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>

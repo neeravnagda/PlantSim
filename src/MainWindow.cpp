@@ -35,14 +35,14 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(m_ui->m_plantType, SIGNAL(currentIndexChanged(int)), this, SLOT(openPlantBlueprintDialogFromUI()));
 	connect(m_ui->s_newPlantBlueprint, SIGNAL(triggered(bool)), this, SLOT(openPlantBlueprintDialogFromMenubar()));
 	//Close the Plant Blueprint dialog
-	connect(m_plantBlueprintDialog->getUI().m_cancel, SIGNAL(released()), this, SLOT(closePlantBlueprintDialog()));
+	connect(m_plantBlueprintDialog->Ui().m_cancel, SIGNAL(released()), this, SLOT(closePlantBlueprintDialog()));
 	//Create a new Plant Blueprint
-	connect(m_plantBlueprintDialog->getUI().m_create, SIGNAL(released()), this, SLOT(createPlantBlueprint()));
+	connect(m_plantBlueprintDialog->Ui().m_create, SIGNAL(released()), this, SLOT(createPlantBlueprint()));
 	//Open the scene manager
 	connect(m_ui->s_sceneManagerMenuButton, SIGNAL(triggered(bool)), this, SLOT(openSceneManager()));
 	connect(m_ui->m_sceneManagerButton, SIGNAL(released()), this, SLOT(openSceneManager()));
 	//Close the scene manager
-	connect(m_sceneManagerDialog->getUI().m_closeButton, SIGNAL(released()), this, SLOT(closeSceneManager()));
+	connect(m_sceneManagerDialog->Ui().m_closeButton, SIGNAL(released()), this, SLOT(closeSceneManager()));
 	//Set the plant visibility
 	connect(m_sceneManagerDialog, SIGNAL(plantVisibility(uint,bool)), this, SLOT(setPlantVisibility(uint,bool)));
 
@@ -50,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	//m_ui->m_plantType->addItem("test");
 
 	//Add all the names of the instances of PlantBlueprint
-	for (std::string s : PlantBlueprint::getKeys())
+	for (std::string s : PlantBlueprint::keys())
 	{
 		m_ui->m_plantType->addItem(QString::fromStdString(s));
 	}
@@ -126,7 +126,7 @@ void MainWindow::createPlantBlueprint()
 	{
 		closePlantBlueprintDialog();
 		//Update the blueprint names
-		for (std::string s : PlantBlueprint::getKeys())
+		for (std::string s : PlantBlueprint::keys())
 		{
 			//Check if the item does not exist before adding it
 			if (m_ui->m_plantType->findText(QString::fromStdString(s)) == -1)
