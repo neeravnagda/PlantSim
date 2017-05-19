@@ -32,7 +32,6 @@ CONFIG-=app_bundle
 # add .cpp files
 SOURCES+= src/main.cpp \
 	  src/NGLScene.cpp \
-	  src/NGLSceneMouseControls.cpp \
     src/Plant.cpp \
     src/PlantBlueprint.cpp \
     src/MainWindow.cpp \
@@ -41,7 +40,6 @@ SOURCES+= src/main.cpp \
 
 # add .h files
 HEADERS+= include/NGLScene.h \
-	  include/WindowParams.h \
     include/Branch.h \
     include/ProductionRule.h \
     include/Plant.h \

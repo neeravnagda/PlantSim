@@ -9,11 +9,9 @@
 #include <ngl/Vec3.h>
 #include <QOpenGLWidget>
 #include "Plant.h"
-#include "WindowParams.h"
 //----------------------------------------------------------------------------------------------------------------------
 /// @file NGLScene.h
 /// @brief This class is a widget in the MainWindow and draws the plants
-/// @author Jonathan Macey
 /// @author Neerav Nagda
 /// @version 1.0
 /// @date 10/05/17
@@ -72,19 +70,6 @@ class NGLScene : public QOpenGLWidget
 
 	private:
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief windows parameters for mouse control etc.
-		//----------------------------------------------------------------------------------------------------------------------
-		WinParams m_win;
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief position for our model
-		/// Since there is more than one model, this acts as the position to rotate around for mouse rotation
-		//----------------------------------------------------------------------------------------------------------------------
-		ngl::Vec3 m_modelPos;
-		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief used to store global mouse transforms
-		//----------------------------------------------------------------------------------------------------------------------
-		ngl::Mat4 m_mouseGlobalTX;
-		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief the camera
 		//----------------------------------------------------------------------------------------------------------------------
 		ngl::Camera m_camera;
@@ -96,6 +81,19 @@ class NGLScene : public QOpenGLWidget
 		/// @brief Ground Texture ID for draw calls
 		//----------------------------------------------------------------------------------------------------------------------
 		GLuint m_groundTexture;
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Last x position
+		//----------------------------------------------------------------------------------------------------------------------
+		int m_origX = 0;
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Last y position
+		//----------------------------------------------------------------------------------------------------------------------
+		int m_origY = 0;
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Mouse rotation flag
+		//----------------------------------------------------------------------------------------------------------------------
+		bool m_rotate = false;
+
 
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Draw the ground plane and the plants in the scene
@@ -107,26 +105,28 @@ class NGLScene : public QOpenGLWidget
 		//----------------------------------------------------------------------------------------------------------------------
 		void initialisePresets();
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief this method is called every time a mouse is moved
-		/// @param _event the Qt Event structure
+		/// @brief Move the camera
+		/// @param _event Qt Key Event
+		//----------------------------------------------------------------------------------------------------------------------
+		void keyPressEvent(QKeyEvent *_event);
+		//----------------------------------------------------------------------------------------------------------------------
+		/// @brief Move the camera if left clicked
+		/// @param _event Qt Event
 		//----------------------------------------------------------------------------------------------------------------------
 		void mouseMoveEvent (QMouseEvent * _event ) override;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief this method is called everytime the mouse button is pressed
-		/// inherited from QObject and overridden here.
-		/// @param _event the Qt Event structure
+		/// @brief This checks which button is pressed
+		/// @param _event Qt Event
 		//----------------------------------------------------------------------------------------------------------------------
 		void mousePressEvent ( QMouseEvent *_event) override;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief this method is called everytime the mouse button is released
-		/// inherited from QObject and overridden here.
-		/// @param _event the Qt Event structure
+		/// @brief This checks if a button is released
+		/// @param _event Qt Event
 		//----------------------------------------------------------------------------------------------------------------------
 		void mouseReleaseEvent ( QMouseEvent *_event ) override;
 		//----------------------------------------------------------------------------------------------------------------------
-		/// @brief this method is called everytime the mouse wheel is moved
-		/// inherited from QObject and overridden here.
-		/// @param _event the Qt Event structure
+		/// @brief Translate the camera in the current direction
+		/// @param _event Qt Event
 		//----------------------------------------------------------------------------------------------------------------------
 		void wheelEvent( QWheelEvent *_event) override;
 };

@@ -26,11 +26,11 @@ Plant::Plant(const std::string& _blueprint, const ngl::Vec3& _position)
 //----------------------------------------------------------------------------------------------------------------------
 Plant::~Plant(){}
 //----------------------------------------------------------------------------------------------------------------------
-void Plant::loadMatricesToShader(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, const ngl::Mat4 _projectionMatrix) const
+void Plant::loadMatricesToShader(const ngl::Mat4 _viewMatrix, const ngl::Mat4 _projectionMatrix) const
 {
 	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
 	//Create the matrices
-	ngl::Mat4 M = m_transform * _mouseGlobalTX;
+	ngl::Mat4 M = m_transform;
 	ngl::Mat4 MV = M * _viewMatrix;
 	ngl::Mat4 MVP = MV * _projectionMatrix;
 	ngl::Mat3 N = MV;
@@ -77,7 +77,7 @@ ngl::Mat4 Plant::axisAngleRotationMatrix(const float& _angle, const ngl::Vec3& _
 	return rot;
 }
 //----------------------------------------------------------------------------------------------------------------------
-void Plant::draw(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, const ngl::Mat4 _projectionMatrix)
+void Plant::draw(const ngl::Mat4 _viewMatrix, const ngl::Mat4 _projectionMatrix)
 {
 	//Set some initial parameters
 	float decay = 1.0f;
@@ -120,7 +120,7 @@ void Plant::draw(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, c
 			m_transform.m_32 = position.m_z;
 
 			//Load the matrices to the shader and draw the branch part
-			loadMatricesToShader(_mouseGlobalTX, _viewMatrix, _projectionMatrix);
+			loadMatricesToShader(_viewMatrix, _projectionMatrix);
 			PlantBlueprint::drawCylinder();
 		}
 
@@ -151,7 +151,7 @@ void Plant::draw(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, c
 			m_transform.m_32 = b.m_leafPositions[i].m_z;
 
 			//Load the matrices to the shader and draw the leaf
-			loadMatricesToShader(_mouseGlobalTX, _viewMatrix, _projectionMatrix);
+			loadMatricesToShader(_viewMatrix, _projectionMatrix);
 			PlantBlueprint::drawLeaf();
 		}
 		glEnable(GL_CULL_FACE);	//Re-enable face culling for the branches

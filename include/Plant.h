@@ -35,11 +35,10 @@ class Plant
 		~Plant();
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Draw the plant
-		/// @param _mouseGlobalTX The global mouse transformation
 		/// @param _viewMatrix The view matrix from the camera
 		/// @param _projectionMatrix The projection matrix from the camera
 		//----------------------------------------------------------------------------------------------------------------------
-		void draw(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, const ngl::Mat4 _projectionMatrix);
+		void draw(const ngl::Mat4 _viewMatrix, const ngl::Mat4 _projectionMatrix);
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Update function to evaluate the Plant simulation
 		//----------------------------------------------------------------------------------------------------------------------
@@ -97,11 +96,10 @@ class Plant
 
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Calculate and load the matrices to the shader
-		/// @param _mouseGlobalTX The global mouse transformation
 		/// @param _viewMatrix The view matrix from the camera
 		/// @param _projectionMatrix The projection matrix from the camera
 		//----------------------------------------------------------------------------------------------------------------------
-		void loadMatricesToShader(const ngl::Mat4& _mouseGlobalTX, const ngl::Mat4 _viewMatrix, const ngl::Mat4 _projectionMatrix) const;
+		void loadMatricesToShader(const ngl::Mat4 _viewMatrix, const ngl::Mat4 _projectionMatrix) const;
 		//----------------------------------------------------------------------------------------------------------------------
 		/// @brief Calculate axis-angle rotation matrix
 		/// @param _angle The angle to rotate in radians

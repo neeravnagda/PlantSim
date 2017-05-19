@@ -110,17 +110,13 @@ void NGLScene::resizeGL(int _w , int _h)
 {
 	//Set the camera and window parameters
 	m_camera.setShape(45, static_cast<float>(width())/height(), 0.001f, 60.0f);
-	m_win.width  = static_cast<int>( _w * devicePixelRatio() );
-	m_win.height = static_cast<int>( _h * devicePixelRatio() );
 }
 //----------------------------------------------------------------------------------------------------------------------
 void NGLScene::initializeGL()
 {
-	// we need to initialise the NGL lib which will load all of the OpenGL functions, this must
-	// be done once we have a valid GL context but before we call any GL commands. If we dont do
-	// this everything will crash
-	ngl::NGLInit::instance();
-	glClearColor(0.57f, 0.77f, 0.92f, 1.0f);			   // Light blue background
+	QWidget::setFocusPolicy(Qt::StrongFocus);//Set keyboard focus
+	ngl::NGLInit::instance();//Initialise the ngl library
+	glClearColor(0.57f, 0.77f, 0.92f, 1.0f);// Light blue background
 	// enable depth testing for drawing
 	glEnable(GL_DEPTH_TEST);
 	// enable multisampling for smoother drawing
@@ -160,16 +156,7 @@ void NGLScene::drawScene()
 {
 	//Calculate the matrices for the ground plane
 	ngl::ShaderLib *shader = ngl::ShaderLib::instance();
-	ngl::Mat4 rotX;
-	ngl::Mat4 rotY;
-	rotX.rotateX(m_win.spinXFace);
-	rotY.rotateY(m_win.spinYFace);
-	m_mouseGlobalTX=rotY*rotX;
-	m_mouseGlobalTX.m_30 = m_modelPos.m_x;
-	m_mouseGlobalTX.m_31 = m_modelPos.m_y;
-	m_mouseGlobalTX.m_32 = m_modelPos.m_z;
 	ngl::Mat4 M;
-	M *= m_mouseGlobalTX;
 	ngl::Mat4 MV = M * m_camera.getViewMatrix();
 	ngl::Mat4 MVP = MV * m_camera.getProjectionMatrix();
 	ngl::Mat3 N = MV;
@@ -194,7 +181,7 @@ void NGLScene::drawScene()
 	//Draw the plants if visible
 	for (Plant &p : m_plants)
 	{
-		if (p.visibility()) p.draw(m_mouseGlobalTX, m_camera.getViewMatrix(), m_camera.getProjectionMatrix());
+		if (p.visibility()) p.draw(m_camera.getViewMatrix(), m_camera.getProjectionMatrix());
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -202,7 +189,143 @@ void NGLScene::paintGL()
 {
 	// clear the screen and depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glViewport(0,0,m_win.width,m_win.height);
+	glViewport(0,0,width(),height());
 	drawScene();	//Draw the ground plane then call each Plant draw call
+}
+//----------------------------------------------------------------------------------------------------------------------
+void NGLScene::keyPressEvent(QKeyEvent *_event)
+{
+	switch (_event->key()) {
+		//WASD movement
+		//Move forward
+		case Qt::Key_W:
+		{
+			ngl::Vec4 forward = m_camera.getN() * -0.05f;
+			m_camera.moveBoth(forward.m_x, forward.m_y, forward.m_z);
+			break;
+		}
+		//Move back
+		case Qt::Key_S:
+		{
+			ngl::Vec4 backward = m_camera.getN() * 0.05f;
+			m_camera.moveBoth(backward.m_x, backward.m_y, backward.m_z);
+			break;
+		}
+		//Move left
+		case Qt::Key_A:
+		{
+			ngl::Vec4 left = m_camera.getU() * -0.05f;
+			m_camera.moveBoth(left.m_x, left.m_y, left.m_z);
+			break;
+		}
+		//Move right
+		case Qt::Key_D:
+		{
+			ngl::Vec4 right = m_camera.getU() * 0.05f;
+			m_camera.moveBoth(right.m_x, right.m_y, right.m_z);
+			break;
+		}
+		//Arrow keys movement
+		//Move forward
+		case Qt::Key_Up:
+		{
+			ngl::Vec4 forward = m_camera.getN() * -0.05f;
+			m_camera.moveBoth(forward.m_x, forward.m_y, forward.m_z);
+			break;
+		}
+		//Move back
+		case Qt::Key_Down:
+		{
+			ngl::Vec4 backward = m_camera.getN() * 0.05f;
+			m_camera.moveBoth(backward.m_x, backward.m_y, backward.m_z);
+			break;
+		}
+		//Move left
+		case Qt::Key_Left:
+		{
+			ngl::Vec4 left = m_camera.getU() * -0.05f;
+			m_camera.moveBoth(left.m_x, left.m_y, left.m_z);
+			break;
+		}
+		//Move right
+		case Qt::Key_Right:
+		{
+			ngl::Vec4 right = m_camera.getU() * 0.05f;
+			m_camera.moveBoth(right.m_x, right.m_y, right.m_z);
+			break;
+		}
+		//Reset the camera
+		case Qt::Key_Space:
+		{
+			m_camera.set(ngl::Vec3(0.0f, 0.6f, 1.6f),//from
+									 ngl::Vec3::zero(),//to
+									 ngl::Vec3::up());//up
+			break;
+		}
+		default: break;
+	}
+	update();
+}
+//----------------------------------------------------------------------------------------------------------------------
+void NGLScene::mouseMoveEvent( QMouseEvent* _event )
+{
+	//Rotate the camera
+	if ( m_rotate && _event->buttons() == Qt::LeftButton )
+	{
+		//The mouse movement
+		int diffx = _event->x() - m_origX;
+		int diffy = _event->y() - m_origY;
+		//Calculate a y-rotation
+		ngl::Mat4 rotY;
+		rotY.rotateY(diffx);
+		//Calculate a screen space up rotation
+		ngl::Mat4 rotUp;
+		rotUp.euler(diffy, m_camera.getU().m_x, m_camera.getU().m_y, m_camera.getU().m_z);
+		//Move the look vector to the origin
+		ngl::Vec4 look = m_camera.getLook() - m_camera.getEye();
+		//Rotate the look vector about the origin
+		look = rotY * rotUp * look;
+		//Move the look vector back to the transformed position
+		look += m_camera.getEye();
+		//Set the updated camera
+		m_camera.set(m_camera.getEye().toVec3(), look.toVec3(), ngl::Vec3::up());
+		//Update the mouse positions
+		m_origX = _event->x();
+		m_origY = _event->y();
+		//Update the window
+		update();
+	}
+}
+//----------------------------------------------------------------------------------------------------------------------
+void NGLScene::mousePressEvent( QMouseEvent* _event )
+{
+	//Set the rotation flag to true
+	if ( _event->button() == Qt::LeftButton )
+	{
+		m_origX  = _event->x();
+		m_origY  = _event->y();
+		m_rotate = true;
+	}
+}
+//----------------------------------------------------------------------------------------------------------------------
+void NGLScene::mouseReleaseEvent( QMouseEvent* _event )
+{
+	//Set the rotation flag to false
+	if ( _event->button() == Qt::LeftButton )
+	{
+		m_rotate = false;
+	}
+}
+//----------------------------------------------------------------------------------------------------------------------
+void NGLScene::wheelEvent( QWheelEvent* _event )
+{
+	//Calculate a direction vector
+	ngl::Vec4 moveDirection = m_camera.getEye() - m_camera.getLook();
+	//Normalise and scale the vector by the mouse wheel movement
+	moveDirection.normalize();
+	moveDirection *= _event->delta() * -0.01f;
+	//Move the camera
+	m_camera.moveBoth(moveDirection.m_x, moveDirection.m_y, moveDirection.m_z);
+	update();
 }
 //----------------------------------------------------------------------------------------------------------------------
